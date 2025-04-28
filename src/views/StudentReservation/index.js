@@ -243,12 +243,18 @@ const StudentReservation = () => {
     {
       field: 'startDate',
       headerName: 'Start Date',
-      flex: 1
+      flex: 1,
+      renderCell: (params) => {
+        return <Box>{moment(params.value).format('DD-MM-YYYY')}</Box>;
+      }
     },
     {
       field: 'endDate',
       headerName: 'End Date',
-      flex: 1
+      flex: 1,
+      renderCell: (params) => {
+        return <Box>{moment(params.value).format('DD-MM-YYYY')}</Box>;
+      }
     },
     {
       field: 'address',

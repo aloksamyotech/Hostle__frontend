@@ -66,14 +66,6 @@ import {
         icon: icons.IconNotebook,
         breadcrumbs: false
       },
-      // {
-      //   id: '02',
-      //   title: 'Hostel Administrators',
-      //   type: 'item',
-      //   url: '/superadmindashboard/administrator',
-      //   icon: icons.IconUserPlus,
-      //   breadcrumbs: false
-      // }
     ]
   };
   export default superdashboard;

@@ -75,7 +75,7 @@ const ConsumptionInventory = (props) => {
       console.log("response ====>",response);
 
       if(response.status === 205){
-        toast.warning("Insufficient Consume Quantity");
+        toast.error("Insufficient Consume Quantity");
         console.log("Consume quantity cannot be greater than remaining or purchase quantity.");
       }
 

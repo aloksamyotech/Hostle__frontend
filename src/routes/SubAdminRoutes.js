@@ -33,6 +33,9 @@ const Expenditure = Loadable(lazy(() => import('views/Expenditure')));
 const Payment = Loadable(lazy(() => import('views/Payment')));
 const NoticeBoard = Loadable(lazy(() => import('views/NoticeBoard')));
 const WeeklyFoodMenu = Loadable(lazy(() => import('views/WeeklyFoodMenu')));
+const RoomType = Loadable(lazy(() => import('views/RoomType')));
+
+const ViewBeds = Loadable(lazy(() => import('views/Room/ViewBeds')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -58,10 +61,11 @@ const SubAdminRoutes = {
       children: [
         {
           path: 'student',
-          element: <Student/>
-        },{
+          element: <Student />
+        },
+        {
           path: 'student/view/:id',
-          element: <ViewStudent/>
+          element: <ViewStudent />
         }
       ]
     },
@@ -70,7 +74,7 @@ const SubAdminRoutes = {
       children: [
         {
           path: 'complaints',
-          element: <Complaints/>
+          element: <Complaints />
         }
       ]
     },
@@ -80,9 +84,24 @@ const SubAdminRoutes = {
         {
           path: 'room',
           element: <Room />
-        },{
+        },
+        {
           path: 'room/view/:id',
-          element: <ViewRoom/>
+          element: <ViewRoom />
+        },
+        {
+          path: 'room/view_beds/:id',
+          element: <ViewBeds />
+        }
+      ]
+    },
+
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'roomtype',
+          element: <RoomType />
         }
       ]
     },
@@ -91,7 +110,7 @@ const SubAdminRoutes = {
       children: [
         {
           path: 'visitor',
-          element: <Visitors/>
+          element: <Visitors />
         }
       ]
     },
@@ -101,13 +120,14 @@ const SubAdminRoutes = {
         {
           path: 'student_reservation',
           element: <StudentReservation />
-        },{
+        },
+        {
           path: 'student_reservation/view/:id',
-          element: <ViewReserveStudent/>
-        },{
+          element: <ViewReserveStudent />
+        },
+        {
           path: 'student_reservation/view_profile/:id',
-          element: <ProfileDetails/>
-
+          element: <ProfileDetails />
         }
       ]
     },
@@ -116,7 +136,7 @@ const SubAdminRoutes = {
       children: [
         {
           path: 'canteen_inventory',
-          element: <CanteenInventory/>
+          element: <CanteenInventory />
         }
       ]
     },
@@ -125,7 +145,7 @@ const SubAdminRoutes = {
       children: [
         {
           path: 'purches_inventory',
-          element: <InventoryPurches/>
+          element: <InventoryPurches />
         }
       ]
     },
@@ -134,7 +154,7 @@ const SubAdminRoutes = {
       children: [
         {
           path: 'consume_inventory',
-          element: <InventoryConsumption/>
+          element: <InventoryConsumption />
         }
       ]
     },
@@ -143,7 +163,7 @@ const SubAdminRoutes = {
       children: [
         {
           path: 'expenditures',
-          element: <Expenditure/>
+          element: <Expenditure />
         }
       ]
     },
@@ -152,7 +172,7 @@ const SubAdminRoutes = {
       children: [
         {
           path: 'notice_board',
-          element: <NoticeBoard/>
+          element: <NoticeBoard />
         }
       ]
     },
@@ -161,7 +181,7 @@ const SubAdminRoutes = {
       children: [
         {
           path: 'weekly_foodmenu',
-          element: <WeeklyFoodMenu/>
+          element: <WeeklyFoodMenu />
         }
       ]
     },
@@ -170,7 +190,7 @@ const SubAdminRoutes = {
       children: [
         {
           path: 'payments',
-          element: <Payment/>
+          element: <Payment />
         }
       ]
     }
