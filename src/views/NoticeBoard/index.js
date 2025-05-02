@@ -159,10 +159,18 @@ const NoticeBoard = () => {
 
   const columns = [
     {
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+    },
+    {
       field: 'noticeTitle',
       headerName: 'Notice Title',
       flex: 1,
-      cellClassName: 'name-column--cell name-column--cell--capitalize',
+      cellClassName: 'name-column--cell--capitalize',
       renderCell: (params) => {
         return (
           <Box>
@@ -208,51 +216,6 @@ const NoticeBoard = () => {
             </Button>
           </Stack>
         </Stack>
-        {/* <TableStyle>
-          <Box width="100%">
-            <Card>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <HeaderCell>Notice Title</HeaderCell>
-                      <HeaderCell>Description</HeaderCell>
-                      <HeaderCell>Date & Time</HeaderCell>
-                      <HeaderCell>Action</HeaderCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {allNotice.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell>{row.noticeTitle}</TableCell>
-                        <TableCell>{row.description}</TableCell>
-                        <TableCell>{moment(row.dateTime).format('YYYY-MM-DD HH:mm')}</TableCell>
-                        <TableCell>
-                          <Stack direction="row">
-                            <IconButton onClick={() => handleEdit(row._id)} aria-label="edit" style={{ color: 'green' }}>
-                              <EditOutlined />
-                            </IconButton>
-                            <IconButton onClick={() => handleDelete(row._id)} aria-label="delete" style={{ color: 'red' }}>
-                              <DeleteOutline />
-                            </IconButton>
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <TablePagination
-                component="div"
-                count={totalCount}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            </Card>
-          </Box>
-        </TableStyle> */}
 
         <TableStyle>
           <Box width="100%">

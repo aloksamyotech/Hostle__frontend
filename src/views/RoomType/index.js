@@ -8,10 +8,10 @@ import {
   Card,
   Table,
   TableBody,
-  TableCell,
+  TableCell as MuiTableCell,
   TableContainer,
   TableHead,
-  TableRow,
+  TableRow as MuiTableRow,
   IconButton,
   Dialog,
   DialogTitle,
@@ -21,53 +21,40 @@ import {
   MenuItem,
   Popover
 } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import Iconify from '../../ui-component/iconify';
-import AddHostel from './AddHostel';
 import { EditOutlined, DeleteOutline } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import TableStyle from '../../ui-component/TableStyle';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
-import { render } from '@fullcalendar/core/preact';
+import AddRoomType from './AddRoomType';
 
-const Hostel = () => {
-  const navigate = useNavigate();
-  const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-
+const RoomType = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [hostelData, setHostelData] = useState([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [editHostel, setEditHostel] = useState(null);
-  const [deleteHostelId, setDeleteHostelId] = useState(null);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [hostelId, setHostelId] = useState(null);
+  const [roomData, setRoomData] = useState([]);
+  const [deleteStudentId, setDeleteStudentId] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [rowData, setRowData] = useState(null);
 
-  useEffect(() => {
-    fetchHostelData();
-  }, [openAdd]);
-
-  const fetchHostelData = async () => {
-    try {
-      const response = await axios.get(`${REACT_APP_BACKEND_URL}/hostel/list`);
-      console.log('response==>', response);
-      setHostelData(response.data.result);
-      setTotalCount(response.data.totalRecodes);
-    } catch (error) {
-      console.error('Error fetching hostel data:', error);
-    }
+  const handleOpenAdd = () => {
+    setOpenAdd(true);
   };
 
-  const handleNavigate = (_id) => {
-    navigate(`/superadmindashboard/hostel/view/${_id}`);
+  const handleCloseAdd = () => {
+    setOpenAdd(false);
+    handleClose();
   };
+
+  const navigate = useNavigate();
+  const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   const handleClick = (event, row) => {
     setAnchorEl(event.currentTarget);
@@ -81,25 +68,34 @@ const Hostel = () => {
 
   const open = Boolean(anchorEl);
 
-  const handleOpenAdd = () => {
+  // Get Hostel Obj Id Which is Set in Cookies
+  useEffect(() => {
+    const Hos_Id = Cookies.get('_Id');
+    if (Hos_Id) {
+      setHostelId(Hos_Id);
+    }
+    fetchRoomTypesData(Hos_Id);
+  }, [openAdd]);
+
+  // Fetch All Room's Data Here
+  const fetchRoomTypesData = async (hostelId) => {
+    try {
+      const response = await axios.get(`${REACT_APP_BACKEND_URL}/roomTypes/getall/${hostelId}`);
+      setRoomData(response.data.result);
+    } catch (error) {
+      console.error('Error fetching room data:', error);
+    }
+  };
+
+  const handleEdit = () => {
     setOpenAdd(true);
-    setEditHostel(null);
+    setRowData(row);
   };
 
-  const handleCloseAdd = () => {
-    setOpenAdd(false);
-    handleClose();
-  };
-
-  const handleEdit = (id) => {
-    const hostel = hostelData.find((hostel) => hostel._id === id);
-    setOpenAdd(true);
-    setEditHostel(hostel);
-  };
-
+  // Handle Delete Action Here
   const handleDelete = (id) => {
     setOpenDeleteDialog(true);
-    setDeleteHostelId(id);
+    setDeleteStudentId(id);
   };
 
   const handleCloseDeleteDialog = () => {
@@ -109,33 +105,13 @@ const Hostel = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      const response = await axios.delete(`${REACT_APP_BACKEND_URL}/hostel/delete/${deleteHostelId}`);
-      console.log('handleConfirmDelete :', response);
-
-      if (response.status === 200) {
-        console.log('Hostel Data Delete Successfully !!');
-        toast.success('Hostel Data Delete Successfully !!');
-      } else {
-        toast.error('Failed to Delete Hostel Data !!');
-        console.error('Failed to Delete Hostel Data !!');
-      }
-
+      await axios.delete(`${REACT_APP_BACKEND_URL}/roomTypes/delete/${rowData._id}`);
       setOpenDeleteDialog(false);
+      fetchRoomTypesData(hostelId);
       handleClose();
-      fetchHostelData();
     } catch (error) {
-      console.error('Error deleting hostel:', error);
+      console.error('Error deleting room:', error);
     }
-  };
-
-  const handleChangePage = (event, newPage) => {
-    console.log('New Page:', newPage);
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
   };
 
   const columns = [
@@ -148,38 +124,38 @@ const Hostel = () => {
       renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
     },
     {
-      field: 'hostelName',
-      headerName: 'Hostel Name',
+      field: 'roomType',
+      headerName: 'Room Type',
       flex: 1,
-      cellClassName: 'name-column--cell name-column--cell--capitalize',
+      cellClassName: 'name-column--cell--capitalize'
+    },
+    {
+      field: 'roomCategory',
+      headerName: 'Room Category',
+      flex: 1,
       renderCell: (params) => {
+        const isAc = params.value === 'AC';
         return (
-          <Box onClick={() => handleNavigate(params.row._id)} sx={{ cursor: 'pointer' }}>
-            <Typography variant="body1" fontWeight="bold">
-              {params.row.hostelName}
-            </Typography>
-            <Typography variant="body2" color="textSecondary">
-              {params.row.hostelPhoneNumber}
-            </Typography>
+          <Box
+            sx={{
+              px: 1.5,
+              py: 0.5,
+              width: '70px',
+              borderRadius: 1,
+              color: '#fff',
+              backgroundColor: isAc ? 'info.main' : '#be4732',
+              display: 'inline-block',
+              textAlign: 'center',
+              textTransform: 'uppercase',
+              fontWeight: 'bold'
+            }}
+          >
+            {isAc ? 'AC' : 'Non-AC'}
           </Box>
         );
       }
     },
-    {
-      field: 'ownerName',
-      headerName: 'Owner Name',
-      flex: 1
-    },
-    {
-      field: 'ownerPhoneNumber',
-      headerName: 'Owner ContactNo.',
-      flex: 1
-    },
-    {
-      field: 'address',
-      headerName: 'Address',
-      flex: 2
-    },
+
     {
       field: 'action',
       headerName: 'Action',
@@ -194,11 +170,11 @@ const Hostel = () => {
 
   return (
     <>
-      <AddHostel open={openAdd} handleClose={handleCloseAdd} editHostelData={editHostel} />
+      <AddRoomType open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} rowData={rowData} />
       <Container>
-        <Stack direction="row" alignItems="center" mb={5} justifyContent="space-between">
-          <Typography variant="h4">Hostel Basic Information</Typography>
-          <Stack direction="row" alignItems="center">
+        <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
+          <Typography variant="h3">Room Types Details</Typography>
+          <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
             <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
               Add New
             </Button>
@@ -208,9 +184,9 @@ const Hostel = () => {
         <TableStyle>
           <Box width="100%">
             <Card style={{ height: '600px', paddingTop: '15px' }}>
-              {hostelData && (
+              {roomData && (
                 <DataGrid
-                  rows={hostelData}
+                  rows={roomData}
                   columns={columns}
                   getRowId={(row) => row?._id}
                   slots={{ toolbar: GridToolbar }}
@@ -222,10 +198,11 @@ const Hostel = () => {
         </TableStyle>
       </Container>
 
+      {/* Dialog for Delete */}
       <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-        <DialogTitle>Delete Hostel</DialogTitle>
+        <DialogTitle variant="h4">Delete Room</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete this Hostel?</Typography>
+          <Typography variant="body2">Are you sure you want to delete this Room Type Details?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteDialog} variant="contained" color="primary">
@@ -264,5 +241,4 @@ const Hostel = () => {
     </>
   );
 };
-
-export default Hostel;
+export default RoomType;

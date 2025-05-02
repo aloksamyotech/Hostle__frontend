@@ -1,7 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Button, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, FormLabel,
-  Grid, MenuItem, TextField, Typography, InputAdornment, IconButton, List, ListItem
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormHelperText,
+  FormLabel,
+  Grid,
+  MenuItem,
+  TextField,
+  Typography,
+  InputAdornment,
+  IconButton,
+  List,
+  ListItem,
+  FormControl,
+  InputLabel,
+  Select
 } from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import axios from 'axios';
@@ -9,122 +25,130 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { paymentValidationSchema } from 'views/Validation/validationSchema';
 import moment from 'moment';
+import { ToastContainer, toast } from 'react-toastify';
 
 const AddPayment = (props) => {
-  console.log("In Add Payment =>",props);
   const { open, handleClose, hostelId, currentStudent } = props;
+
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   const [studentList, setStudentList] = useState([]);
+  const [paymentdata, setPaymentData] = useState();
 
-  const [filteredStudentList, setFilteredStudentList] = useState([]);
-
-  const [inputValue, setInputValue] = useState('');
-
-  const [selectedStudentName, setSelectedStudentName] = useState('');
-
-  useEffect(() => {
-    if (open) {
-      console.log("URL =>",`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
-      axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`)
-        .then(response => {
-          console.log("in hook =>",response);
-          const studentData = response.data.result.map(student => ({
-            studentName : student.studentName, 
-            studentPhoneNo: student.studentPhoneNo,
-          }));
-          setStudentList(studentData);
-        })
-        .catch(error => {
-          console.log("Error fetching student data", error);
-        });
+  const fetchStudents = async (hostelId) => {
+    try {
+      const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
+      const activeStudents = response.data.result.filter((item) => item.status === 'active');
+      setStudentList(activeStudents);
+    } catch (error) {
+      console.error('Error fetching room data:', error);
     }
-  }, [open, hostelId]);
-  console.log("studentList==>",studentList);
+  };
 
-  useEffect(() => {
-    console.log("Filtering students with phone number input:", inputValue);
-    if (inputValue) {
-      const filteredStudents = studentList.filter(student => {
-        const phoneNo = student.studentPhoneNo?.toString();
-        return phoneNo.includes(inputValue);
+  const handleStudentChange = async (studentId) => {
+    formik.setFieldValue('studentId', studentId);
+
+    try {
+      const res1 = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/getStudent/${studentId}`);
+      const assignedData = res1.data.data;
+      console.log('assignedData ---------->', assignedData);
+
+      const res2 = await axios.get(`${REACT_APP_BACKEND_URL}/student_payment/getRemaningData/${studentId}`);
+      console.log('res2 :', res2);
+
+      const paymentData = res2.data?.result;
+      console.log('paymentData ---------->', paymentData);
+      setPaymentData(paymentData);
+
+      const totalRent = assignedData?.totalRent || 0;
+      const remainingAmount = paymentData != null ? paymentData.remainingAmount : totalRent;
+
+      formik.setValues({
+        ...formik.values,
+        studentId,
+        totalStayingMonth: assignedData?.stayMonths || '',
+        roomNo: assignedData?.roomNumber || '',
+        roomType: assignedData?.roomType || '',
+        bedNo: assignedData?.bedNumber || '',
+        roomRent: assignedData?.roomRent || '',
+        foodFee: assignedData?.foodFee || '',
+        libraryFee: assignedData?.libraryFee || '',
+        totalRent: totalRent,
+        remainingAmount: remainingAmount
       });
-      console.log("Filtered students:", filteredStudents);
-      setFilteredStudentList(filteredStudents);
-    } else {
-      setFilteredStudentList([]);
+    } catch (error) {
+      console.error('Error fetching student/payment data:', error);
     }
-  }, [inputValue, studentList]);
-
-
- 
-  const handleStudentSelect = (name) => {
-    setSelectedStudentName(name);
-    setInputValue(name);
-    setFilteredStudentList([]);
   };
 
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
-    setSelectedStudentName('');
-  };
-
-  
-  
+  useEffect(() => {
+    fetchStudents(hostelId);
+  }, [open]);
 
   const formik = useFormik({
     initialValues: {
-      studentName: '',
-      month: '',
-      paymentDate: '',
-      paymentType: '',
-      paymentAmount: '',
-      paymentAttachment: '',
+      studentId: '',
+      totalStayingMonth: '',
+      roomNo: '',
+      roomType: '',
+      bedNo: '',
+      roomRent: '',
+      foodFee: '',
+      libraryFee: '',
+      totalRent: '',
+      remainingAmount: '',
+      paymentMethod: '',
+      date: '',
+      paymentAmount: ''
     },
     validationSchema: paymentValidationSchema,
 
     onSubmit: async (values) => {
-      console.log("values========>",values);
-
-     
-
-      const formData = new FormData();
-      formData.append('studentName', selectedStudentName); 
-    
-      Object.keys(values).forEach(key => {
-        if (key !== 'studentName') {
-          formData.append(key, values[key]);
-        }
-      });
+      console.log('values :', values);
 
       try {
-        let response;
+        const response = await axios.post(`${REACT_APP_BACKEND_URL}/student_payment/add/${hostelId}`, values);
 
-        if(currentStudent){
-          console.log("in if");
-        }
-        else{
-          response = await axios.post(`${REACT_APP_BACKEND_URL}/student_payment/add/${hostelId}`, formData);
-        }
-        
-        if (response.status === 201 || response.status === 200) {
-          console.log("Payment added successfully!");
-          handleClose();
+        if (response.status === 201) {
+          toast.success('Payment Details Added Successfully !!');
         } else {
-          console.error('Failed to save data');
+          toast.error('Failed to Add Payment Details');
         }
+
+        handleClose();
+        formik.resetForm();
       } catch (error) {
-        console.log("Error while submitting the form", error);
+        console.log('Error=>', error);
+        toast.error('Something went wrong!');
       }
-    },
+    }
   });
 
+  // useEffect(() => {
+  //   if (paymentdata !== null) {
+  //     console.log("paymentData :",paymentdata);
+
+  //     const paymentAmount = parseFloat(formik.values.paymentAmount) || 0;
+  //     const totalRent = paymentdata?.remainingAmount;
+  //     const remaining = totalRent - paymentAmount;
+  //     console.log('vaishnaviiiiiiiiiii remaining :', remaining);
+
+  //     formik.setFieldValue('remainingAmount', remaining);
+  //   } else {
+  //     const totalRent = parseFloat(formik.values.totalRent) || 0;
+  //     const paymentAmount = parseFloat(formik.values.paymentAmount) || 0;
+  //     const remaining = totalRent - paymentAmount;
+  //     formik.setFieldValue('remainingAmount', remaining);
+  //   }
+  // }, [formik.values.paymentAmount]);
+
   useEffect(() => {
-    if (open) {
-      formik.resetForm();
-      setInputValue('')
-    }
-  }, [open]);
+    const total = paymentdata?.remainingAmount ?? (parseFloat(formik.values.totalRent) || 0);
+    const paid = parseFloat(formik.values.paymentAmount) || 0;
+    const remaining = total - paid;
+
+    formik.setFieldValue('remainingAmount', remaining);
+  }, [formik.values.paymentAmount]);
 
   return (
     <Dialog open={open} onClose={handleClose} aria-labelledby="add-payment-dialog-title">
@@ -134,144 +158,124 @@ const AddPayment = (props) => {
       </DialogTitle>
       <DialogContent dividers>
         <form onSubmit={formik.handleSubmit}>
-          <Grid container spacing={3}>
-            
-            <Grid item xs={12}>
-              <FormLabel>Student Name</FormLabel>
-              <TextField
-                id="studentName"
-                name="studentName"
+          <Grid container spacing={2}>
+            {/* Select Student */}
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Select Student</FormLabel>
+              <Select
+                name="studentId"
+                value={formik.values.studentId}
+                onChange={(e) => handleStudentChange(e.target.value)}
                 size="small"
                 fullWidth
-                value={inputValue}
-                onChange={handleInputChange}
-                placeholder="Enter Phone Number"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setInputValue('')}>
-                        <ClearIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                error={formik.touched.studentName && !!formik.errors.studentName}
-                helperText={formik.touched.studentName && formik.errors.studentName}
-              />
-              {filteredStudentList.length > 0 && (
-                <List style={{ border: '1px solid #ddd', marginTop: 4 }}>
-                  {filteredStudentList.map(student => (
-                    <ListItem
-                      key={student.studentPhoneNo}
-                      onClick={() => handleStudentSelect(student.studentName)}
-                    >
-                      {student.studentName}
-                    </ListItem>
-                  ))}
-                </List>
-              )}
+              >
+                {studentList.map((student) => (
+                  <MenuItem key={student._id} value={student._id}>
+                    {student.studentName}
+                  </MenuItem>
+                ))}
+              </Select>
             </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <FormLabel>Month</FormLabel>
-              <TextField
-                id="month"
-                name="month"
-                size="small"
-                select
-                fullWidth
-                value={formik.values.month}
-                onChange={formik.handleChange}
-                error={formik.touched.month && !!formik.errors.month}
-              >
-                <MenuItem value=""><em>Select Month</em></MenuItem>
-                <MenuItem value="January">January</MenuItem>
-                <MenuItem value="February">February</MenuItem>
-                <MenuItem value="March">March</MenuItem>
-                <MenuItem value="April">April</MenuItem>
-                <MenuItem value="May">May</MenuItem>
-                <MenuItem value="June">June</MenuItem>
-                <MenuItem value="July">July</MenuItem>
-                <MenuItem value="August">August</MenuItem>
-                <MenuItem value="September">September</MenuItem>
-                <MenuItem value="October">October</MenuItem>
-                <MenuItem value="November">November</MenuItem>
-                <MenuItem value="December">December</MenuItem>
-              </TextField>
-              {formik.touched.month && formik.errors.month && (
-                <FormHelperText error>{formik.errors.month}</FormHelperText>
-              )}
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Total Staying Month</FormLabel>
+              <TextField name="totalStayingMonth" value={formik.values.totalStayingMonth} size="small" fullWidth disabled />
             </Grid>
-            <Grid item xs={12} sm={6}>
+
+            {/* Room Number */}
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Room Number</FormLabel>
+              <TextField name="roomNo" value={formik.values.roomNo} size="small" fullWidth disabled />
+            </Grid>
+
+            {/* Room Type */}
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Room Type</FormLabel>
+              <TextField name="roomType" value={formik.values.roomType} size="small" fullWidth disabled />
+            </Grid>
+
+            {/* Bed Number */}
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Bed Number</FormLabel>
+              <TextField name="bedNo" value={formik.values.bedNo} size="small" fullWidth disabled />
+            </Grid>
+
+            {/* Room Rent */}
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Room Rent</FormLabel>
+              <TextField name="roomRent" value={formik.values.roomRent} size="small" fullWidth disabled />
+            </Grid>
+
+            {/* Food Fee */}
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Food Fee</FormLabel>
+              <TextField name="foodFee" value={formik.values.foodFee} size="small" fullWidth disabled />
+            </Grid>
+
+            {/* Library Fee */}
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Library Fee</FormLabel>
+              <TextField name="libraryFee" value={formik.values.libraryFee} size="small" fullWidth disabled />
+            </Grid>
+
+            {/* Total Rent */}
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Total Rent</FormLabel>
+              <TextField name="totalRent" value={formik.values.totalRent} size="small" fullWidth disabled />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Remaining Amount</FormLabel>
+              <TextField type="number" name="remainingAmount" value={formik.values.remainingAmount} size="small" fullWidth disabled />
+            </Grid>
+
+            {/* Payment Method */}
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Payment Method</FormLabel>
+              <FormControl size="small" fullWidth required>
+                <Select name="paymentMethod" value={formik.values.paymentMethod} onChange={formik.handleChange}>
+                  <MenuItem value="UPI">UPI</MenuItem>
+                  <MenuItem value="Cash">Cash</MenuItem>
+                  <MenuItem value="Card">Card</MenuItem>
+                  <MenuItem value="Net Banking">Net Banking</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            {/* Select Month */}
+            <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Date</FormLabel>
               <TextField
-                id="paymentDate"
-                name="paymentDate"
-                size="small"
                 type="date"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={formik.values.paymentDate}
+                name="date"
+                value={formik.values.date}
                 onChange={formik.handleChange}
-                error={formik.touched.paymentDate && !!formik.errors.paymentDate}
-                helperText={formik.touched.paymentDate && formik.errors.paymentDate}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormLabel>Payment Method</FormLabel>
-              <TextField
-                id="paymentType"
-                name="paymentType"
-                size="small"
-                select
-                fullWidth
-                value={formik.values.paymentType}
-                onChange={formik.handleChange}
-                error={formik.touched.paymentType && !!formik.errors.paymentType}
-              >
-                <MenuItem value=""><em>Select Payment Method</em></MenuItem>
-                <MenuItem value="Cash">Cash</MenuItem>
-                <MenuItem value="Online Payment">Online Payment</MenuItem>
-                <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
-              </TextField>
-              {formik.touched.paymentType && formik.errors.paymentType && (
-                <FormHelperText error>{formik.errors.paymentType}</FormHelperText>
-              )}
-            </Grid>
-            <Grid item xs={12}>
-              <FormLabel>Payment Amount</FormLabel>
-              <TextField
-                id="paymentAmount"
-                name="paymentAmount"
-                size="small"
-                type="number"
-                fullWidth
-                value={formik.values.paymentAmount}
-                onChange={formik.handleChange}
-                error={formik.touched.paymentAmount && !!formik.errors.paymentAmount}
-                helperText={formik.touched.paymentAmount && formik.errors.paymentAmount}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormLabel>Payment Attachment (optional)</FormLabel>
-              <TextField
-                id="paymentAttachment"
-                name="paymentAttachment"
-                type="file"
                 size="small"
                 fullWidth
-                onChange={(event) => {
-                  const file = event.currentTarget.files[0];
-                  formik.setFieldValue('paymentAttachment', file); // Set the file
+                required
+                InputLabelProps={{
+                  shrink: true
                 }}
               />
-              {formik.touched.paymentAttachment && formik.errors.paymentAttachment && (
-                <FormHelperText error>{formik.errors.paymentAttachment}</FormHelperText>
-              )}
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Payment Amount</FormLabel>
+              <TextField
+                type="number"
+                name="paymentAmount"
+                value={formik.values.paymentAmount}
+                onChange={formik.handleChange}
+                size="small"
+                fullWidth
+                required
+                inputProps={{ min: 0 }}
+              />
             </Grid>
           </Grid>
+
           <DialogActions>
-            <Button onClick={formik.handleSubmit} variant="contained" color="primary" type="submit">
+            <Button variant="contained" color="primary" type="submit">
               Save
             </Button>
             <Button onClick={handleClose} variant="outlined" color="error">
@@ -284,280 +288,3 @@ const AddPayment = (props) => {
   );
 };
 export default AddPayment;
-
-// import React, { useState, useEffect } from 'react';
-// import {
-//   Button, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, FormLabel,
-//   Grid, MenuItem, TextField, Typography, InputAdornment, IconButton, List, ListItem
-// } from '@mui/material';
-// import ClearIcon from '@mui/icons-material/Clear';
-// import axios from 'axios';
-// import { useFormik } from 'formik';
-// import * as Yup from 'yup';
-// import { paymentValidationSchema } from 'views/Validation/validationSchema';
-// import moment from 'moment';
-// import { makeStyles } from '@mui/styles';
-
-// const useStyles = makeStyles((theme) => ({
-//   tableHeader: {
-//     backgroundColor: '#3f51b5',
-//     color: '#fff',
-//   },
-//   tableRow: {
-//     '&:hover': {
-//       backgroundColor: '#f1f1f1',
-//     },
-//   },
-//   formLabel: {
-//     marginBottom: theme.spacing(1),
-//     fontWeight: 'bold',
-//   },
-// }));
-
-// const AddPayment = (props) => {
-//   const classes = useStyles();
-//   const { open, handleClose, hostelId, currentStudent } = props;
-//   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-
-//   const [studentList, setStudentList] = useState([]);
-//   const [filteredStudentList, setFilteredStudentList] = useState([]);
-//   const [inputValue, setInputValue] = useState('');
-//   const [selectedStudentName, setSelectedStudentName] = useState('');
-
-//   useEffect(() => {
-//     if (open) {
-//       axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`)
-//         .then(response => {
-//           const studentData = response.data.result.map(student => ({
-//             studentName: student.studentName, 
-//             studentPhoneNo: student.studentPhoneNo,
-//           }));
-//           setStudentList(studentData);
-//         })
-//         .catch(error => {
-//           console.error("Error fetching student data", error);
-//         });
-//     }
-//   }, [open, hostelId]);
-
-//   useEffect(() => {
-//     if (inputValue) {
-//       const filteredStudents = studentList.filter(student => {
-//         const phoneNo = student.studentPhoneNo?.toString();
-//         return phoneNo.includes(inputValue);
-//       });
-//       setFilteredStudentList(filteredStudents);
-//     } else {
-//       setFilteredStudentList([]);
-//     }
-//   }, [inputValue, studentList]);
-
-//   const handleStudentSelect = (name) => {
-//     setSelectedStudentName(name);
-//     setInputValue(name);
-//     setFilteredStudentList([]);
-//   };
-
-//   const handleInputChange = (event) => {
-//     setInputValue(event.target.value);
-//     setSelectedStudentName('');
-//   };
-
-//   const formik = useFormik({
-//     initialValues: {
-//       studentName: '',
-//       month: '',
-//       paymentDate: '',
-//       paymentType: '',
-//       paymentAmount: '',
-//       paymentAttachment: '',
-//     },
-//     validationSchema: paymentValidationSchema,
-//     onSubmit: async (values) => {
-//       const formData = new FormData();
-//       formData.append('studentName', selectedStudentName); 
-//       Object.keys(values).forEach(key => {
-//         if (key !== 'studentName') {
-//           formData.append(key, values[key]);
-//         }
-//       });
-
-//       try {
-//         let response;
-//         if (currentStudent) {
-//           // Update logic here
-//         } else {
-//           response = await axios.post(`${REACT_APP_BACKEND_URL}/student_payment/add/${hostelId}`, formData);
-//         }
-//         if (response.status === 201 || response.status === 200) {
-//           handleClose();
-//         } else {
-//           console.error('Failed to save data');
-//         }
-//       } catch (error) {
-//         console.error("Error while submitting the form", error);
-//       }
-//     },
-//   });
-
-//   useEffect(() => {
-//     if (open) {
-//       formik.resetForm();
-//       setInputValue('');
-//     }
-//   }, [open]);
-
-//   return (
-//     <Dialog open={open} onClose={handleClose} aria-labelledby="add-payment-dialog-title">
-//       <DialogTitle id="add-payment-dialog-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
-//         <Typography variant="h6">Add Payment</Typography>
-//         <ClearIcon onClick={handleClose} style={{ cursor: 'pointer' }} />
-//       </DialogTitle>
-//       <DialogContent dividers>
-//         <form onSubmit={formik.handleSubmit}>
-//           <Grid container spacing={3}>
-//             <Grid item xs={12}>
-//               <FormLabel className={classes.formLabel}>Student Name</FormLabel>
-//               <TextField
-//                 id="studentName"
-//                 name="studentName"
-//                 size="small"
-//                 fullWidth
-//                 value={inputValue}
-//                 onChange={handleInputChange}
-//                 placeholder="Enter Phone Number"
-//                 InputProps={{
-//                   endAdornment: (
-//                     <InputAdornment position="end">
-//                       <IconButton onClick={() => setInputValue('')}>
-//                         <ClearIcon />
-//                       </IconButton>
-//                     </InputAdornment>
-//                   ),
-//                 }}
-//                 error={formik.touched.studentName && !!formik.errors.studentName}
-//                 helperText={formik.touched.studentName && formik.errors.studentName}
-//               />
-//               {filteredStudentList.length > 0 && (
-//                 <List style={{ border: '1px solid #ddd', marginTop: 4 }}>
-//                   {filteredStudentList.map(student => (
-//                     <ListItem
-//                       key={student.studentPhoneNo}
-//                       onClick={() => handleStudentSelect(student.studentName)}
-//                       className={classes.tableRow}
-//                     >
-//                       {student.studentName}
-//                     </ListItem>
-//                   ))}
-//                 </List>
-//               )}
-//             </Grid>
-
-//             <Grid item xs={12} sm={6}>
-//               <FormLabel className={classes.formLabel}>Month</FormLabel>
-//               <TextField
-//                 id="month"
-//                 name="month"
-//                 size="small"
-//                 select
-//                 fullWidth
-//                 value={formik.values.month}
-//                 onChange={formik.handleChange}
-//                 error={formik.touched.month && !!formik.errors.month}
-//               >
-//                 <MenuItem value=""><em>Select Month</em></MenuItem>
-//                 {['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-//                   .map(month => (
-//                     <MenuItem key={month} value={month}>{month}</MenuItem>
-//                   ))}
-//               </TextField>
-//               {formik.touched.month && formik.errors.month && (
-//                 <FormHelperText error>{formik.errors.month}</FormHelperText>
-//               )}
-//             </Grid>
-//             <Grid item xs={12} sm={6}>
-//               <FormLabel className={classes.formLabel}>Date</FormLabel>
-//               <TextField
-//                 id="paymentDate"
-//                 name="paymentDate"
-//                 size="small"
-//                 type="date"
-//                 fullWidth
-//                 InputLabelProps={{ shrink: true }}
-//                 value={formik.values.paymentDate}
-//                 onChange={formik.handleChange}
-//                 error={formik.touched.paymentDate && !!formik.errors.paymentDate}
-//                 helperText={formik.touched.paymentDate && formik.errors.paymentDate}
-//               />
-//             </Grid>
-//             <Grid item xs={12}>
-//               <FormLabel className={classes.formLabel}>Payment Method</FormLabel>
-//               <TextField
-//                 id="paymentType"
-//                 name="paymentType"
-//                 size="small"
-//                 select
-//                 fullWidth
-//                 value={formik.values.paymentType}
-//                 onChange={formik.handleChange}
-//                 error={formik.touched.paymentType && !!formik.errors.paymentType}
-//               >
-//                 <MenuItem value=""><em>Select Payment Method</em></MenuItem>
-//                 <MenuItem value="Cash">Cash</MenuItem>
-//                 <MenuItem value="Online Payment">Online Payment</MenuItem>
-//                 <MenuItem value="Bank Transfer">Bank Transfer</MenuItem>
-//               </TextField>
-//               {formik.touched.paymentType && formik.errors.paymentType && (
-//                 <FormHelperText error>{formik.errors.paymentType}</FormHelperText>
-//               )}
-//             </Grid>
-//             <Grid item xs={12}>
-//               <FormLabel className={classes.formLabel}>Payment Amount</FormLabel>
-//               <TextField
-//                 id="paymentAmount"
-//                 name="paymentAmount"
-//                 size="small"
-//                 type="number"
-//                 fullWidth
-//                 value={formik.values.paymentAmount}
-//                 onChange={formik.handleChange}
-//                 error={formik.touched.paymentAmount && !!formik.errors.paymentAmount}
-//                 helperText={formik.touched.paymentAmount && formik.errors.paymentAmount}
-//               />
-//             </Grid>
-//             <Grid item xs={12}>
-//               <FormLabel className={classes.formLabel}>Payment Attachment (optional)</FormLabel>
-//               <TextField
-//                 id="paymentAttachment"
-//                 name="paymentAttachment"
-//                 type="file"
-//                 size="small"
-//                 fullWidth
-//                 onChange={(event) => {
-//                   const file = event.currentTarget.files[0];
-//                   formik.setFieldValue('paymentAttachment', file); // Set the file
-//                 }}
-//               />
-//               {formik.touched.paymentAttachment && formik.errors.paymentAttachment && (
-//                 <FormHelperText error>{formik.errors.paymentAttachment}</FormHelperText>
-//               )}
-//             </Grid>
-//           </Grid>
-//           <DialogActions>
-//             <Button onClick={formik.handleSubmit} variant="contained" color="primary" type="submit">
-//               Save
-//             </Button>
-//             <Button onClick={handleClose} variant="outlined" color="error">
-//               Cancel
-//             </Button>
-//           </DialogActions>
-//         </form>
-//       </DialogContent>
-//     </Dialog>
-//   );
-// };
-
-// export default AddPayment;
-
-
-

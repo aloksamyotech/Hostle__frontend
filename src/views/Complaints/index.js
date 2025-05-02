@@ -19,7 +19,8 @@ import {
   DialogActions,
   TablePagination,
   MenuItem,
-  Popover
+  Popover,
+  Chip
 } from '@mui/material';
 import Iconify from '../../ui-component/iconify';
 import AddComplaint from './AddComplaint';
@@ -170,20 +171,42 @@ const ResidentComplaints = () => {
 
   const columns = [
     {
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+    },
+    {
       field: 'studentName',
       headerName: 'Name',
       flex: 1,
       cellClassName: 'name-column--cell--capitalize',
+      renderCell: (params) => {
+        const name = params.row.studentInfo?.studentName || '';
+        const contact = params.row.studentInfo?.studentContact || '';
+
+        return (
+          <Box>
+            <Typography variant="body2" fontWeight="bold">
+              {name}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {contact}
+            </Typography>
+          </Box>
+        );
+      }
     },
-    {
-      field: 'studentPhoneNo',
-      headerName: 'PhoneNo',
-      flex: 1
-    },
+
     {
       field: 'roomNumber',
       headerName: 'Room Number',
-      flex: 1
+      flex: 1,
+      renderCell: (params) => {
+        return params.row.roomData?.roomNumber;
+      }
     },
     {
       field: 'datetime',
@@ -196,12 +219,37 @@ const ResidentComplaints = () => {
     {
       field: 'problemDescription',
       headerName: 'Problem Description',
-      flex: 1
+      flex: 2
     },
+
     {
       field: 'status',
       headerName: 'Status',
-      flex: 1
+      flex: 1,
+      renderCell: (params) => {
+        let color = 'default';
+        let label = '';
+
+        switch (params.value) {
+          case 'register':
+            color = 'info';
+            label = 'Registered';
+            break;
+          case 'in progress':
+            color = 'warning';
+            label = 'In Progress';
+            break;
+          case 'complete':
+            color = 'success';
+            label = 'Completed';
+            break;
+          default:
+            color = 'default';
+            label = params.value;
+        }
+
+        return <Chip label={label} color={color} variant="outlined" />;
+      }
     },
     {
       field: 'action',
@@ -301,9 +349,9 @@ const ResidentComplaints = () => {
       {/*-------------------- Dialog for Delete ----------------- */}
 
       <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-        <DialogTitle variant="h4">Delete Administrator</DialogTitle>
+        <DialogTitle variant="h4">Delete Complaint</DialogTitle>
         <DialogContent>
-          <Typography variant="body2">Are you sure you want to delete this Room Details?</Typography>
+          <Typography variant="body2">Are you sure you want to delete this Complaint Details?</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteDialog} variant="contained" color="primary">

@@ -161,6 +161,14 @@ const WeeklyFoodMenu = () => {
 
   const columns = [
     {
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+    },
+    {
       field: 'weekdays',
       headerName: 'Weekdays',
       cellClassName: 'name-column--cell--capitalize',
@@ -169,8 +177,7 @@ const WeeklyFoodMenu = () => {
     {
       field: 'foodType',
       headerName: 'FoodType',
-      flex: 1,
-     
+      flex: 1
     },
     {
       field: 'foodDescription',
@@ -202,7 +209,6 @@ const WeeklyFoodMenu = () => {
             </Button>
           </Stack>
         </Stack>
-       
 
         <TableStyle>
           <Box width="100%">

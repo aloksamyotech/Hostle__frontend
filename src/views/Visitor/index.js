@@ -26,7 +26,6 @@ import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import * as React from 'react';
 
-
 const HeaderCell = styled(MuiTableCell)(({ theme }) => ({
   backgroundColor: theme.palette.grey[200],
   color: theme.palette.common.black,
@@ -122,17 +121,40 @@ const Visitors = () => {
 
   const columns = [
     {
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+    },
+    {
       field: 'studentName',
-      headerName: 'Student Name',
+      headerName: 'Name',
+      flex: 1,
       cellClassName: 'name-column--cell--capitalize',
-      flex: 1
+      renderCell: (params) => {
+        const name = params.row.studentInfo?.studentName || '';
+        const contact = params.row.studentInfo?.studentContact || '';
+
+        return (
+          <Box>
+            <Typography variant="body2" fontWeight="bold">
+              {name}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {contact}
+            </Typography>
+          </Box>
+        );
+      }
     },
     {
       field: 'roomNumber',
-      headerName: 'Room No',
+      headerName: 'Room Number',
       flex: 1,
       renderCell: (params) => {
-        return params.row.studentId.roomNumber;
+        return params.row.roomData?.roomNumber;
       }
     },
     {

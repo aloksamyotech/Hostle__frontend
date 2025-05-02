@@ -24,7 +24,12 @@ import {
   Popper,
   Stack,
   Switch,
-  Typography
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button
 } from '@mui/material';
 
 // third-party
@@ -58,11 +63,21 @@ const ProfileSection = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
 
+  const [openDeleteDialog, setDeleteDialog] = useState(false);
+
   const [adminId, setAdminId] = useState(null);
 
   const [hostelId, setHostelId] = useState(null);
 
   const [adminData, setAdminData] = useState(null);
+
+  const handleClickOpen = () => {
+    setDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setDeleteDialog(false);
+  };
 
   //Get Admin Obj Id Which is Seted In Cookies
   useEffect(() => {
@@ -78,11 +93,10 @@ const ProfileSection = () => {
   const anchorRef = useRef(null);
 
   const handleLogout = async () => {
- 
-
     Cookies.remove('Token');
     Cookies.remove('_Id');
     Cookies.remove('Role');
+    Cookies.remove('user');
 
     navigate('/login');
     window.location.reload();
@@ -127,8 +141,6 @@ const ProfileSection = () => {
       console.error('Error fetching enpenses data:', error);
     }
   };
-
-
 
   return (
     <>
@@ -205,8 +217,8 @@ const ProfileSection = () => {
                         <Typography variant="h4">Good Morning,</Typography>
                         {adminData == null ? (
                           <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
-                          Super Admin
-                        </Typography>
+                            Super Admin
+                          </Typography>
                         ) : (
                           <Typography component="span" variant="h4" sx={{ fontWeight: 400 }}>
                             {adminData?.ownerName}
@@ -238,7 +250,7 @@ const ProfileSection = () => {
                         <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 4}
-                          onClick={handleLogout}
+                          onClick={handleClickOpen}
                         >
                           <ListItemIcon>
                             <IconLogout stroke={1.5} size="1.3rem" />
@@ -254,6 +266,17 @@ const ProfileSection = () => {
           </Transitions>
         )}
       </Popper>
+
+      <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>Logout Confirmation</DialogTitle>
+        <DialogContent>Are you sure you want to log out?</DialogContent>
+        <DialogActions>
+          <Button onClick={handleLogout} color="primary">
+            Confirm
+          </Button>
+          <Button onClick={handleClose}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

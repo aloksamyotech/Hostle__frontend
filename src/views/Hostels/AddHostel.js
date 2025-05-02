@@ -1,5 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Dialog, FormControl, FormHelperText, FormLabel, Grid, MenuItem, Select, TextField,IconButton, Typography, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Grid,
+  MenuItem,
+  Select,
+  TextField,
+  IconButton,
+  Typography,
+  DialogActions,
+  DialogContent,
+  DialogTitle
+} from '@mui/material';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useFormik } from 'formik';
 import { hostelNewValidationSchema, editHostelValidationSchema } from 'views/Validation/validationSchema';
@@ -9,20 +24,17 @@ import Cookies from 'js-cookie';
 import { ToastContainer, toast } from 'react-toastify';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-
-
 const AddHostel = (props) => {
   const { open, handleClose, editHostelData } = props;
 
-  console.log("props==========>",props);
+  console.log('props==========>', props);
 
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
 
-  const [selectedState, setSelectedState] = useState("");
+  const [selectedState, setSelectedState] = useState('');
 
   const [showPassword, setShowPassword] = useState(false);
-
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -38,19 +50,17 @@ const AddHostel = (props) => {
       city: '',
       address: '',
       hostelphoto: '',
-      aadharphoto: '',
+      aadharphoto: ''
     },
 
-    validationSchema : editHostelData? editHostelValidationSchema : hostelNewValidationSchema,
+    validationSchema: editHostelData ? editHostelValidationSchema : hostelNewValidationSchema,
 
-    
-    
     onSubmit: async (values) => {
       console.log('Form is valid =======>', values);
 
       const formData = new FormData();
 
-      Object.keys(values).forEach(key => {
+      Object.keys(values).forEach((key) => {
         if (key === 'hostelphoto') {
           formData.append('hostelphoto', values.hostelphoto);
         } else if (key === 'aadharphoto') {
@@ -65,8 +75,8 @@ const AddHostel = (props) => {
       }
 
       try {
-        let response;  
-        if(editHostelData){
+        let response;
+        if (editHostelData) {
           response = await axios.put(`${REACT_APP_BACKEND_URL}/hostel/edit/${editHostelData._id}`, formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
@@ -80,18 +90,20 @@ const AddHostel = (props) => {
           });
         }
 
-        console.log("response====------->",response);
-
-        if (response.status === 200 || response.status === 201) {
-          console.log('Hostel Data Add Successfully');
-          handleClose();
-          toast.success("Hostel added successfully !!");
+        if (response.status === 201) {
+          console.log('Hostel Data Add Successfully !!');
+          toast.success('Hostel Data Add Successfully !!');
+        } else if (response.status === 200) {
+          console.log('Hostel Data Update Successfully !!');
+          toast.success('Hostel Data Update Successfully !!');
         } else {
-          toast.error("Can not add hostel !!");
-          console.error('Failed to save Hostel');
+          toast.error('Failed to Save Hostel Data !!');
+          console.error('Failed to Save Hostel Data !!');
         }
+        handleClose();
+        formik.resetForm();
       } catch (error) {
-        console.log("Found Error =>", error);
+        console.log('Found Error =>', error);
       }
     }
   });
@@ -101,7 +113,7 @@ const AddHostel = (props) => {
     const fetchAllStates = async () => {
       const allStates = State.getStatesOfCountry(countryCode);
       setStates(allStates);
-    }
+    };
     fetchAllStates();
   }, []);
 
@@ -109,14 +121,14 @@ const AddHostel = (props) => {
     const getSelectedState = e.target.value;
     formik.handleChange(e);
     setSelectedState(getSelectedState);
-  }
+  };
 
   useEffect(() => {
     if (selectedState) {
       const fetchCities = async () => {
         const allCities = City.getCitiesOfState('IN', selectedState);
         setCities(allCities);
-      }
+      };
       fetchCities();
     }
   }, [selectedState]);
@@ -137,12 +149,12 @@ const AddHostel = (props) => {
         ownerName: editHostelData.ownerName || '',
         ownerPhoneNumber: editHostelData.ownerPhoneNumber || '',
         // email: editHostelData.email || '',
-        // password: '', 
+        // password: '',
         state: editHostelData.state || '',
         city: editHostelData.city || '',
         address: editHostelData.address || '',
-        hostelphoto : editHostelData.hostelphoto || '',
-        aadharphoto : editHostelData.aadharphoto || '',
+        hostelphoto: editHostelData.hostelphoto || '',
+        aadharphoto: editHostelData.aadharphoto || ''
       });
       setSelectedState(editHostelData.state || '');
     }
@@ -151,10 +163,7 @@ const AddHostel = (props) => {
   return (
     <div>
       <Dialog open={open} onClose={handleClose} aria-labelledby="scroll-dialog-title" aria-describedby="scroll-dialog-description">
-        <DialogTitle
-          id="scroll-dialog-title"
-          style={{ display: 'flex', justifyContent: 'space-between' }}
-        >
+        <DialogTitle id="scroll-dialog-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h6">Hostel Basic Information</Typography>
           <Typography>
             <ClearIcon onClick={handleClose} style={{ cursor: 'pointer' }} />
@@ -164,7 +173,6 @@ const AddHostel = (props) => {
         <DialogContent dividers>
           <form onSubmit={formik.handleSubmit}>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
-
               <Grid item xs={12} sm={6}>
                 <FormLabel>Hostel Name</FormLabel>
                 <TextField
@@ -221,24 +229,24 @@ const AddHostel = (props) => {
                 />
               </Grid>
 
-              {editHostelData ? (null) : 
-              (<>
-                <Grid item xs={12} sm={6}>
-                  <FormLabel>Email</FormLabel>
-                  <TextField
-                    id="email"
-                    name="email"
-                    size="small"
-                    fullWidth
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    error={formik.touched.email && !!formik.errors.email}
-                    helperText={formik.touched.email && formik.errors.email}
-                  />
-                </Grid>
+              {editHostelData ? null : (
+                <>
+                  <Grid item xs={12} sm={6}>
+                    <FormLabel>Email</FormLabel>
+                    <TextField
+                      id="email"
+                      name="email"
+                      size="small"
+                      fullWidth
+                      value={formik.values.email}
+                      onChange={formik.handleChange}
+                      error={formik.touched.email && !!formik.errors.email}
+                      helperText={formik.touched.email && formik.errors.email}
+                    />
+                  </Grid>
 
-                <Grid item xs={12} sm={6}>
-                  <FormLabel>Password</FormLabel>
+                  <Grid item xs={12} sm={6}>
+                    <FormLabel>Password</FormLabel>
                     <TextField
                       id="password"
                       name="password"
@@ -258,12 +266,12 @@ const AddHostel = (props) => {
                           >
                             {showPassword ? <Visibility /> : <VisibilityOff />}
                           </IconButton>
-                        ),
+                        )
                       }}
                     />
-                </Grid>
-              </>)
-              }
+                  </Grid>
+                </>
+              )}
 
               <Grid item xs={12} sm={6}>
                 <FormLabel>Hostel Photo</FormLabel>
@@ -273,7 +281,7 @@ const AddHostel = (props) => {
                   type="file"
                   size="small"
                   onChange={(event) => {
-                    formik.setFieldValue("hostelphoto", event.currentTarget.files[0]);
+                    formik.setFieldValue('hostelphoto', event.currentTarget.files[0]);
                   }}
                 />
                 {formik.touched.hostelphoto && formik.errors.hostelphoto && (
@@ -289,52 +297,38 @@ const AddHostel = (props) => {
                   type="file"
                   size="small"
                   onChange={(event) => {
-                    formik.setFieldValue("aadharphoto", event.currentTarget.files[0]);
+                    formik.setFieldValue('aadharphoto', event.currentTarget.files[0]);
                   }}
                 />
                 {formik.touched.aadharphoto && formik.errors.aadharphoto && (
                   <FormHelperText error>{formik.errors.aadharphoto}</FormHelperText>
                 )}
               </Grid>
-            
+
               <Grid item xs={12} sm={6}>
                 <FormLabel>State</FormLabel>
-                <Select
-                  id="state"
-                  name="state"
-                  size="small"
-                  fullWidth
-                  value={formik.values.state}
-                  onChange={handleStateChange}
-                >
+                <Select id="state" name="state" size="small" fullWidth value={formik.values.state} onChange={handleStateChange}>
                   <MenuItem value="">Select State</MenuItem>
                   {states.map((state) => (
-                    <MenuItem key={state.isoCode} value={state.isoCode}>{state.name}</MenuItem>
+                    <MenuItem key={state.isoCode} value={state.isoCode}>
+                      {state.name}
+                    </MenuItem>
                   ))}
                 </Select>
-                {formik.touched.state && formik.errors.state ? (
-                  <FormHelperText error>{formik.errors.state}</FormHelperText>
-                ) : null}
+                {formik.touched.state && formik.errors.state ? <FormHelperText error>{formik.errors.state}</FormHelperText> : null}
               </Grid>
 
               <Grid item xs={12} sm={6}>
                 <FormLabel>City</FormLabel>
-                <Select
-                  id="city"
-                  name="city"
-                  size="small"
-                  fullWidth
-                  value={formik.values.city}
-                  onChange={formik.handleChange}
-                >
+                <Select id="city" name="city" size="small" fullWidth value={formik.values.city} onChange={formik.handleChange}>
                   <MenuItem value="">Select City</MenuItem>
                   {cities.map((city) => (
-                    <MenuItem key={city.name} value={city.name}>{city.name}</MenuItem>
+                    <MenuItem key={city.name} value={city.name}>
+                      {city.name}
+                    </MenuItem>
                   ))}
                 </Select>
-                {formik.touched.city && formik.errors.city ? (
-                  <FormHelperText error>{formik.errors.city}</FormHelperText>
-                ) : null}
+                {formik.touched.city && formik.errors.city ? <FormHelperText error>{formik.errors.city}</FormHelperText> : null}
               </Grid>
 
               <Grid item xs={12}>
@@ -370,8 +364,3 @@ const AddHostel = (props) => {
 };
 
 export default AddHostel;
-
-
-
-
-

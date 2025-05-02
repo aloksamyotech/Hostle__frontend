@@ -2,13 +2,14 @@ import PropTypes from 'prop-types';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Avatar, Box, ButtonBase } from '@mui/material';
+import { Avatar, Box, ButtonBase, Typography } from '@mui/material';
 
 // project imports
 import LogoSection from '../LogoSection';
 import SearchSection from './SearchSection';
 import ProfileSection from './ProfileSection';
 import NotificationSection from './NotificationSection';
+import Cookies from 'js-cookie';
 
 // assets
 import { IconMenu2 } from '@tabler/icons';
@@ -17,6 +18,9 @@ import { IconMenu2 } from '@tabler/icons';
 
 const Header = ({ handleLeftDrawerToggle }) => {
   const theme = useTheme();
+
+  const user = JSON.parse(Cookies.get('user'));
+  console.log('HosIdHosIdHosIdHosIdHosIdHosIdHosId :', user);
 
   return (
     <>
@@ -34,7 +38,6 @@ const Header = ({ handleLeftDrawerToggle }) => {
           <LogoSection />
         </Box>
         <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
-          
           <Avatar
             variant="rounded"
             sx={{
@@ -53,14 +56,30 @@ const Header = ({ handleLeftDrawerToggle }) => {
           >
             <IconMenu2 stroke={1.5} size="1.3rem" />
           </Avatar>
-
         </ButtonBase>
       </Box>
 
-      {/* header search */}
-      {/* <SearchSection /> */}
+      {user.role === 'Customer' ? (
+        <Typography variant="h3" sx={{ mx: 2, color: '#2C69D1' }}>
+          {' '}
+          Welcome to {user?.hostelName} !
+        </Typography>
+      ) : (
+        <Typography variant="h3" sx={{ mx: 2, color: '#2C69D1' }}>
+          {' '}
+          Welcome {user?.name} !
+        </Typography>
+      )}
       <Box sx={{ flexGrow: 1 }} />
-      <Box sx={{ flexGrow: 1 }} />
+
+      <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <Typography variant="h4" sx={{ color: 'grey.600' }}>
+          Today is {new Date().toLocaleDateString('en-US', { weekday: 'long' })}, {new Date().toLocaleDateString('en-GB')}
+        </Typography>
+      </Box>
+
+      {/* <Box sx={{ flexGrow: 1 }} /> */}
+      {/* <Box sx={{ flexGrow: 1 }} /> */}
 
       {/* notification & profile */}
       {/* <NotificationSection /> */}

@@ -69,6 +69,9 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 const TotalStudents = ({ isLoading,studentData}) => {
   const theme = useTheme();
 
+  console.log("This is the studentData :::::::::::::::::: studentData :",studentData);
+  
+
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleClick = (event) => {

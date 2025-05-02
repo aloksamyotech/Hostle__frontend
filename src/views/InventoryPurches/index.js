@@ -164,17 +164,17 @@ const InventoryPurches = () => {
 
   const columns = [
     {
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+    },
+    {
       field: 'productName',
       headerName: 'Product Name',
       flex: 1
-      // cellClassName: 'name-column--cell name-column--cell--capitalize',
-      // renderCell: (params) => {
-      //   return (
-      //     <Box>
-      //       <Box onClick={() => handleNavigate(params.row._id)}>{params.value}</Box>
-      //     </Box>
-      //   );
-      // }
     },
     {
       field: 'quantity',

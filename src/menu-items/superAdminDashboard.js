@@ -66,6 +66,14 @@ import {
         icon: icons.IconNotebook,
         breadcrumbs: false
       },
+      {
+        id: '02',
+        title: 'Report',
+        type: 'item',
+        url: '/superadmindashboard/hostel',
+        icon: icons.IconReceipt,
+        breadcrumbs: false
+      },
     ]
   };
   export default superdashboard;

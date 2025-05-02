@@ -147,6 +147,14 @@ const InventoryConsumption = () => {
 
   const columns = [
     {
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+    },
+    {
       field: 'productName',
       headerName: 'productName',
       flex: 1,
@@ -208,46 +216,6 @@ const InventoryConsumption = () => {
             </Button>
           </Stack>
         </Stack>
-        {/* <TableStyle>
-          <Box width="100%">
-            <Card>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <HeaderCell>Product Name</HeaderCell>
-                      <HeaderCell>Consume Quantity</HeaderCell>
-                      <HeaderCell>Remaning Quantity</HeaderCell>
-                      <HeaderCell>Date</HeaderCell>
-                      <HeaderCell>Action</HeaderCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {allConsumeProducts.map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell>{row.productName}</TableCell>
-                        <TableCell>{row.quantity}</TableCell>
-                        <TableCell>{row.remaning}</TableCell>
-                        <TableCell>{moment(row.date).format('YYYY-MM-DD')}</TableCell>
-                        <TableCell>
-                          <Stack direction="row">
-                            <IconButton onClick={() => handleEdit(row._id)} aria-label="edit" style={{ color: 'green' }}>
-                              <EditOutlined />
-                            </IconButton>
-                            <IconButton onClick={() => handleDelete(row._id)} aria-label="delete" style={{ color: 'red' }}>
-                              <DeleteOutline />
-                            </IconButton>
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Card>
-          </Box>
-        </TableStyle> */}
-
         <TableStyle>
           <Box width="100%">
             <Card style={{ height: '600px', paddingTop: '15px' }}>

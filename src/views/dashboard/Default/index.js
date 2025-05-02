@@ -49,8 +49,8 @@ const Dashboard = () => {
       try{
         console.log("URL=>",`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
         const resForStudent = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
-        console.log(" response for resForStudent ========>",resForStudent);
-        setStudentCount(resForStudent.data.totalRecodes);
+        console.log("hyyyyyyyyyyyyyy response for resForStudent ========>",resForStudent);
+        setStudentCount(resForStudent.data.total_recodes);
 
         console.log("URL=>",`${REACT_APP_BACKEND_URL}/room/index/${hostelId}`);
         const resForTotalRooms = await axios.get(`${REACT_APP_BACKEND_URL}/room/index/${hostelId}`);

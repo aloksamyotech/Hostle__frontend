@@ -207,6 +207,14 @@ const CanteenInventory = () => {
 
   const columns = [
     {
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+    },
+    {
       field: 'productName',
       headerName: 'Product Name',
       flex: 1
@@ -238,55 +246,8 @@ const CanteenInventory = () => {
             <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
               Add New
             </Button>
-
-            {/* <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" onClick={handleOpenImportModal} />}>
-              Import
-            </Button> */}
           </Stack>
         </Stack>
-        {/* <TableStyle>
-          <Box width="100%">
-            <Card>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <HeaderCell>Product Name</HeaderCell>
-                      <HeaderCell>Measurement</HeaderCell>
-                      <HeaderCell>Action</HeaderCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {allInventory.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell>{row.productName}</TableCell>
-                        <TableCell>{row.mesurment}</TableCell>
-                        <TableCell>
-                          <Stack direction="row">
-                            <IconButton onClick={() => handleEdit(row._id)} aria-label="edit" style={{ color: 'green' }}>
-                              <EditOutlined />
-                            </IconButton>
-                            <IconButton onClick={() => handleDelete(row._id)} aria-label="delete" style={{ color: 'red' }}>
-                              <DeleteOutline />
-                            </IconButton>
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <TablePagination
-                component="div"
-                count={totalCount}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
-            </Card>
-          </Box>
-        </TableStyle> */}
 
         <TableStyle>
           <Box width="100%">

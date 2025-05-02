@@ -67,11 +67,11 @@ const subdashboard = {
       title: 'Room Type',
       type: 'item',
       url: '/dashboard/roomtype',
-      icon: icons.IconFileInvoice,
+      icon: icons.IconCategory,
       breadcrumbs: false
     },
     {
-      id: '02',
+      id: '03',
       title: 'Room Details',
       type: 'item',
       url: '/dashboard/room',
@@ -79,7 +79,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '03',
+      id: '04',
       title: 'Student Reservation',
       type: 'item',
       url: '/dashboard/student_reservation',
@@ -87,7 +87,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '04',
+      id: '05',
       title: 'Student Complaints',
       type: 'item',
       url: '/dashboard/complaints',
@@ -95,7 +95,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '05',
+      id: '06',
       title: 'Visitor Details',
       type: 'item',
       url: '/dashboard/visitor',
@@ -103,7 +103,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '06',
+      id: '07',
       title: 'Inventory',
       type: 'collapse',
       icon: icons.IconCategory,
@@ -136,7 +136,7 @@ const subdashboard = {
     },
 
     {
-      id: '07',
+      id: '08',
       title: "Expenditure's",
       type: 'item',
       url: '/dashboard/expenditures',
@@ -144,7 +144,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '08',
+      id: '09',
       title: 'Notice Board',
       type: 'item',
       url: '/dashboard/notice_board',
@@ -152,7 +152,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '09',
+      id: '10',
       title: 'Weekly Food Menu',
       type: 'item',
       url: '/dashboard/weekly_foodmenu',

@@ -16,110 +16,40 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 import Cookies from 'js-cookie';
+import { ToastContainer, toast } from 'react-toastify';
 
 const AddComplaint = (props) => {
   const { open, handleClose, hostelId, editComplaint } = props;
-  console.log('props====>', props);
-
-  const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  console.log(' AddComplaint props====>', props);
 
   const [studentList, setStudentList] = useState([]);
-  const [filteredStudentList, setFilteredStudentList] = useState([]);
 
-  const [inputValue, setInputValue] = useState('');
-  const [selectedStudentName, setSelectedStudentName] = useState('');
-  const [selectedStudentPhoneNo, setSelectedStudentPhoneNo] = useState('');
-
-  //For Student Name and Contact No Array
-  useEffect(() => {
-    if (open) {
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
-      axios
-        .get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`)
-        .then((response) => {
-          console.log('in hook =>', response);
-          const studentData = response.data.result
-            .filter((student) => student.status !== 'deactive')
-            .map((student) => ({
-              studentName: student.studentName,
-              studentPhoneNo: student.studentPhoneNo
-            }));
-          setStudentList(studentData);
-        })
-        .catch((error) => {
-          console.log('Error fetching student data', error);
-        });
+  const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const fetchStudents = async (hostelId) => {
+    try {
+      const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
+      const activeStudents = response.data.result.filter((item) => item.status === 'active');
+      setStudentList(activeStudents);
+    } catch (error) {
+      console.error('Error fetching room data:', error);
     }
-  }, [open, hostelId]);
-  console.log('studentList  ==>', studentList);
+  };
 
   useEffect(() => {
-    console.log('Filtering students with phone number input:', inputValue);
-    if (inputValue) {
-      console.log('inputValue======>', inputValue);
-      const filteredStudents = studentList.filter((student) => {
-        const phoneNo = student.studentPhoneNo?.toString();
-        return phoneNo.includes(inputValue);
-      });
-      console.log('Filtered students:', filteredStudents);
-      setFilteredStudentList(filteredStudents);
-    } else {
-      setFilteredStudentList([]);
-    }
-  }, [inputValue, studentList]);
-
-  // Reset fields when dialog is closed
-  useEffect(() => {
-    if (!open) {
-      formik.resetForm();
-      setInputValue('');
-      setSelectedStudentName('');
-      setSelectedStudentPhoneNo('');
-    }
+    fetchStudents(hostelId);
   }, [open]);
-
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
-    setSelectedStudentName('');
-    setSelectedStudentPhoneNo('');
-  };
-
-  const handleStudentSelect = (name, phoneNo) => {
-    setSelectedStudentName(name);
-    setSelectedStudentPhoneNo(phoneNo);
-    setInputValue(name);
-    formik.setFieldValue('studentName', name);
-    formik.setFieldValue('studentPhoneNo', phoneNo);
-    setFilteredStudentList([]);
-  };
-
-  //When Found editRoom Data
-  useEffect(() => {
-    if (open && editComplaint) {
-      const formattedDate = moment(editComplaint.datetime).format('YYYY-MM-DD');
-      formik.setValues({
-        studentName: editComplaint.studentName || '',
-        datetime: formattedDate || '',
-        problemDescription: editComplaint.problemDescription || '',
-        status: editComplaint.status || ''
-      });
-
-      setInputValue(editComplaint.studentName || '');
-    }
-  }, [open, editComplaint]);
 
   const formik = useFormik({
     initialValues: {
-      studentName: editComplaint ? editComplaint.studentName : selectedStudentName || '',
-      // studentPhoneNo: editComplaint ? editComplaint.studentPhoneNo : selectedStudentPhoneNo || '',
-      datetime: editComplaint ? moment(editComplaint.datetime).format('YYYY-MM-DD') : '',
-      problemDescription: editComplaint ? editComplaint.problemDescription : '',
-      status: editComplaint ? editComplaint.status : ''
+      studentId: editComplaint?.studentId || '',
+      datetime: moment(editComplaint?.datetime).format('YYYY-MM-DD') || '',
+      problemDescription: editComplaint?.problemDescription || '',
+      status: editComplaint?.status || ''
     },
+    enableReinitialize: true,
     validationSchema: studentComplaintValidationSchema,
     onSubmit: async (values) => {
-      // Handle form submission here
-      console.log('Form values:====>', values);
+      console.log('Hyyyyyyy Form values:====>', values);
 
       try {
         let response;
@@ -131,23 +61,25 @@ const AddComplaint = (props) => {
             }
           });
         } else {
-          console.log('URL=>', `${REACT_APP_BACKEND_URL}/student_complaint/add/${hostelId}`);
           response = await axios.post(`${REACT_APP_BACKEND_URL}/student_complaint/add/${hostelId}`, values, {
             headers: {
               Authorization: `Bearer ${Cookies.get('Admin_Token')}`
             }
           });
         }
-        console.log('response==>', response);
 
-        if (response.status === 201 || response.status === 200) {
+        if (response.status === 201) {
           console.log('Complaint Add Successfully !!');
-          handleClose();
+          toast.success('Complaint Add Successfully !!');
         } else {
           console.error('Failed to save data');
+          toast.success('Something went wrong while add complaint !!');
         }
+
+        handleClose();
       } catch (error) {
         console.log('Error Found', error);
+        toast.success('Something went wrong !!');
       }
     }
   });
@@ -172,40 +104,14 @@ const AddComplaint = (props) => {
           <form>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Students List</FormLabel>
-                <TextField
-                  id="studentName"
-                  name="studentName"
-                  size="small"
-                  fullWidth
-                  value={inputValue}
-                  onChange={handleInputChange}
-                  placeholder="Enter Phone Number"
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setInputValue('')}>
-                          <ClearIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    )
-                  }}
-                  error={formik.touched.studentName && !!formik.errors.studentName}
-                  helperText={formik.touched.studentName && formik.errors.studentName}
-                />
-                {filteredStudentList.length > 0 && (
-                  <List style={{ border: '1px solid #ddd', marginTop: 4 }}>
-                    {filteredStudentList.map((student) => (
-                      <ListItem
-                        key={student.studentPhoneNo}
-                        onClick={() => handleStudentSelect(student.studentName, student.studentPhoneNo)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        {student.studentName} - {student.studentPhoneNo}
-                      </ListItem>
-                    ))}
-                  </List>
-                )}
+                <FormLabel>Select Student</FormLabel>
+                <Select name="studentId" value={formik.values.studentId} onChange={formik.handleChange} size="small" fullWidth>
+                  {studentList.map((student) => (
+                    <MenuItem key={student._id} value={student._id}>
+                      {student.studentName}
+                    </MenuItem>
+                  ))}
+                </Select>
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
