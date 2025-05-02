@@ -34,27 +34,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
-
-const HeaderCell = styled(MuiTableCell)(({ theme }) => ({
-  backgroundColor: theme.palette.grey[200],
-  color: theme.palette.common.black,
-  fontWeight: 'bold',
-  padding: theme.spacing(1)
-}));
-
-const TableCell = styled(MuiTableCell)(({ theme }) => ({
-  padding: theme.spacing(1),
-  borderBottom: `1px solid ${theme.palette.divider}`
-}));
-
-const TableRow = styled(MuiTableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}));
+import ViewBeds from './ViewBeds';
+import { useTheme } from '@mui/material/styles';
 
 const Room = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -69,14 +50,16 @@ const Room = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [rowData, setRowData] = useState();
 
+  const theme = useTheme();
+
   const handleOpenAdd = () => {
     setOpenAdd(true);
-    setEditRoom(null);
   };
 
   const handleCloseAdd = () => {
     setOpenAdd(false);
     fetchRoomsData(hostelId);
+    handleClose();
   };
 
   const navigate = useNavigate();
@@ -124,16 +107,13 @@ const Room = () => {
   };
 
   // Handle Edit Action Here
-  const handleEdit = (id) => {
-    console.log('handleEdit id =>', id);
+  const handleEdit = () => {
     setOpenAdd(true);
-    let room = roomData.find((room) => room._id === id);
-    setEditRoom(room);
+    setRowData(row);
   };
 
   // Handle Delete Action Here
   const handleDelete = (id) => {
-    console.log('handleDelete id =>', id);
     setOpenDeleteDialog(true);
     setDeleteStudentId(id);
   };
@@ -169,7 +149,20 @@ const Room = () => {
     setPage(0);
   };
 
+  const handleClickForBeds = (id) => {
+    console.log('on click handleClickForBeds :', id);
+    navigate(`/dashboard/room/view_beds/${id}`);
+  };
+
   const columns = [
+    {
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+    },
     {
       field: 'roomNumber',
       headerName: 'Room No',
@@ -186,10 +179,38 @@ const Room = () => {
     {
       field: 'roomType',
       headerName: 'Room Type',
-      flex: 1
+      flex: 1.5,
+      renderCell: (params) => {
+        const roomType = params.row.roomType;
+        const roomCategory = params.row.roomCategory;
+        const isAC = roomCategory === 'AC';
+
+        return (
+          <Button
+            variant="contained"
+            size="small"
+            sx={{
+              backgroundColor: isAC ? theme.palette.primary.main : '#be4732',
+              color: 'white',
+              textTransform: 'none',
+              fontWeight: 400,
+              borderRadius: '8px',
+              width: '130px',
+              height: '32px',
+              fontSize: '0.75rem',
+              opacity: 1,
+              pointerEvents: 'none',
+              px: 1.5
+            }}
+            disableElevation
+          >
+            {capitalizeWords(roomType)} | {roomCategory}
+          </Button>
+        );
+      }
     },
     {
-      field: 'numOfBeds',
+      field: 'noOfBeds',
       headerName: 'No Of Beds',
       flex: 1
     },
@@ -203,7 +224,30 @@ const Room = () => {
       headerName: 'Available Beds',
       flex: 1
     },
+    {
+      field: 'roomPrice',
+      headerName: 'Room Price',
+      flex: 1,
+      renderCell: (params) => `₹ ${params.value}`
+    },
+    {
+      field: 'bookingStatus',
+      headerName: 'Booking Status',
+      flex: 1,
+      renderCell: (params) => {
+        const beds = params.row.availableBeds;
 
+        return beds !== 0 ? (
+          <Button variant="contained" color="primary" size="small" onClick={() => handleClickForBeds(params.row._id)}>
+            Book Beds
+          </Button>
+        ) : (
+          <Button variant="contained" color="error" size="small" disabled>
+            Booked Beds
+          </Button>
+        );
+      }
+    },
     {
       field: 'action',
       headerName: 'Action',
@@ -216,9 +260,13 @@ const Room = () => {
     }
   ];
 
+  function capitalizeWords(str) {
+    return str.replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
   return (
     <>
-      <AddRoom open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} editRoom={editRoom} />
+      <AddRoom open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} rowData={rowData} />
       <Container>
         <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
           <Typography variant="h3">Room Basic Details</Typography>
@@ -228,59 +276,6 @@ const Room = () => {
             </Button>
           </Stack>
         </Stack>
-
-        {/* <Box width="100%" sx={{ mt: '10px' }}>
-          <Card sx={{ border: 'none', boxShadow: 'none' }}>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <HeaderCell>Room No</HeaderCell>
-                    <HeaderCell>Room Type</HeaderCell>
-                    <HeaderCell>Total No. of Beds</HeaderCell>
-                    <HeaderCell>Occupied Beds</HeaderCell>
-                    <HeaderCell>Available Beds</HeaderCell>
-                    <HeaderCell>Action</HeaderCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {roomData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell
-                        style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }}
-                        onClick={() => handleNavigate(row._id)}
-                      >
-                        {row.roomNumber}
-                      </TableCell>
-                      <TableCell>{row.roomType}</TableCell>
-                      <TableCell>{row.numOfBeds}</TableCell>
-                      <TableCell>{row.occupiedBeds}</TableCell>
-                      <TableCell>{row.availableBeds}</TableCell>
-                      <TableCell>
-                        <Stack direction="row">
-                          <IconButton onClick={() => handleEdit(row._id)} aria-label="edit" style={{ color: 'green' }}>
-                            <EditOutlined />
-                          </IconButton>
-                          <IconButton onClick={() => handleDelete(row._id)} aria-label="delete" style={{ color: 'red' }}>
-                            <DeleteOutline />
-                          </IconButton>
-                        </Stack>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              component="div"
-              count={totalCount}
-              page={page}
-              onPageChange={handleChangePage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-          </Card>
-        </Box> */}
 
         <TableStyle>
           <Box width="100%">
@@ -324,7 +319,7 @@ const Room = () => {
       >
         <MenuItem
           onClick={() => {
-            handleEdit(rowData._id);
+            handleEdit();
             handleClose();
           }}
         >

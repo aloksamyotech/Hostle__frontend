@@ -9,196 +9,196 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import ClearIcon from '@mui/icons-material/Clear';
-import { FormControl, FormHelperText, FormLabel, MenuItem, Select,IconButton,  FormControlLabel,  Radio, RadioGroup } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import {
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  MenuItem,
+  Select,
+  IconButton,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Checkbox,
+  Input,
+  FormGroup
+} from '@mui/material';
 import { useFormik } from 'formik';
-import { addStudentValidationSchema, editStudentValidationSchema } from 'views/Validation/validationSchema';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import moment from 'moment';
-import Cookies from 'js-cookie';
-import { State, City } from 'country-state-city';
+import { addReservedBedValidationSchema } from 'views/Validation/validationSchema';
+import { ToastContainer, toast } from 'react-toastify';
 
 const AddNewReservation = (props) => {
-  const { open, handleClose, hostelId, editStudent} = props;
-  console.log("props=====>",props);
+  const { open, handleClose, hostelId } = props;
+  console.log('AddNewReservation props :', props);
 
-  const [roomList, setRoomList] = useState([]);
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
-  const [selectedState, setSelectedState] = useState("");
-
-  const [existingStudentPhoto, setExistingStudentPhoto] = useState(null);
-  const [existingAadharCardPhoto, setExistingAadharCardPhoto] = useState(null);
+  const [roomTypes, setRoomTypes] = useState([]);
+  const [roomNumbers, setRoomNumbers] = useState([]);
+  const [selectedRoomData, setSelectedRoomData] = useState(null);
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-  //When Found editStudent Data
-  useEffect(()=>{
-    if(open && editStudent){
-
-      const formatteddateOfBirth = moment(editStudent.dateOfBirth).format('YYYY-MM-DD');
-      const formattedstartDate = moment(editStudent.startDate).format('YYYY-MM-DD');
-      const formattedendDate = moment(editStudent.endDate).format('YYYY-MM-DD');
-      const formattedpaymentDateTime = moment(editStudent.paymentDateTime).format('YYYY-MM-DD');
-
-      formik.setValues({
-        studentName: editStudent.studentName || '',
-        studentPhoneNo: editStudent.studentPhoneNo || '',
-        fathersName: editStudent.fathersName || '',
-        fathersPhoneNo: editStudent.fathersPhoneNo || '',
-        dateOfBirth: formatteddateOfBirth || '',
-        gender: editStudent.gender || '',
-        email: editStudent.email || '',
-        state: editStudent.state || '',
-        city: editStudent.city || '',
-        address: editStudent.address || '',
-        roomNumber: editStudent.roomNumber || '',
-        startDate: formattedstartDate || '',
-        endDate: formattedendDate || '',
-        isLibrary: editStudent.isLibrary || '',
-        isFood: editStudent.isFood || '',
-        libraryAmount: editStudent.libraryAmount || '',
-        foodAmount: editStudent.foodAmount || '',
-        hostelRent: editStudent.hostelRent || '',
-        advancePayment: editStudent.advancePayment || '',
-      });
-      setSelectedState(editStudent.state || '');
-      setExistingStudentPhoto(editStudent.studentphoto);
-      setExistingAadharCardPhoto(editStudent.aadharcardphoto);
-    }
-  },[open,editStudent]);
-
-  useEffect(() => {
-    if (open && hostelId) {
-      console.log("Fetching rooms URL:", `${REACT_APP_BACKEND_URL}/room/index/${hostelId}`);
-      axios.get(`${REACT_APP_BACKEND_URL}/room/index/${hostelId}`)
-        .then(response => {
-          console.log("Room response:", response);
-          const roomNumbers = response.data.result.map(room => room.roomNumber);
-          setRoomList(roomNumbers);
-        })
-        .catch(error => {
-          console.log("Error fetching rooms:", error);
-        });
-    }
-  }, [open, hostelId]);
-
-
-
   const formik = useFormik({
     initialValues: {
-      studentName : '',
-      studentPhoneNo : '',
-      fathersName : '',
-      fathersPhoneNo : '',
-      dateOfBirth : '',
-      gender : '',
-      email : '',
-      studentphoto : '',
-      state : '',
-      city : '',
-      address : '',
-      aadharcardphoto : '',
-      roomNumber : '',
-      startDate : '',
-      endDate : '',
-      isLibrary : 'No',
-      isFood : 'No',
-      libraryAmount : 0,
-      foodAmount : 0,
-      hostelRent : '',
-      advancePayment : '',
+      roomCategory: '',
+      roomType: '',
+      roomNumber: '',
+      bedNumber: '',
+      roomRent: '',
+      startDate: '',
+      endDate: '',
+      stayMonths: '',
+      totalRent: '',
+      advanceAmount: '',
+
+      foodFacility: false,
+      foodFee: 0,
+      libraryFacility: false,
+      libraryFee: 0,
+
+      studentName: '',
+      studentContact: '',
+      fatherName: '',
+      fatherContact: '',
+      guardianName: '',
+      guardianContactNo: '',
+      guardiansAddress: '',
+      dob: '',
+      gender: '',
+      mailId: '',
+      courseOccupation: '',
+      address: '',
+      studentPhoto: '',
+      aadharPhoto: ''
     },
-    validationSchema: editStudent ? editStudentValidationSchema : addStudentValidationSchema,
-      onSubmit: async  (values) => {
-      console.log('Form values==>', values);
+
+    validationSchema: addReservedBedValidationSchema,
+    onSubmit: async (values) => {
+      console.log('values are  1234 :::::::::::: ===>', values);
 
       const formData = new FormData();
 
-      Object.keys(values).forEach(key => {
-        if (key === 'studentphoto') {
-          formData.append('studentphoto', values.studentphoto);
-        } else if (key === 'aadharcardphoto') {
-          formData.append('aadharcardphoto', values.aadharcardphoto);
-        } else {
-          formData.append(key, values[key]);
-        }
-      });
+      formData.append('roomCategory', values.roomCategory);
+      formData.append('roomType', values.roomType);
+      formData.append('roomNumber', values.roomNumber);
+      formData.append('bedNumber', values.bedNumber);
+      formData.append('roomRent', values.roomRent);
+      formData.append('startDate', values.startDate);
+      formData.append('endDate', values.endDate);
+      formData.append('stayMonths', values.stayMonths);
+      formData.append('totalRent', values.totalRent);
+      formData.append('advanceAmount', values.advanceAmount);
+      // formData.append('paymentMethod', values.paymentMethod);
 
-      for (let [key, value] of formData.entries()) {
-        console.log(`formData==> ${key}: ${value}`);
+      formData.append('foodFee', values.foodFee);
+      formData.append('libraryFee', values.libraryFee);
+
+      formData.append('studentName', values.studentName);
+      formData.append('studentContact', values.studentContact);
+      formData.append('fatherName', values.fatherName);
+      formData.append('fatherContact', values.fatherContact);
+      formData.append('guardianName', values.guardianName);
+      formData.append('guardianContactNo', values.guardianContactNo);
+      formData.append('guardiansAddress', values.guardiansAddress);
+      formData.append('dob', values.dob);
+      formData.append('gender', values.gender);
+      formData.append('mailId', values.mailId);
+      formData.append('courseOccupation', values.courseOccupation);
+      formData.append('address', values.address);
+
+      if (values.studentPhoto) {
+        formData.append('studentPhoto', values.studentPhoto);
       }
 
-      try{
-        let response;
-        if(editStudent){
-          console.log("URL =>",`${REACT_APP_BACKEND_URL}/sudent_reservation/edit/${editStudent._id}`);
-          response = await axios.put(`${REACT_APP_BACKEND_URL}/sudent_reservation/edit/${editStudent._id}`,formData, {
-            headers : {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-        }else{
-          console.log("URL =>",`${REACT_APP_BACKEND_URL}/sudent_reservation/add/${hostelId}`);
-          response = await axios.post(`${REACT_APP_BACKEND_URL}/sudent_reservation/add/${hostelId}`,formData,{
-            headers : {
-              'Content-Type': 'multipart/form-data'
-            }
-          });
-        }
+      if (values.aadharPhoto) {
+        formData.append('aadharPhoto', values.aadharPhoto);
+      }
 
-        console.log("response=========>",response);
+      try {
+        const response = await axios.post(`${REACT_APP_BACKEND_URL}/sudent_reservation/assignBed/${hostelId}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        console.log('------ response --------->', response);
 
-        if(response.status === 201 || response.status === 200){
-          console.log("Student Reserve Successfully !!");
+        if (response.status === 201) {
+          toast.success('Student Reservation Successfully !!');
           handleClose();
-        }else {
-          console.error('Failed to save data');
+          formik.resetForm();
+        } else {
+          toast.error('Something went wrong while reservation !!');
         }
-
-      }catch(error){
-        console.log("Found Error =>", error);
+        handleClose();
+        formik.resetForm();
+      } catch (error) {
+        console.log('Error=>', error);
+        toast.error('Something went wrong while reservation !!');
       }
-    },
+    }
   });
 
+  const fetchRoomTypesData = async (hostelId) => {
+    try {
+      const response = await axios.get(`${REACT_APP_BACKEND_URL}/roomTypes/getall/${hostelId}`);
+      setRoomTypes(response.data.result);
+    } catch (error) {
+      console.error('Error fetching Room Type Data:', error);
+    }
+  };
+
+  const fetchRoomData = async (hostelId) => {
+    try {
+      const response = await axios.get(`${REACT_APP_BACKEND_URL}/room/index/${hostelId}`);
+      setRoomNumbers(response.data.result);
+    } catch (error) {
+      console.error('Error fetching Room Type Data:', error);
+    }
+  };
+
+  console.log('roomNumbers  : --------------------------->', roomNumbers);
 
   useEffect(() => {
-    const countryCode = 'IN';
-    const fetchAllStates = async () => {
-      const allStates = State.getStatesOfCountry(countryCode);
-      setStates(allStates);
-    }
-    fetchAllStates();
-  }, []);
+    fetchRoomTypesData(hostelId);
+    fetchRoomData(hostelId);
+  }, [formik.values.roomCategory, formik.values.roomType]);
 
-  const handleStateChange = (e) => {
-    const getSelectedState = e.target.value;
-    formik.handleChange(e);
-    setSelectedState(getSelectedState);
+  function monthDiffInclusive(start, end) {
+    const s = new Date(start),
+      e = new Date(end);
+    if (e <= s) return 0;
+    let months = (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+    if (e.getDate() > s.getDate()) months++;
+
+    return months;
   }
 
   useEffect(() => {
-    if (selectedState) {
-      const fetchCities = async () => {
-        const allCities = City.getCitiesOfState('IN', selectedState);
-        setCities(allCities);
-      }
-      fetchCities();
-    }
-  }, [selectedState]);
+    const { startDate, endDate, foodFacility, libraryFacility } = formik.values;
+    if (startDate && endDate) {
+      const months = monthDiffInclusive(startDate, endDate);
+      formik.setFieldValue('stayMonths', months);
 
-  //For Reset Feilds When Add New
-  useEffect(() => {
-    if (open && !editStudent) {
-      formik.resetForm();
-       setSelectedState('');
-       setCities([]);
-       setExistingStudentPhoto('');
-       setExistingAadharCardPhoto('');
+      const roomRent = selectedRoomData?.roomPrice || 0;
+      const foodFee = foodFacility ? Number(formik.values.foodFee || 0) : 0;
+      const libraryFee = libraryFacility ? Number(formik.values.libraryFee || 0) : 0;
+
+      const facilityFeePerMonth = foodFee + libraryFee;
+      const totalRent = months * (roomRent + facilityFeePerMonth);
+
+      console.log('calculate total rent :', totalRent);
+
+      formik.setFieldValue('totalRent', totalRent);
     }
-  }, [open]);
+  }, [
+    formik.values.startDate,
+    formik.values.endDate,
+    formik.values.foodFacility,
+    formik.values.libraryFacility,
+    formik.values.foodFee,
+    formik.values.libraryFee
+  ]);
 
   return (
     <div>
@@ -210,422 +210,600 @@ const AddNewReservation = (props) => {
             justifyContent: 'space-between'
           }}
         >
-          <Typography variant="h6">Student Reservation</Typography>
-            <Typography>
-              <ClearIcon onClick={handleClose} style={{ cursor: 'pointer' }} />
-            </Typography>
+          <Typography variant="h6">Assign Bed to the Student</Typography>
+          <Typography>
+            <ClearIcon
+              onClick={() => {
+                formik.resetForm();
+                handleClose();
+              }}
+              style={{ cursor: 'pointer' }}
+            />
+          </Typography>
         </DialogTitle>
 
         <DialogContent dividers>
           <form onSubmit={formik.handleSubmit}>
-            <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
-              {/*----------------------- student basic credentials ----------------------  */}
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Student Name</FormLabel>
-                  <TextField
-                    id="studentName"
-                    name="studentName"
-                    size="small"
-                    fullWidth
-                    value={formik.values.studentName}
-                    onChange={formik.handleChange}
-                    error={formik.touched.studentName && !!formik.errors.studentName}
-                    helperText={formik.touched.studentName && formik.errors.studentName}
-                  />
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Room Information
+                </Typography>
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Student Phone No.</FormLabel>
-                  <TextField
-                    id="studentPhoneNo"
-                    name="studentPhoneNo"
-                    size="small"
-                    type="number"
-                    fullWidth
-                    value={formik.values.studentPhoneNo}
-                    onChange={formik.handleChange}
-                    error={formik.touched.studentPhoneNo && Boolean(formik.errors.studentPhoneNo)}
-                    helperText={formik.touched.studentPhoneNo && formik.errors.studentPhoneNo}
-                  />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Fathers Name</FormLabel>
-                  <TextField
-                    id="fathersName"
-                    name="fathersName"
-                    size="small"
-                    fullWidth
-                    value={formik.values.fathersName}
-                    onChange={formik.handleChange}
-                    error={formik.touched.fathersName && !!formik.errors.fathersName}
-                    helperText={formik.touched.fathersName && formik.errors.fathersName}
-                  />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Fathers Phone No.</FormLabel>
-                  <TextField
-                    id="fathersPhoneNo"
-                    name="fathersPhoneNo"
-                    size="small"
-                    type="number"
-                    fullWidth
-                    value={formik.values.fathersPhoneNo}
-                    onChange={formik.handleChange}
-                    error={formik.touched.fathersPhoneNo && Boolean(formik.errors.fathersPhoneNo)}
-                    helperText={formik.touched.fathersPhoneNo && formik.errors.fathersPhoneNo}
-                  />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Date Of Birth</FormLabel>
-                  <TextField
-                    name="dateOfBirth"
-                    type="date"
-                    size="small"
-                    fullWidth
-                    value={formik.values.dateOfBirth}
-                    onChange={formik.handleChange}
-                    error={formik.touched.dateOfBirth && Boolean(formik.errors.dateOfBirth)}
-                    helperText={formik.touched.dateOfBirth && formik.errors.dateOfBirth}
-                  />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormControl fullWidth>
-                  <FormLabel>Gender</FormLabel>
-                    <RadioGroup row name="gender" value={formik.values.gender} onChange={formik.handleChange}>
-                      <FormControlLabel value="Male" control={<Radio />} label="Male"/>
-                      <FormControlLabel value="Female" control={<Radio />} label="Female"/>
-                    </RadioGroup>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <FormLabel>Email ID</FormLabel>
-                  <TextField
-                    id="email"
-                    name="email"
-                    size="small"
-                    fullWidth
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    error={formik.touched.email && !!formik.errors.email}
-                    helperText={formik.touched.email && formik.errors.email}
-                  />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Photo</FormLabel>
-                  <input
-                    id="studentphoto"
-                    name="studentphoto"
-                    type="file"
-                    size="small"
-                    onChange={(event) => {
-                      formik.setFieldValue("studentphoto", event.currentTarget.files[0]);
-                      setExistingStudentPhoto(null);
-                    }}
-                  />
-                  {existingStudentPhoto && !formik.values.studentphoto && (
-                  <Typography>Current file: {existingStudentPhoto}</Typography>
-                  )}
-                  {formik.values.studentphoto && formik.values.studentphoto.name && (
-                    <Typography>Selected file: {formik.values.studentphoto.name}</Typography>
-                  )}
-                  {formik.touched.studentphoto && formik.errors.studentphoto && (
-                    <FormHelperText error>{formik.errors.studentphoto}</FormHelperText>
-                  )}
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>State</FormLabel>
+                <FormLabel>Room Category</FormLabel>
                 <Select
-                  id="state"
-                  name="state"
+                  id="roomCategory"
+                  name="roomCategory"
                   size="small"
                   fullWidth
-                  value={formik.values.state}
-                  onChange={handleStateChange}
-                >
-                  <MenuItem value="">Select State</MenuItem>
-                  {states.map((state) => (
-                    <MenuItem key={state.isoCode} value={state.isoCode}>{state.name}</MenuItem>
-                  ))}
-                </Select>
-                {formik.touched.state && formik.errors.state ? (
-                  <FormHelperText error>{formik.errors.state}</FormHelperText>
-                ) : null}
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>City</FormLabel>
-                <Select
-                  id="city"
-                  name="city"
-                  size="small"
-                  fullWidth
-                  value={formik.values.city}
+                  value={formik.values.roomCategory}
                   onChange={formik.handleChange}
+                  error={formik.touched.roomCategory && !!formik.errors.roomCategory}
                 >
-                  <MenuItem value="">Select City</MenuItem>
-                  {cities.map((city) => (
-                    <MenuItem key={city.name} value={city.name}>{city.name}</MenuItem>
-                  ))}
+                  <MenuItem value="">Select Room Category</MenuItem>
+                  <MenuItem value="AC">AC</MenuItem>
+                  <MenuItem value="Non-AC">Non-AC</MenuItem>
                 </Select>
-                {formik.touched.city && formik.errors.city ? (
-                  <FormHelperText error>{formik.errors.city}</FormHelperText>
-                ) : null}
-              </Grid>
-
-             
-
-              <Grid item xs={12} sm={12} md={12}>
-                <FormLabel>Address</FormLabel>
-                  <TextField
-                    id="address"
-                    name="address"
-                    size="small"
-                    multiline
-                    fullWidth
-                    rows={4}
-                    value={formik.values.address}
-                    onChange={formik.handleChange}
-                    error={formik.touched.address && !!formik.errors.address}
-                    helperText={formik.touched.address && formik.errors.address}
-                  />
+                {formik.touched.roomCategory && formik.errors.roomCategory && (
+                  <FormHelperText error>{formik.errors.roomCategory}</FormHelperText>
+                )}
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>AadharCard Photo</FormLabel>
-                  <input
-                    id="aadharcardphoto"
-                    name="aadharcardphoto"
-                    type="file"
-                    size="small"
-                    onChange={(event) => {
-                      formik.setFieldValue("aadharcardphoto", event.currentTarget.files[0]);
-                      setExistingAadharCardPhoto(null);
-                    }}
-                  />
-                   {existingAadharCardPhoto && !formik.values.aadharcardphoto && (
-                     <Typography>Current file: {existingAadharCardPhoto}</Typography>
-                    )}
-                    {formik.values.aadharcardphoto && formik.values.aadharcardphoto.name && (
-                      <Typography>Selected file: {formik.values.aadharcardphoto.name}</Typography>
-                    )}
-                    {formik.touched.aadharcardphoto && formik.errors.aadharcardphoto && (
-                      <FormHelperText error>{formik.errors.aadharcardphoto}</FormHelperText>
-                    )}
+                <FormLabel>Room Type</FormLabel>
+                <Select
+                  id="roomType"
+                  name="roomType"
+                  size="small"
+                  fullWidth
+                  value={formik.values.roomType}
+                  onChange={formik.handleChange}
+                  error={formik.touched.roomType && !!formik.errors.roomType}
+                >
+                  <MenuItem value="">Select Room Type</MenuItem>
+                  {roomTypes
+                    ?.filter((type) => type.roomCategory === formik.values.roomCategory)
+                    .map((type) => (
+                      <MenuItem key={type._id} value={type.roomType}>
+                        {type.roomType}
+                      </MenuItem>
+                    ))}
+                </Select>
+                {formik.touched.roomType && formik.errors.roomType && <FormHelperText error>{formik.errors.roomType}</FormHelperText>}
               </Grid>
-              {/*----------------------- student basic credentials ----------------------  */}
 
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Room Number</FormLabel>
-                  <Select
-                    id="roomNumber"
-                    name="roomNumber"
-                    size="small"
-                    fullWidth
-                    value={formik.values.roomNumber}
-                    onChange={formik.handleChange}
-                    error={formik.touched.roomNumber && !!formik.errors.roomNumber}
-                    helperText={formik.touched.roomNumber && formik.errors.roomNumber}
-                  >
+                <Select
+                  id="roomNumber"
+                  name="roomNumber"
+                  size="small"
+                  fullWidth
+                  value={formik.values.roomNumber}
+                  // onChange={formik.handleChange}
+
+                  onChange={(e) => {
+                    const selectedNumber = e.target.value;
+                    formik.setFieldValue('roomNumber', selectedNumber);
+
+                    const fullRoomData = roomNumbers.find((room) => room.roomNumber === selectedNumber);
+                    setSelectedRoomData(fullRoomData);
+                    formik.setFieldValue('roomRent', fullRoomData?.roomPrice);
+                  }}
+                  error={formik.touched.roomNumber && !!formik.errors.roomNumber}
+                >
                   <MenuItem value="">Select Room Number</MenuItem>
-                    {
-                      roomList.map(room => (
-                        <MenuItem key={room} value={room}>{room}</MenuItem>
-                      ))
-                    }
-                  </Select>
-                  {formik.touched.roomNumber && formik.errors.roomNumber ? (
-                    <FormHelperText error>{formik.errors.roomNumber}</FormHelperText>
-                  ) : null}
+                  {roomNumbers
+                    ?.filter((room) => room.roomType === formik.values.roomType && room.availableBeds !== 0)
+                    .map((room) => (
+                      <MenuItem key={room._id} value={room.roomNumber}>
+                        {room.roomNumber}
+                      </MenuItem>
+                    ))}
+                </Select>
+                {formik.touched.roomNumber && formik.errors.roomNumber && <FormHelperText error>{formik.errors.roomNumber}</FormHelperText>}
+              </Grid>
+
+              {/* <Grid item xs={12} sm={6} md={6}>
+                <FormLabel component="legend">Bed Numbers</FormLabel>
+
+                <FormGroup row>
+                  {selectedRoomData?.beds.map((bed) => (
+                    <FormControlLabel
+                      key={bed.bedNumber}
+                      control={
+                        <Checkbox
+                          name="bedNumber"
+                          value={bed.bedNumber}
+                          checked={formik.values.bedNumber === bed.bedNumber}
+                          disabled={bed.status !== 'available'}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value, 10);
+                            if (e.target.checked) {
+                              formik.setFieldValue('bedNumber', value);
+                            } else {
+                              formik.setFieldValue('bedNumber', null);
+                            }
+                          }}
+                        />
+                      }
+                      label={`Bed ${bed.bedNumber} (${bed.status})`}
+                    />
+                  ))}
+                </FormGroup>
+                {formik.touched.bedNumber && formik.errors.bedNumber && <FormHelperText error>{formik.errors.bedNumber}</FormHelperText>}
+              </Grid> */}
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel component="legend">Bed Numbers</FormLabel>
+                <FormGroup row>
+                  {selectedRoomData?.beds?.length > 0 ? (
+                    selectedRoomData.beds.map((bed) => (
+                      <FormControlLabel
+                        key={bed.bedNumber}
+                        control={
+                          <Checkbox
+                            name="bedNumber"
+                            value={bed.bedNumber}
+                            checked={formik.values.bedNumber === bed.bedNumber}
+                            disabled={bed.status !== 'available'}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value, 10);
+                              if (e.target.checked) {
+                                formik.setFieldValue('bedNumber', value);
+                              } else {
+                                formik.setFieldValue('bedNumber', null);
+                              }
+                            }}
+                          />
+                        }
+                        label={`Bed ${bed.bedNumber} (${bed.status})`}
+                      />
+                    ))
+                  ) : (
+                    <>
+                      {[1, 2, 3].map((num) => (
+                        <FormControlLabel key={num} control={<Checkbox disabled />} label={`Bed ${num}`} />
+                      ))}
+                    </>
+                  )}
+                </FormGroup>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Room Rent (Per Month)</FormLabel>
+                <TextField
+                  id="roomRent"
+                  name="roomRent"
+                  type="number"
+                  size="small"
+                  fullWidth
+                  value={formik.values.roomRent}
+                  InputProps={{
+                    readOnly: true
+                  }}
+                  onChange={formik.handleChange}
+                  error={formik.touched.roomRent && !!formik.errors.roomRent}
+                  helperText={formik.touched.roomRent && formik.errors.roomRent}
+                />
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Start Date</FormLabel>
-                  <TextField
-                    id="startDate"
-                    name="startDate"
-                    type="date"
-                    size="small"
-                    fullWidth
-                    value={formik.values.startDate}
-                    onChange={formik.handleChange}
-                    error={formik.touched.startDate && !!formik.errors.startDate}
-                    helperText={formik.touched.startDate && formik.errors.startDate}
-                  />
+                <TextField
+                  id="startDate"
+                  name="startDate"
+                  type="date"
+                  size="small"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={formik.values.startDate}
+                  onChange={formik.handleChange}
+                  error={formik.touched.startDate && !!formik.errors.startDate}
+                  helperText={formik.touched.startDate && formik.errors.startDate}
+                />
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>End Date</FormLabel>
-                  <TextField
-                    id="endDate"
-                    name="endDate"
-                    type="date"
-                    size="small"
-                    fullWidth
-                    value={formik.values.endDate}
-                    onChange={formik.handleChange}
-                    error={formik.touched.endDate && !!formik.errors.endDate}
-                    helperText={formik.touched.endDate && formik.errors.endDate}
-                  />
+                <TextField
+                  id="endDate"
+                  name="endDate"
+                  type="date"
+                  size="small"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={formik.values.endDate}
+                  onChange={formik.handleChange}
+                  error={formik.touched.endDate && !!formik.errors.endDate}
+                  helperText={formik.touched.endDate && formik.errors.endDate}
+                />
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Library Facility</FormLabel>
-                  <Select
-                    id="isLibrary"
-                    name="isLibrary"
-                    size="small"
-                    fullWidth
-                    value={formik.values.isLibrary}
-                    onChange={formik.handleChange}
-                    error={formik.touched.isLibrary && !!formik.errors.isLibrary}
-                    helperText={formik.touched.isLibrary && formik.errors.isLibrary}
-                  >
-                  <MenuItem value={true}>Yes</MenuItem>
-                  <MenuItem value={false}>No</MenuItem>
-                </Select>
+                <FormLabel>No. of Stay Months</FormLabel>
+                <TextField
+                  id="stayMonths"
+                  name="stayMonths"
+                  size="small"
+                  fullWidth
+                  InputProps={{
+                    readOnly: true
+                  }}
+                  value={formik.values.stayMonths}
+                  onChange={formik.handleChange}
+                  error={formik.touched.stayMonths && !!formik.errors.stayMonths}
+                  helperText={formik.touched.stayMonths && formik.errors.stayMonths}
+                />
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Food Facility</FormLabel>
-                  <Select
-                    id="isFood"
-                    name="isFood"
-                    size="small"
-                    fullWidth
-                    value={formik.values.isFood}
-                    onChange={formik.handleChange}
-                    error={formik.touched.isFood && !!formik.errors.isFood}
-                    helperText={formik.touched.isFood && formik.errors.isFood}
-                  >
-                  <MenuItem value={true}>Yes</MenuItem>
-                  <MenuItem value={false}>No</MenuItem>
-                  </Select>
+                <FormLabel>Advance Amount</FormLabel>
+                <TextField
+                  id="advanceAmount"
+                  name="advanceAmount"
+                  type="number"
+                  size="small"
+                  fullWidth
+                  value={formik.values.advanceAmount}
+                  onChange={formik.handleChange}
+                  error={formik.touched.advanceAmount && !!formik.errors.advanceAmount}
+                  helperText={formik.touched.advanceAmount && formik.errors.advanceAmount}
+                />
               </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Library Amount</FormLabel>
-                  <TextField
-                    id="libraryAmount"
-                    name="libraryAmount"
-                    size="small"
-                    type="number"
-                    fullWidth
-                    value={formik.values.libraryAmount}
-                    onChange={formik.handleChange}
-                    error={formik.touched.libraryAmount && !!formik.errors.libraryAmount}
-                    helperText={formik.touched.libraryAmount && formik.errors.libraryAmount} 
-                  />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Food Amount</FormLabel>
-                  <TextField
-                    id="foodAmount"
-                    name="foodAmount"
-                    size="small"
-                    type="number"
-                    fullWidth
-                    value={formik.values.foodAmount}
-                    onChange={formik.handleChange}
-                    error={formik.touched.foodAmount && !!formik.errors.foodAmount}
-                    helperText={formik.touched.foodAmount && formik.errors.foodAmount}
-                  />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Hostel Rent / Per Bed Rent</FormLabel>
-                  <TextField
-                    id="hostelRent"
-                    name="hostelRent"
-                    size="small"
-                    type="number"
-                    fullWidth
-                    value={formik.values.hostelRent}
-                    onChange={formik.handleChange}
-                    error={formik.touched.hostelRent && !!formik.errors.hostelRent}
-                    helperText={formik.touched.hostelRent && formik.errors.hostelRent}
-                  />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Advance Payment</FormLabel>
-                  <TextField
-                    id="advancePayment"
-                    name="advancePayment"
-                    type="number"
-                    size="small"
-                    fullWidth
-                    value={formik.values.advancePayment}
-                    onChange={formik.handleChange}
-                    error={formik.touched.advancePayment && !!formik.errors.advancePayment}
-                    helperText={formik.touched.advancePayment && formik.errors.advancePayment}
-                  />
-              </Grid>
-
-              {/* <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Runnig Payment</FormLabel>
-                  <TextField
-                    id="depositAmount"
-                    name="depositAmount"
-                    size="small"
-                    type="number"
-                    fullWidth
-                    value={formik.values.depositAmount}
-                    onChange={formik.handleChange}
-                    error={formik.touched.depositAmount && !!formik.errors.depositAmount}
-                    helperText={formik.touched.depositAmount && formik.errors.depositAmount}
-                  />
-              </Grid> */}
-
-              {/* <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Payment Date & Time</FormLabel>
-                  <TextField
-                    id="paymentDateTime"
-                    name="paymentDateTime"
-                    size="small"
-                    type="date"
-                    fullWidth
-                    value={formik.values.paymentDateTime}
-                    onChange={formik.handleChange}
-                    error={formik.touched.paymentDateTime && !!formik.errors.paymentDateTime}
-                    helperText={formik.touched.paymentDateTime && formik.errors.paymentDateTime}
-                  />
-              </Grid>  */}
 
               {/* <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Payment Method</FormLabel>
-                  <Select
-                    id="paymentMethod"
-                    name="paymentMethod"
-                    size="small"
-                    fullWidth
-                    value={formik.values.paymentMethod}
-                    onChange={formik.handleChange}
+                <TextField
+                  id="paymentMethod"
+                  name="paymentMethod"
+                  size="small"
+                  fullWidth
+                  select
+                  value={formik.values.paymentMethod}
+                  onChange={formik.handleChange}
+                  error={formik.touched.paymentMethod && !!formik.errors.paymentMethod}
+                  helperText={formik.touched.paymentMethod && formik.errors.paymentMethod}
+                >
+                  <MenuItem value="Cash">Cash</MenuItem>
+                  <MenuItem value="UPI">UPI</MenuItem>
+                  <MenuItem value="Card">Card</MenuItem>
+                  <MenuItem value="Net-Banking">Net-Banking</MenuItem>
+                </TextField>
+              </Grid> */}
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Total Rent</FormLabel>
+                <TextField
+                  id="totalRent"
+                  name="totalRent"
+                  size="small"
+                  fullWidth
+                  value={formik.values.totalRent}
+                  onChange={formik.handleChange}
+                  disabled
+                />
+              </Grid>
+
+              {/* Other Facility Information Title */}
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Other Facility (Optional)
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id="foodFacility"
+                      name="foodFacility"
+                      checked={formik.values.foodFacility}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        formik.setFieldValue('foodFacility', checked);
+                        formik.setFieldValue('foodFee', checked ? formik.values.foodFee : 0);
+                      }}
+                    />
+                  }
+                  label="Food Facility"
+                />
+                <TextField
+                  id="foodFee"
+                  name="foodFee"
+                  type="number"
+                  size="small"
+                  fullWidth
+                  label="Food Facility Price"
+                  disabled={!formik.values.foodFacility}
+                  value={formik.values.foodFee}
+                  onChange={formik.handleChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id="libraryFacility"
+                      name="libraryFacility"
+                      checked={formik.values.libraryFacility}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        formik.setFieldValue('libraryFacility', checked);
+                        formik.setFieldValue('libraryFee', checked ? formik.values.libraryFee : 0);
+                      }}
+                    />
+                  }
+                  label="Library Facility"
+                />
+                <TextField
+                  id="libraryFee"
+                  name="libraryFee"
+                  type="number"
+                  size="small"
+                  fullWidth
+                  label="Library Facility Price"
+                  disabled={!formik.values.libraryFacility}
+                  value={formik.values.libraryFee}
+                  onChange={formik.handleChange}
+                />
+              </Grid>
+
+              {/* Student Information Title */}
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Student Information
+                </Typography>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Student Name</FormLabel>
+                <TextField
+                  id="studentName"
+                  name="studentName"
+                  size="small"
+                  fullWidth
+                  value={formik.values.studentName}
+                  onChange={formik.handleChange}
+                  error={formik.touched.studentName && !!formik.errors.studentName}
+                  helperText={formik.touched.studentName && formik.errors.studentName}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Student Contact No.</FormLabel>
+                <TextField
+                  id="studentContact"
+                  name="studentContact"
+                  size="small"
+                  fullWidth
+                  value={formik.values.studentContact}
+                  onChange={formik.handleChange}
+                  error={formik.touched.studentContact && !!formik.errors.studentContact}
+                  helperText={formik.touched.studentContact && formik.errors.studentContact}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Fathers Name</FormLabel>
+                <TextField
+                  id="fatherName"
+                  name="fatherName"
+                  size="small"
+                  fullWidth
+                  value={formik.values.fatherName}
+                  onChange={formik.handleChange}
+                  error={formik.touched.fatherName && !!formik.errors.fatherName}
+                  helperText={formik.touched.fatherName && formik.errors.fatherName}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Fathers Contact No.</FormLabel>
+                <TextField
+                  id="fatherContact"
+                  name="fatherContact"
+                  size="small"
+                  fullWidth
+                  value={formik.values.fatherContact}
+                  onChange={formik.handleChange}
+                  error={formik.touched.fatherContact && !!formik.errors.fatherContact}
+                  helperText={formik.touched.fatherContact && formik.errors.fatherContact}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Date of Birth</FormLabel>
+                <TextField
+                  id="dob"
+                  name="dob"
+                  type="date"
+                  size="small"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={formik.values.dob}
+                  onChange={formik.handleChange}
+                  error={formik.touched.dob && !!formik.errors.dob}
+                  helperText={formik.touched.dob && formik.errors.dob}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Gender</FormLabel>
+                <TextField
+                  id="gender"
+                  name="gender"
+                  size="small"
+                  fullWidth
+                  select
+                  value={formik.values.gender}
+                  onChange={formik.handleChange}
+                  error={formik.touched.gender && !!formik.errors.gender}
+                  helperText={formik.touched.gender && formik.errors.gender}
+                >
+                  <MenuItem value="Male">Male</MenuItem>
+                  <MenuItem value="Female">Female</MenuItem>
+                  <MenuItem value="Other">Other</MenuItem>
+                </TextField>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Email ID</FormLabel>
+                <TextField
+                  id="mailId"
+                  name="mailId"
+                  size="small"
+                  fullWidth
+                  value={formik.values.mailId}
+                  onChange={formik.handleChange}
+                  error={formik.touched.mailId && !!formik.errors.mailId}
+                  helperText={formik.touched.mailId && formik.errors.mailId}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Course / Occupation</FormLabel>
+                <TextField
+                  id="courseOccupation"
+                  name="courseOccupation"
+                  size="small"
+                  fullWidth
+                  value={formik.values.courseOccupation}
+                  onChange={formik.handleChange}
+                  error={formik.touched.courseOccupation && !!formik.errors.courseOccupation}
+                  helperText={formik.touched.courseOccupation && formik.errors.courseOccupation}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={12} md={12}>
+                <FormLabel>Full Address</FormLabel>
+                <TextField
+                  id="address"
+                  name="address"
+                  size="small"
+                  fullWidth
+                  multiline
+                  rows={2}
+                  value={formik.values.address}
+                  onChange={formik.handleChange}
+                  error={formik.touched.address && !!formik.errors.address}
+                  helperText={formik.touched.address && formik.errors.address}
+                />
+              </Grid>
+
+              {/* Uploads */}
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Upload Student Photo</FormLabel>
+                <Input
+                  id="studentPhoto"
+                  name="studentPhoto"
+                  type="file"
+                  onChange={(event) => formik.setFieldValue('studentPhoto', event.currentTarget.files[0])}
+                />
+                {formik.touched.studentPhoto && formik.errors.studentPhoto && (
+                  <div
+                    style={{
+                      color: '#f44336',
+                      fontSize: '0.75rem',
+                      marginTop: '4px',
+                      marginRight: '14px',
+                      marginLeft: '14px',
+                      fontFamily: 'Roboto,sans-serif',
+                      fontWeight: '400'
+                    }}
                   >
-                  <MenuItem value="">Select Method</MenuItem>
-                  <MenuItem key="cash" value="cash">Cash</MenuItem>
-                  <MenuItem key="online" value="online">Online</MenuItem>
-                  <MenuItem key="netBanking" value="netBanking">Net Banking</MenuItem>
-                  </Select>
-                  {formik.touched.paymentMethod && formik.errors.paymentMethod ? (
-                    <FormHelperText error>{formik.errors.paymentMethod}</FormHelperText>
-                  ) : null}
-              </Grid>  */}
+                    {formik.errors.studentPhoto}
+                  </div>
+                )}
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Upload AadharCard Photo</FormLabel>
+                <Input
+                  id="aadharPhoto"
+                  name="aadharPhoto"
+                  type="file"
+                  onChange={(event) => formik.setFieldValue('aadharPhoto', event.currentTarget.files[0])}
+                />
+                {formik.touched.aadharPhoto && formik.errors.aadharPhoto && (
+                  <div
+                    style={{
+                      color: '#f44336',
+                      fontSize: '0.75rem',
+                      marginTop: '4px',
+                      marginRight: '14px',
+                      marginLeft: '14px',
+                      fontFamily: 'Roboto,sans-serif',
+                      fontWeight: '400'
+                    }}
+                  >
+                    {formik.errors.aadharPhoto}
+                  </div>
+                )}
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Local Guardians Name</FormLabel>
+                <TextField
+                  id="guardianName"
+                  name="guardianName"
+                  size="small"
+                  fullWidth
+                  value={formik.values.guardianName}
+                  onChange={formik.handleChange}
+                  error={formik.touched.guardianName && !!formik.errors.guardianName}
+                  helperText={formik.touched.guardianName && formik.errors.guardianName}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Local Guardians Contact No.</FormLabel>
+                <TextField
+                  id="guardianContactNo"
+                  name="guardianContactNo"
+                  size="small"
+                  fullWidth
+                  value={formik.values.guardianContactNo}
+                  onChange={formik.handleChange}
+                  error={formik.touched.guardianContactNo && !!formik.errors.guardianContactNo}
+                  helperText={formik.touched.guardianContactNo && formik.errors.guardianContactNo}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={12} md={12}>
+                <FormLabel>Local Guardians Full Address</FormLabel>
+                <TextField
+                  id="guardiansAddress"
+                  name="guardiansAddress"
+                  size="small"
+                  fullWidth
+                  multiline
+                  rows={2}
+                  value={formik.values.guardiansAddress}
+                  onChange={formik.handleChange}
+                  error={formik.touched.guardiansAddress && !!formik.errors.guardiansAddress}
+                  helperText={formik.touched.guardiansAddress && formik.errors.guardiansAddress}
+                />
+              </Grid>
             </Grid>
           </form>
         </DialogContent>
+
         <DialogActions>
           <Button onClick={formik.handleSubmit} variant="contained" color="primary" type="submit">
             Save
           </Button>
-          <Button onClick={handleClose} variant="outlined" color="error">
+          <Button
+            onClick={() => {
+              formik.resetForm();
+              handleClose();
+            }}
+            variant="outlined"
+            color="error"
+          >
             Cancel
           </Button>
         </DialogActions>

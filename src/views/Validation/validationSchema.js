@@ -138,25 +138,21 @@ export const hostelValidationSchema = Yup.object({
 
 export const hostelNewValidationSchema = Yup.object({
   hostelName: Yup.string()
-    .matches(/^[A-Za-z\s]+$/, 'Name must contain only letters')
+    .matches(/^[A-Za-z\s]+$/, 'Hostel Name must contain only letters and spaces')
+    .max(50, 'Hostel Name must be at most 50 characters')
     .required('Hostel Name is required'),
   hostelPhoneNumber: Yup.string()
-    .matches(/^[6-9]\d{9}$/, 'Invalid phone number')
+    .matches(/^\d{10}$/, 'Phone number must be 10 digits')
     .required('Phone number is required'),
   ownerName: Yup.string()
-    .matches(/^[A-Za-z\s]+$/, 'Name must contain only letters')
+    .matches(/^[A-Za-z\s]+$/, 'Owner Name must contain only letters and spaces')
+    .max(50, 'Owner Name must be at most 50 characters')
     .required('Owner Name is required'),
   ownerPhoneNumber: Yup.string()
-    .matches(/^[6-9]\d{9}$/, 'Invalid phone number')
+    .matches(/^\d{10}$/, 'Phone number must be 10 digits')
     .required('Phone number is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
-  password: Yup.string()
-    .required('Password is required')
-    .min(8, 'Password must be at least 8 characters')
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,}$/,
-      'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number'
-    ),
+  password: Yup.string().max(20, 'Password must be at most 20 characters').required('Password is required'),
   state: Yup.string().required('State is required'),
   city: Yup.string().required('City is required'),
   address: Yup.string().required('Address is required'),
@@ -166,16 +162,18 @@ export const hostelNewValidationSchema = Yup.object({
 
 export const editHostelValidationSchema = Yup.object({
   hostelName: Yup.string()
-    .matches(/^[A-Za-z\s]+$/, 'Name must contain only letters')
+    .matches(/^[A-Za-z\s]+$/, 'Hostel Name must contain only letters and spaces')
+    .max(50, 'Hostel Name must be at most 50 characters')
     .required('Hostel Name is required'),
   hostelPhoneNumber: Yup.string()
-    .matches(/^[6-9]\d{9}$/, 'Invalid phone number')
+    .matches(/^\d{10}$/, 'Phone number must be 10 digits')
     .required('Phone number is required'),
   ownerName: Yup.string()
-    .matches(/^[A-Za-z\s]+$/, 'Name must contain only letters')
+    .matches(/^[A-Za-z\s]+$/, 'Owner Name must contain only letters and spaces')
+    .max(50, 'Owner Name must be at most 50 characters')
     .required('Owner Name is required'),
   ownerPhoneNumber: Yup.string()
-    .matches(/^[6-9]\d{9}$/, 'Invalid phone number')
+    .matches(/^\d{10}$/, 'Phone number must be 10 digits')
     .required('Phone number is required'),
   state: Yup.string().required('State is required'),
   city: Yup.string().required('City is required'),
@@ -185,11 +183,17 @@ export const editHostelValidationSchema = Yup.object({
 });
 
 export const roomValidationSchema = Yup.object({
-  roomCategory: Yup.string().required('Select Room Category is required'),
   roomType: Yup.string().required('Select Room Type is required'),
-  roomNumber: Yup.string().required('Room number is required'),
-  noOfBeds: Yup.number().required('No of Beds is required'),
-  roomPrice: Yup.number().required('Room price is required'),
+  roomNumber: Yup.string().max(20, 'Room number must not exceed 20 characters').required('Room number is required'),
+  noOfBeds: Yup.number()
+    .typeError('No of Beds must be a number')
+    .positive('No of Beds must be a positive number')
+    .max(10, 'No of Beds cannot be more than 10')
+    .required('No of Beds is required'),
+  roomPrice: Yup.number()
+    .typeError('Room price must be a number')
+    .positive('Room price must be a positive number')
+    .required('Room price is required'),
   roomphoto: Yup.mixed().required('Room Photos is required')
 });
 
@@ -226,6 +230,63 @@ export const addStudentValidationSchema = Yup.object({
   advancePayment: Yup.number().required('Advance Payment is required').integer('Advance Payment must be an integer')
 });
 
+export const addReservedBedValidationSchema = Yup.object({
+  roomCategory: Yup.string().required('Room Type is required'),
+  roomType: Yup.string().required('Room Type is required'),
+  roomNumber: Yup.string().required('Room No is required'),
+  bedNumber: Yup.string().required('Bed No is required'),
+  roomRent: Yup.number().typeError('Room Price must be a number').required('Room Price is required'),
+  startDate: Yup.date().required('Start Date is required'),
+  endDate: Yup.date().min(Yup.ref('startDate'), 'End Date cannot be before Start Date').required('End Date is required'),
+  stayMonths: Yup.number().typeError('Account of Stay Months must be a number').required('Account of Stay Months is required'),
+  totalRent: Yup.number().typeError('Total Rent must be a number').required('Total Rent is required'),
+  advanceAmount: Yup.number().typeError('Advance Amount must be a number').required('Advance Amount is required'),
+
+  studentName: Yup.string()
+    .matches(/^[A-Za-z\s]+$/, 'Student Name can only contain letters')
+    .max(30, 'Student Name must be at most 30 characters')
+    .required('Student Name is required'),
+
+  studentContact: Yup.string()
+    .matches(/^[0-9]{10}$/, 'Contact No must be exactly 10 digits')
+    .required('Contact No is required'),
+
+  fatherName: Yup.string()
+    .matches(/^[A-Za-z\s]+$/, 'Father Name can only contain letters')
+    .max(30, 'Father Name must be at most 30 characters')
+    .required('Father Name is required'),
+
+  fatherContact: Yup.string()
+    .matches(/^[0-9]{10}$/, 'Father Contact No must be exactly 10 digits')
+    .required('Father Contact No is required'),
+
+  guardianName: Yup.string()
+    .matches(/^[A-Za-z\s]+$/, 'Guardian Name can only contain letters')
+    .max(30, 'Guardian Name must be at most 30 characters')
+    .required('Guardian Name is required'),
+
+  guardianContactNo: Yup.string()
+    .matches(/^[0-9]{10}$/, 'Guardian Contact No must be exactly 10 digits')
+    .required('Guardian Contact No is required'),
+
+  guardiansAddress: Yup.string().max(100, 'Address must be at most 100 characters').required('Address is required'),
+
+  dob: Yup.date().max(new Date(), 'Date of Birth cannot be a future date').required('Date of Birth is required'),
+  gender: Yup.string().required('Gender is required'),
+  mailId: Yup.string().required('Main ID is required'),
+  courseOccupation: Yup.string().max(100, 'Course Occupation must be at most 100 characters').required('Course / Occupation is required'),
+  address: Yup.string().max(100, 'Address must be at most 100 characters').required('Address is required')
+});
+
+export const editReservedBedValidationSchema = Yup.object({
+  roomCategory: Yup.string().required('Room Type is required'),
+  roomType: Yup.string().required('Room Type is required'),
+  roomNumber: Yup.string().required('Room No is required'),
+  bedNumber: Yup.string().required('Bed No is required'),
+  startDate: Yup.date().required('Start Date is required'),
+  endDate: Yup.date().min(Yup.ref('startDate'), 'End Date cannot be before Start Date').required('End Date is required')
+});
+
 export const editStudentValidationSchema = Yup.object({
   studentName: Yup.string().required('Student Name is required'),
   studentPhoneNo: Yup.string()
@@ -253,12 +314,14 @@ export const editStudentValidationSchema = Yup.object({
 });
 
 export const studentComplaintValidationSchema = Yup.object({
+  studentId: Yup.string().required('Student is required'),
   datetime: Yup.date().required('Date and time are required'),
   problemDescription: Yup.string().required('Problem Description is required'),
   status: Yup.string().required('Status is required')
 });
 
 export const visitorValidationSchema = Yup.object({
+  studentId: Yup.string().required('Student is required'),
   visitorName: Yup.string()
     .matches(/^[A-Za-z\s]+$/, 'Name must contain only letters')
     .required('Visitor Name is required'),
@@ -331,10 +394,11 @@ export const weeklyFoodValidationSchema = Yup.object().shape({
 });
 
 export const paymentValidationSchema = Yup.object({
-  // studentName: Yup.string().required('Student Name is required'),
-  month: Yup.string().required('Month is required'),
-  paymentDate: Yup.date().required('Date is required'),
-  paymentType: Yup.string().required('Payment Method is required'),
-  paymentAmount: Yup.number().positive('Amount must be positive').required('Payment Amount is required'),
-  paymentAttachment: Yup.mixed().nullable()
+  studentId: Yup.string().required('Student is required'),
+  paymentMethod: Yup.string().required('Payment Method is required'),
+  date: Yup.date().required('Date is required'),
+  paymentAmount: Yup.number()
+    .typeError('Amount must be a number')
+    .positive('Amount must be positive')
+    .required('Payment Amount is required')
 });

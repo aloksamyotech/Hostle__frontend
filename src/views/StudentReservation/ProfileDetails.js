@@ -30,6 +30,7 @@ import axios from 'axios';
 import moment from 'moment';
 import TableStyle from '../../ui-component/TableStyle';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const ProfileDetails = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -47,13 +48,11 @@ const ProfileDetails = () => {
   const [studentName, setStudentName] = useState('');
 
   const location = useLocation();
-  console.log('location=>', location);
   const pathname = location.pathname;
-
-  // Split the pathname by slashes and get the last part
   const parts = pathname.split('/');
   const id = parts[parts.length - 1];
-  console.log('id in profile componenet  ==>', id);
+
+  console.log('student id :', id);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -67,7 +66,6 @@ const ProfileDetails = () => {
 
   const fetchStudentDetails = async () => {
     try {
-      console.log('Making API With This URL==>', `${REACT_APP_BACKEND_URL}/sudent_reservation/view/${id}`);
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/view/${id}`);
       console.log('API fetch StudentDetails response=>', response);
       setProfileData(response.data.result);
@@ -187,7 +185,7 @@ const ProfileDetails = () => {
         </Box>
       </Box>
 
-      {activeTab === 0 && (
+      {/* {activeTab === 0 && (
         <>
           <Card style={{ borderTopLeftRadius: '0px', borderTopRightRadius: '0px', marginTop: '10px' }}>
             <Box p={3}>
@@ -279,6 +277,170 @@ const ProfileDetails = () => {
             </Box>
           </Card>
         </>
+      )} */}
+
+      {activeTab === 0 && (
+        <Box sx={{ flexGrow: 1, overflowX: 'auto', mt: 2 }}>
+          <Grid container spacing={2}>
+            {/* Room Information */}
+            <Grid item xs={12} md={6}>
+              <Card>
+                <Box p={3}>
+                  <Typography variant="h4" fontWeight="bold">
+                    Room Information
+                  </Typography>
+                  <hr />
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Room Number:</Typography>
+                      <Typography>{profileData?.roomNumber || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Room Type:</Typography>
+                      <Typography>{profileData?.roomType || 'N/A'} seater</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Bed Number:</Typography>
+                      <Typography>{profileData?.bedNumber || 'N/A'} </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Monthly Room Rent:</Typography>
+                      <Typography>{profileData?.roomRent || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Total Stay Months:</Typography>
+                      <Typography>{profileData?.stayMonths || 'N/A'}</Typography>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Total Rent till EndMonth:</Typography>
+                      <Typography>{profileData?.totalRent || 'N/A'}</Typography>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Advance Payment:</Typography>
+                      <Typography>{profileData?.advanceAmount || 'N/A'}</Typography>
+                    </Grid>
+
+
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Food Amount:</Typography>
+                      <Typography>{profileData?.foodFee || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Library Amount:</Typography>
+                      <Typography>{profileData?.libraryFee || 'N/A'}</Typography>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Start Date:</Typography>
+                      <Typography>{moment(profileData?.startDate).format('DD-MM-YYYY')}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">End Date:</Typography>
+                      <Typography>{moment(profileData?.endDate).format('DD-MM-YYYY')}</Typography>
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Card>
+            </Grid>
+
+            {/* Student Information */}
+            <Grid item xs={12} md={6}>
+              <Card>
+                <Box p={3}>
+                  <Typography variant="h4" fontWeight="bold">
+                    Student Information
+                  </Typography>
+                  <hr />
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Student Name:</Typography>
+                      <Typography>{profileData?.studentId?.studentName || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Contact No :</Typography>
+                      <Typography>{profileData?.studentId?.studentContact || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Email:</Typography>
+                      <Typography>{profileData?.studentId?.mailId || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Gender:</Typography>
+                      <Typography>{profileData?.studentId?.gender || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">DOB:</Typography>
+                      <Typography>{moment(profileData?.studentId?.dob).format('DD-MM-YYYY') || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Fathers Name:</Typography>
+                      <Typography>{profileData?.studentId?.fatherName || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Fathers Phone No:</Typography>
+                      <Typography>{profileData?.studentId?.fatherContact || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Address:</Typography>
+                      <Typography>{profileData?.studentId?.address || 'N/A'}</Typography>
+                    </Grid>
+
+                    {/* Additional fields */}
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Course/Occupation:</Typography>
+                      <Typography>{profileData?.studentId?.courseOccupation || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Guardian Name:</Typography>
+                      <Typography>{profileData?.studentId?.guardianName || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Guardian Contact No:</Typography>
+                      <Typography>{profileData?.studentId?.guardianContactNo || 'N/A'}</Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Guardian Address:</Typography>
+                      <Typography>{profileData?.studentId?.guardiansAddress || 'N/A'}</Typography>
+                    </Grid>
+
+                    <Grid item xs={6}>
+                      <Typography variant="h6">Student Photo:</Typography>
+                      <Typography style={{ color: 'black', marginTop: '7px' }}>
+                        <a
+                          href={`${REACT_APP_BACKEND_URL}/uploads/students/${profileData?.studentId?.aadharPhoto}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ textDecoration: 'none' }}
+                        >
+                          <Button startIcon={<VisibilityIcon />} variant="contained" color="primary">
+                            View Id Photo
+                          </Button>
+                        </a>
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6} md={6}>
+                      <Typography variant="h6">Aadhar Proof:</Typography>
+                      <Typography style={{ color: 'black', marginTop: '7px' }}>
+                        <a
+                          href={`${REACT_APP_BACKEND_URL}/uploads/students/${profileData?.studentId?.aadharPhoto}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ textDecoration: 'none' }}
+                        >
+                          <Button startIcon={<VisibilityIcon />} variant="contained" color="primary">
+                            View Aadhar
+                          </Button>
+                        </a>
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Box>
+              </Card>
+            </Grid>
+          </Grid>
+        </Box>
       )}
 
       {activeTab === 1 && (

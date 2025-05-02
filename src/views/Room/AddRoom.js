@@ -20,31 +20,37 @@ import Cookies from 'js-cookie';
 import { ToastContainer, toast } from 'react-toastify';
 import { useState } from 'react';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import { format } from 'date-fns';
 
 const AddRoom = (props) => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-  const { open, handleClose, hostelId, editRoom } = props;
+  const { open, handleClose, hostelId, rowData } = props;
+ 
+  
 
-  const [roomType, setRoomType] = useState();
+  const [roomType, setRoomType] = useState([]);
   const [roomPhotos, setRoomPhotos] = useState([]);
   const [previews, setPreviews] = useState([]);
 
   const formik = useFormik({
     initialValues: {
-      roomCategory: '',
-      roomType: '',
-      roomNumber: '',
-      noOfBeds: '',
-      roomPrice: '',
+      roomTypeId : rowData?.roomTypeId || '',
+      roomType: rowData?.roomTypeId || '',
+      roomNumber: rowData?.roomNumber || '',
+      noOfBeds: rowData?.noOfBeds || '',
+      roomPrice: rowData?.roomPrice || '',
       roomphoto: []
     },
     validationSchema: roomValidationSchema,
+    enableReinitialize: true,
 
     onSubmit: async (values) => {
-      console.log('Form values hyyyyyyyyyyyyy ======>', values);
+
+      console.log("values :::::", values);
+      
       try {
         const formData = new FormData();
-
+        formData.append('roomTypeId', values.roomTypeId);
         formData.append('roomCategory', values.roomCategory);
         formData.append('roomType', values.roomType);
         formData.append('roomNumber', values.roomNumber);
@@ -55,23 +61,36 @@ const AddRoom = (props) => {
           formData.append('roomPhotos', photo);
         });
 
-        const response = await axios.post(`${REACT_APP_BACKEND_URL}/room/add/${hostelId}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+        let response;
 
-        console.log('response : =====>', response);
+        if (rowData) {
+          response = await axios.put(`${REACT_APP_BACKEND_URL}/room/edit/${rowData?._id}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+        } else {
+          response = await axios.post(`${REACT_APP_BACKEND_URL}/room/add/${hostelId}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+        }
 
         if (response.status === 201) {
           toast.success('Room Details Added Successfully !!');
-          handleClose();
-          formik.resetForm();
+          setRoomPhotos([]);
+          setPreviews([]);
+        } else if (response.status === 200) {
+          toast.success('Room Details Update Successfully !!');
           setRoomPhotos([]);
           setPreviews([]);
         } else {
           toast.error('Failed to Add Room Details');
         }
+
+        handleClose();
+        formik.resetForm();
       } catch (error) {
         console.log('Error=>', error);
         toast.error('Something went wrong!');
@@ -86,7 +105,7 @@ const AddRoom = (props) => {
   const fetchRoomTypesData = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/roomTypes/getall/${hostelId}`);
-      setRoomType(response.data.result);
+      setRoomType(response?.data?.result);
     } catch (error) {
       console.error('Error fetching Room Type Data:', error);
     }
@@ -126,7 +145,13 @@ const AddRoom = (props) => {
         >
           <Typography variant="h6">Room Basic Details</Typography>
           <Typography>
-            <ClearIcon onClick={handleClose} style={{ cursor: 'pointer' }} />
+            <ClearIcon
+              onClick={() => {
+                formik.resetForm();
+                handleClose();
+              }}
+              style={{ cursor: 'pointer' }}
+            />
           </Typography>
         </DialogTitle>
 
@@ -134,45 +159,29 @@ const AddRoom = (props) => {
           <form onSubmit={formik.handleSubmit}>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Room Category</FormLabel>
-                <Select
-                  id="roomCategory"
-                  name="roomCategory"
-                  size="small"
-                  fullWidth
-                  value={formik.values.roomCategory}
-                  onChange={formik.handleChange}
-                  error={formik.touched.roomCategory && !!formik.errors.roomCategory}
-                >
-                  <MenuItem value="">Select Room Category</MenuItem>
-                  <MenuItem value="AC">AC</MenuItem>
-                  <MenuItem value="Non-AC">Non-AC</MenuItem>
-                </Select>
-                {formik.touched.roomCategory && formik.errors.roomCategory && (
-                  <FormHelperText error>{formik.errors.roomCategory}</FormHelperText>
-                )}
-              </Grid>
-
-              {/* Room Type Selection */}
-              <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Room Type</FormLabel>
                 <Select
                   id="roomType"
                   name="roomType"
                   size="small"
                   fullWidth
-                  value={formik.values.roomType}
-                  onChange={formik.handleChange}
+                  value={formik.values.roomTypeId}
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    const selected = roomType.find((type) => type._id === selectedId);
+
+                    formik.setFieldValue('roomTypeId', selected._id); // store the unique ID
+                    formik.setFieldValue('roomType', selected.roomType); // store the string like "single"
+                    formik.setFieldValue('roomCategory', selected.roomCategory); // store the string like "AC"
+                  }}
                   error={formik.touched.roomType && !!formik.errors.roomType}
                 >
                   <MenuItem value="">Select Room Type</MenuItem>
-                  {roomType
-                    ?.filter((type) => type.roomCategory === formik.values.roomCategory)
-                    .map((type) => (
-                      <MenuItem key={type._id} value={type.roomType}>
-                        {type.roomType}
-                      </MenuItem>
-                    ))}
+                  {roomType.map((type) => (
+                    <MenuItem key={type._id} value={type._id}>
+                      {type.roomType} | {type.roomCategory}
+                    </MenuItem>
+                  ))}
                 </Select>
                 {formik.touched.roomType && formik.errors.roomType && <FormHelperText error>{formik.errors.roomType}</FormHelperText>}
               </Grid>
@@ -223,34 +232,6 @@ const AddRoom = (props) => {
                   inputProps={{ min: 0 }}
                 />
               </Grid>
-
-              {/* Room Photo Upload */}
-              {/* <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Select Multiple Room Photos</FormLabel>
-                <input
-                  id="roomphoto"
-                  name="roomphoto"
-                  type="file"
-                  multiple
-                  onChange={(event) => {
-                    const files = Array.from(event.currentTarget.files);
-                    formik.setFieldValue('roomphoto', files);
-                  }}
-                />
-                {Array.isArray(editRoom?.roomphoto) && editRoom.roomphoto.length > 0 && (
-                  <div style={{ marginTop: '8px' }}>
-                    <Typography variant="body2" fontWeight="bold">
-                      Existing Photos:
-                    </Typography>
-                    {editRoom.roomphoto.map((fileName, index) => (
-                      <Typography key={index} variant="body2">
-                        {fileName}
-                      </Typography>
-                    ))}
-                  </div>
-                )}
-                {formik.touched.roomphoto && formik.errors.roomphoto && <FormHelperText error>{formik.errors.roomphoto}</FormHelperText>}
-              </Grid> */}
 
               <Grid item xs={12}>
                 <FormLabel>Upload Room Photos (Max 3)</FormLabel>
@@ -303,7 +284,14 @@ const AddRoom = (props) => {
               <Button onClick={formik.handleSubmit} variant="contained" color="primary" type="submit">
                 Save
               </Button>
-              <Button onClick={handleClose} variant="outlined" color="error">
+              <Button
+                onClick={() => {
+                  formik.resetForm();
+                  handleClose();
+                }}
+                variant="outlined"
+                color="error"
+              >
                 Cancel
               </Button>
             </DialogActions>

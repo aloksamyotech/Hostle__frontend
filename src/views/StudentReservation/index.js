@@ -22,7 +22,8 @@ import {
   Tab,
   Tabs,
   MenuItem,
-  Popover
+  Popover,
+  Chip
 } from '@mui/material';
 import Iconify from '../../ui-component/iconify';
 import AddNewReservation from './AddNewReservation';
@@ -39,27 +40,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
-
-const HeaderCell = styled(MuiTableCell)(({ theme }) => ({
-  backgroundColor: theme.palette.grey[200],
-  color: theme.palette.common.black,
-  fontWeight: 'bold',
-  padding: theme.spacing(1)
-}));
-
-const TableCell = styled(MuiTableCell)(({ theme }) => ({
-  padding: theme.spacing(1),
-  borderBottom: `1px solid ${theme.palette.divider}`
-}));
-
-const TableRow = styled(MuiTableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}));
+import { render } from '@fullcalendar/core/preact';
+import EditReservation from './EditReservation';
 
 const StudentReservation = () => {
   const [page, setPage] = useState(0);
@@ -69,12 +51,13 @@ const StudentReservation = () => {
   const [editStudent, setEditStudent] = useState(null);
   const [hostelId, setHostelId] = useState(null);
   const [deleteStudentId, setDeleteStudentId] = useState(null);
-  const [studentData, setStudentsData] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState({});
   const [anchorEl, setAnchorEl] = useState(null);
   const [rowData, setRowData] = useState();
+  const [studentData, setStudentsData] = useState([]);
+  const [openEdit, setOpenEdit] = useState(false);
 
   const navigate = useNavigate();
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -84,26 +67,15 @@ const StudentReservation = () => {
     if (Hos_Id) {
       setHostelId(Hos_Id);
     }
-    fetchReserveStudentData(Hos_Id);
-  }, []);
+    fetchStudents(Hos_Id);
+  }, [openAdd, openEdit]);
 
-  // Fetch All Student Data Here
-  const fetchReserveStudentData = async (hostelId) => {
+  const fetchStudents = async (hostelId) => {
     try {
-      const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
-      console.log('------ fetchReserveStudentData response ----------> ', response);
-
-      const students = response.data.result;
-      setStudentsData(students);
-      setTotalCount(response.data.totalRecodes);
-
-      const initialStatus = {};
-      students.forEach((student) => {
-        initialStatus[student._id] = student.status === 'active';
-      });
-      setStatus(initialStatus);
+      const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/getAllReservedStudents/${hostelId}`);
+      setStudentsData(response?.data?.data);
     } catch (error) {
-      console.error('Error fetching student data:', error);
+      console.error('Error fetching room data:', error);
     }
   };
 
@@ -113,28 +85,19 @@ const StudentReservation = () => {
 
   const handleCloseAdd = () => {
     setOpenAdd(false);
-    fetchReserveStudentData(hostelId);
-    setEditStudent(null);
   };
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+  const handleOpenEdit = () => {
+    setOpenEdit(true);
+    setRowData(row);
   };
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
   };
 
   const handleNavigate = (id) => {
     navigate(`/dashboard/student_reservation/view_profile/${id}`);
-  };
-
-  // Handle Edit Action Here
-  const handleEdit = (id) => {
-    setOpenAdd(true);
-    let student = studentData.find((student) => student._id === id);
-    setEditStudent(student);
   };
 
   // Handle Delete Action Here
@@ -142,18 +105,6 @@ const StudentReservation = () => {
     setOpenDeleteDialog(true);
     setDeleteStudentId(id);
   };
-
-  const handleClick = (event, row) => {
-    setAnchorEl(event.currentTarget);
-    setRowData(row);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-    setRowData(null);
-  };
-
-  const open = Boolean(anchorEl);
 
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false);
@@ -169,54 +120,45 @@ const StudentReservation = () => {
     }
   };
 
-  // For Filter Search Input
-  const handleChange = (event) => {
-    setQuery(event.target.value);
+  const handleClick = (event, row) => {
+    setAnchorEl(event.currentTarget);
+    setRowData(row);
   };
 
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
-      setPage(0);
-    }
+  const handleClose = () => {
+    setAnchorEl(null);
+    setRowData(null);
   };
 
-  const generalFilter = (row) => {
-    const lowerCaseQuery = query.toLowerCase();
-    return Object.values(row).some((value) => {
-      return value !== undefined && value !== null && value.toString().toLowerCase().includes(lowerCaseQuery);
-    });
-  };
-
-  const filteredData = studentData.filter(generalFilter);
-  console.log('filteredData : =======>', filteredData);
-
-  const handleStatusToggle = async (id) => {
-    const newStatus = !status[id];
-    console.log('on id =>id', id, 'status=>', newStatus);
-    // if(newStatus){
-    //   status = 'active'
-    // }else{
-    //   status = 'deactive'
-    // }
-    try {
-      console.log('url up =>', `${REACT_APP_BACKEND_URL}/sudent_reservation/updateStatus/${id}`, {
-        status: newStatus ? 'active' : 'deactive'
-      });
-      const response = await axios.put(`${REACT_APP_BACKEND_URL}/sudent_reservation/updateStatus/${id}`, {
-        status: newStatus ? 'active' : 'deactive'
-      });
-      console.log('url down =>', `${REACT_APP_BACKEND_URL}/sudent_reservation/updateStatus/${id}`, {
-        status: newStatus ? 'active' : 'deactive'
-      });
-      console.log('response     ===========>   ', response);
-      setStatus((prevStatus) => ({ ...prevStatus, [id]: newStatus }));
-      console.log('on id =========>id', id, 'status=>', newStatus);
-    } catch (error) {
-      console.error('Error updating student status:', error);
-    }
-  };
+  const open = Boolean(anchorEl);
 
   const columns = [
+    {
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+    },
+    {
+      field: 'roomNumber',
+      headerName: 'Room Number',
+      flex: 1,
+      cellClassName: 'name-column--cell--capitalize',
+      renderCell: (params) => {
+        return (
+          <Box>
+            <Typography variant="body1" fontWeight="bold">
+              {params.row.roomNumber}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {params.row.roomType}
+            </Typography>
+          </Box>
+        );
+      }
+    },
     {
       field: 'studentName',
       headerName: 'Student Name',
@@ -224,21 +166,25 @@ const StudentReservation = () => {
       cellClassName: 'name-column--cell name-column--cell--capitalize',
       renderCell: (params) => {
         return (
-          <Box>
-            <Box onClick={() => handleNavigate(params.row._id)}>{params.value}</Box>
+          <Box onClick={() => handleNavigate(params.row.studentId._id)} sx={{ cursor: 'pointer' }}>
+            <Typography variant="body1" fontWeight="bold">
+              {params.row.studentId?.studentName}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {params.row.studentId?.studentContact}
+            </Typography>
           </Box>
         );
       }
     },
-    {
-      field: 'studentPhoneNo',
-      headerName: 'Student PhoneNo',
-      flex: 1
-    },
+
     {
       field: 'email',
       headerName: 'Email',
-      flex: 1
+      flex: 1,
+      renderCell: (params) => {
+        return params.row.studentId?.mailId;
+      }
     },
     {
       field: 'startDate',
@@ -257,9 +203,23 @@ const StudentReservation = () => {
       }
     },
     {
-      field: 'address',
-      headerName: 'Address',
-      flex: 1
+      field: 'status',
+      headerName: 'Status',
+      flex: 1,
+      renderCell: (params) => {
+        const status = params.row.studentId?.status;
+        const isActive = status === 'active';
+
+        return (
+          <Chip
+            label={params.row.studentId?.status}
+            color={isActive ? 'success' : 'error'}
+            variant="outlined"
+            size="small"
+            style={{ textTransform: 'capitalize', fontWeight: 500 }}
+          />
+        );
+      }
     },
     {
       field: 'action',
@@ -275,21 +235,12 @@ const StudentReservation = () => {
 
   return (
     <>
-      <AddNewReservation open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} editStudent={editStudent} />
+      <EditReservation open={openEdit} handleClose={handleCloseEdit} hostelId={hostelId} rowData={rowData} />
+      <AddNewReservation open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} />
       <Container>
         <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
           <Typography variant="h3">Student Details</Typography>
           <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
-            <TextField
-              name="search"
-              label="Search"
-              value={query}
-              onChange={handleChange}
-              onKeyPress={handleKeyPress}
-              variant="outlined"
-              size="small"
-              placeholder="Type to search by any field"
-            />
             <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
               Add New
             </Button>
@@ -360,9 +311,9 @@ const StudentReservation = () => {
         <TableStyle>
           <Box width="100%">
             <Card style={{ height: '600px', paddingTop: '15px' }}>
-              {filteredData && (
+              {studentData && (
                 <DataGrid
-                  rows={filteredData}
+                  rows={studentData}
                   columns={columns}
                   getRowId={(row) => row?._id}
                   slots={{ toolbar: GridToolbar }}
@@ -399,14 +350,14 @@ const StudentReservation = () => {
       >
         <MenuItem
           onClick={() => {
-            handleEdit(rowData._id);
+            handleOpenEdit();
             handleClose();
           }}
         >
           <EditIcon fontSize="small" sx={{ mr: 1 }} />
           Edit
         </MenuItem>
-        <MenuItem
+        {/* <MenuItem
           onClick={() => {
             handleDelete(rowData._id);
             handleClose();
@@ -414,7 +365,7 @@ const StudentReservation = () => {
         >
           <DeleteIcon fontSize="small" sx={{ mr: 1, color: 'red' }} />
           Delete
-        </MenuItem>
+        </MenuItem> */}
       </Popover>
     </>
   );
