@@ -34,27 +34,9 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import * as React from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-const HeaderCell = styled(MuiTableCell)(({ theme }) => ({
-  backgroundColor: theme.palette.grey[200],
-  color: theme.palette.common.black,
-  fontWeight: 'bold',
-  padding: theme.spacing(1)
-}));
-
-const TableCell = styled(MuiTableCell)(({ theme }) => ({
-  padding: theme.spacing(1),
-  borderBottom: `1px solid ${theme.palette.divider}`
-}));
-
-const TableRow = styled(MuiTableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}));
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
+import { useNavigate } from 'react-router';
 
 const InventoryPurches = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -70,6 +52,7 @@ const InventoryPurches = () => {
   const [rowData, setRowData] = useState();
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const navigate = useNavigate();
 
   const handleOpenAdd = () => {
     setOpenAdd(true);
@@ -213,61 +196,35 @@ const InventoryPurches = () => {
     <>
       <PurchaseInventory open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} editPurchase={editPurchase} />
       <Container>
-        <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
-          <Typography variant="h3">Inventory Purchase</Typography>
-          <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-              Add New
-            </Button>
+        <Box
+          sx={{
+            backgroundColor: 'white',
+            height: '50px',
+            width: '100%',
+            display: 'flex',
+            borderRadius: '10px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 25px',
+            mb: '20px'
+          }}
+        >
+          <Stack direction="row" alignItems="center">
+            <IconButton onClick={() => navigate('/dashboard/default')}>
+              <HomeIcon color="primary" />
+            </IconButton>
+            <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+            <Typography variant="h5">Inventory Purchase List</Typography>
           </Stack>
-        </Stack>
-        {/* <TableStyle>
-          <Box width="100%">
+
+          <Stack direction="row" alignItems="center" spacing={2}>
             <Card>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <HeaderCell>Product Name</HeaderCell>
-                      <HeaderCell>Quantity</HeaderCell>
-                      <HeaderCell>Price</HeaderCell>
-                      <HeaderCell>Date</HeaderCell>
-                      <HeaderCell>Action</HeaderCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {purchaseProduct.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell>{row.productName}</TableCell>
-                        <TableCell>{row.quantity}</TableCell>
-                        <TableCell>{row.price}</TableCell>
-                        <TableCell>{moment(row.date).format('YYYY-MM-DD')}</TableCell>
-                        <TableCell>
-                          <Stack direction="row">
-                            <IconButton onClick={() => handleEdit(row._id)} aria-label="edit" style={{ color: 'green' }}>
-                              <EditOutlined />
-                            </IconButton>
-                            <IconButton onClick={() => handleDelete(row._id)} aria-label="delete" style={{ color: 'red' }}>
-                              <DeleteOutline />
-                            </IconButton>
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <TablePagination
-                component="div"
-                count={totalCount}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+                Add Item
+              </Button>
             </Card>
-          </Box>
-        </TableStyle> */}
+          </Stack>
+        </Box>
 
         <TableStyle>
           <Box width="100%">

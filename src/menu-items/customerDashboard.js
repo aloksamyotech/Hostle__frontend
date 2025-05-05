@@ -43,7 +43,7 @@ const icons = {
 };
 // ==============================|| SUB ADMIN USERS DASHBOARD MENU ITEMS ||============================== //
 const subdashboard = {
-  title: 'Dashboard-Menu',
+  // title: 'Dashboard-Menu',
   type: 'Customer',
   children: [
     {

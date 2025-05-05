@@ -1,192 +1,194 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
-
-// material-ui
-import { Grid } from '@mui/material';
+import { Grid, Box, Typography, Card, Container, Stack, Button } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { gridSpacing } from 'store/constant';
-
-//-----------------------------------------------------
-
 import TotalRooms from './TotalRooms';
 import TotalStudents from './TotalStudents';
 import TotalHostels from './TotalHostels';
 import TotalAdmin from './TotalAdmins';
-import RoomsUpdate from './RoomsUpdate';
-
-
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import TableStyle from 'ui-component/TableStyle';
+import Iconify from 'ui-component/iconify';
+import { useNavigate } from 'react-router-dom';
+import AddHostel from 'views/Hostels/AddHostel';
 
 // ==============================|| SUPER ADMIN DEFAULT DASHBOARD ||============================== //
 
-const SuperAdminDashboard = () =>{
+const SuperAdminDashboard = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-  
-  
-    const theme = useTheme();
-    const [isLoading, setLoading] = useState(true);
-    const [adminId, setAdminId] = useState(null);
-    const [hostelData, setHostelData] = useState(0);
-    const [adminData, setAdminData] = useState(0);
-    const [studentData, setStudnetData] = useState(0);
-    const [roomData, setRoomData] = useState(0);
+  const navigate = useNavigate();
+  const theme = useTheme();
+  const [isLoading, setLoading] = useState(true);
+  const [adminId, setAdminId] = useState(null);
+  const [hostelData, setHostelData] = useState(0);
+  const [adminData, setAdminData] = useState(0);
+  const [studentData, setStudnetData] = useState(0);
+  const [roomData, setRoomData] = useState(0);
+  const [hosteldata, setHosteldata] = useState([]);
+  const [openAdd, setOpenAdd] = useState(false);
 
-    const [hostelsData, setHostelsData] = useState([]);
-    const [hostelName, setHostelName ] = useState([]); 
+  async function fetchDashboardData() {
+    try {
+      const resForHostel = await axios.get(`${REACT_APP_BACKEND_URL}/hostel/list`);
+      setHostelData(resForHostel.data.totalRecodes);
 
-    //Fetch Super Admin Dashboard Data Here-------------
-    async function fetchDashboardData(){
-      try{
-        console.log("in fetchDashboardData---");
+      const responseForAdmin = await axios.get(`${REACT_APP_BACKEND_URL}/administrator/list`);
+      setAdminData(responseForAdmin.data.totalRecodes);
 
-        console.log("URL=>",`${REACT_APP_BACKEND_URL}/hostel/list`);
-        const resForHostel = await axios.get(`${REACT_APP_BACKEND_URL}/hostel/list`);
-        console.log("response for resForStudent ==========>",resForHostel);
-        setHostelData(resForHostel.data.totalRecodes);
-        
-        console.log("URL=>",`${REACT_APP_BACKEND_URL}/administrator/list`);
-        const responseForAdmin = await axios.get(`${REACT_APP_BACKEND_URL}/administrator/list`);
-        console.log("response for responseForAdmin =========>",responseForAdmin);
-        setAdminData(responseForAdmin.data.totalRecodes);
+      const responseForStudent = await axios.get(`${REACT_APP_BACKEND_URL}/student/allStudentCount`);
+      setStudnetData(responseForStudent.data.totalCount);
 
-        console.log("URL=>",`${REACT_APP_BACKEND_URL}/student/allStudentCount`);
-        const responseForStudent = await axios.get(`${REACT_APP_BACKEND_URL}/student/allStudentCount`);
-        console.log("response for responseForStudent =========>",responseForStudent);
-        setStudnetData(responseForStudent.data.totalCount);
+      const responseForRoom = await axios.get(`${REACT_APP_BACKEND_URL}/room/alRooms`);
+      setRoomData(responseForRoom.data.roomRecords);
 
-        console.log("URL=>",`${REACT_APP_BACKEND_URL}/room/alRooms`);
-        const responseForRoom = await axios.get(`${REACT_APP_BACKEND_URL}/room/alRooms`);
-        console.log("response for responseForRoom =========>",responseForRoom);
-        setRoomData(responseForRoom.data.roomRecords);
+      const response = await axios.get(`${REACT_APP_BACKEND_URL}/hostel/list`);
+      console.log('response==>', response);
+      setHosteldata(response.data.result);
 
-        console.log("URL=>",`${REACT_APP_BACKEND_URL}/room/calculate-beds`);
-        const responseForHostelBeds = await axios.get(`${REACT_APP_BACKEND_URL}/room/calculate-beds`);
-        console.log("response for responseForHostelBeds =========>",responseForHostelBeds);
-      
+      const responseForHostelBeds = await axios.get(`${REACT_APP_BACKEND_URL}/room/calculate-beds`);
+      const hostelNames = responseForHostelBeds.data.hostelNames;
+      const hostelsData = responseForHostelBeds.data.hostelsData;
 
-
-        const hostelNames = responseForHostelBeds.data.hostelNames;
-
-        console.log("hostelNames==>",hostelNames);
-        
-        const hostelsData = responseForHostelBeds.data.hostelsData;
-
-        console.log("hostelsData==>",hostelsData);
-        
-
-
-        const combinedData = hostelsData.map((hostelData, index) => ({
-          ...hostelData,
-          HostelName: hostelNames[index] 
+      const combinedData = hostelsData.map((hostelData, index) => ({
+        ...hostelData,
+        HostelName: hostelNames[index]
       }));
-
-      console.log("combinedData==>",combinedData);
-
-      setHostelsData(combinedData);
-
-       
-
-       
-       
-      }catch(error){
-        console.error('Failed to fetch data:', error);
-      }finally{
-        setLoading(false);
-      }
-
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    
+  useEffect(() => {
+    fetchDashboardData();
+  }, [openAdd]);
 
+  const columns = [
+    {
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+    },
+    {
+      field: 'hostelName',
+      headerName: 'Hostel Name',
+      flex: 1.5,
+      cellClassName: 'name-column--cell name-column--cell--capitalize',
+      renderCell: (params) => {
+        return (
+          <Box onClick={() => handleNavigate(params.row._id)} sx={{ cursor: 'pointer' }}>
+            <Typography variant="body1" fontWeight="bold">
+              {params.row.hostelName}
+            </Typography>
+          </Box>
+        );
+      }
+    },
+    {
+      field: 'hostelPhoneNumber',
+      headerName: 'Hostel ContactNo.',
+      flex: 1.5
+    },
+    {
+      field: 'email',
+      headerName: 'Email Id',
+      flex: 1.5
+    },
+    {
+      field: 'ownerName',
+      headerName: 'Owner Name',
+      flex: 1.5,
+      renderCell: (params) => {
+        return (
+          <Box>
+            <Typography variant="body1" fontWeight="bold">
+              {params.row.ownerName}
+            </Typography>
+            <Typography variant="body2" color="textSecondary">
+              {params.row.ownerPhoneNumber}
+            </Typography>
+          </Box>
+        );
+      }
+    },
+    {
+      field: 'address',
+      headerName: 'Address',
+      flex: 2
+    }
+  ];
 
-    // useEffect(() => {
-    //     setLoading(false);
-    // }, []);
+  const handleOpenAdd = () => {
+    setOpenAdd(true);
+  };
 
-    //Get Super Admin Obj Id Which is Seted In Cookies
-    useEffect(()=>{
-      // const AdminId = Cookies.get('_Id');		
-      //   if(AdminId){
-      //     setAdminId(AdminId);
-      //   }
-        fetchDashboardData();
-    },[]);
+  const handleCloseAdd = () => {
+    setOpenAdd(false);
+  };
 
-    return (
-        <Grid container spacing={gridSpacing}>
-          <Grid item xs={12}>
-            <Grid container spacing={gridSpacing}>
-    
-              <Grid item lg={3} md={6} sm={6} xs={12}>
-                <TotalHostels isLoading={isLoading} hostelData={hostelData} />
-              </Grid>
-    
-              <Grid item lg={3} md={6} sm={6} xs={12}>
-                <TotalAdmin isLoading={isLoading} adminData={adminData}/>
-              </Grid>
-    
-              <Grid item sm={6} xs={12} md={6} lg={3}>
-                <TotalStudents isLoading={isLoading} studentData={studentData}/>
-              </Grid>
-    
-              <Grid item sm={6} xs={12} md={6} lg={3}>
-                <TotalRooms isLoading={isLoading} roomData={roomData}/>
-              </Grid>
-    
+  const handleNavigate = (_id) => {
+    navigate(`/superadmindashboard/hostel/view/${_id}`);
+  };
+
+  return (
+    <>
+      <AddHostel open={openAdd} handleClose={handleCloseAdd} />
+      <Grid container spacing={gridSpacing}>
+        <Grid item xs={12}>
+          <Grid container spacing={gridSpacing}>
+            <Grid item lg={3} md={6} sm={6} xs={12}>
+              <TotalHostels isLoading={isLoading} hostelData={hostelData} />
+            </Grid>
+
+            <Grid item lg={3} md={6} sm={6} xs={12}>
+              <TotalAdmin isLoading={isLoading} adminData={adminData} />
+            </Grid>
+
+            <Grid item sm={6} xs={12} md={6} lg={3}>
+              <TotalStudents isLoading={isLoading} studentData={studentData} />
+            </Grid>
+
+            <Grid item sm={6} xs={12} md={6} lg={3}>
+              <TotalRooms isLoading={isLoading} roomData={roomData} />
             </Grid>
           </Grid>
-
-          <Grid item xs={12}>
-            <Grid container spacing={gridSpacing}>
-            {hostelsData.map((hostelData) => (
-                <Grid item xs={12} md={4} key={hostelData.HostelId}>
-                    <RoomsUpdate
-                        title={`${hostelData.HostelName}`}
-                        chartData={[
-                            { label: 'Total Beds', value: hostelData.TotalBeds },
-                            { label: 'Occupied Beds', value: hostelData.TotalOccupiedBeds },
-                            { label: 'Available Beds', value: hostelData.TotalAvailableBeds }
-                        ]}
-                        chartColors={[theme.palette.primary.main, theme.palette.success.main, theme.palette.warning.main]}
-                    />
-                </Grid>
-            ))}
-              
-
-              
-              {/* <Grid item xs={12} md={4} lg={4}>
-                <RoomsUpdate
-                  title="All Hostel Room Updates"
-                  chartData={[
-                    { label: 'America', value: 4344 },
-                    { label: 'Asia', value: 5435 },
-                    { label: 'Europe', value: 1443 },
-                    { label: 'Africa', value: 4443 }
-                  ]}
-                  chartColors={[theme.palette.primary.main, theme.palette.success.main, theme.palette.warning.main]}
-                />
-              </Grid> */}
-            </Grid>
-          </Grid>
-
-{/* <Grid container spacing={3}>
-            {hostelsData.map((hostelData) => (
-                <Grid item xs={12} md={4} key={hostelData.HostelId}>
-                    <RoomsUpdate
-                        title={`Pie Chart for Hostel ${hostelData.HostelId}`}
-                        chartData={[
-                            { label: 'Occupied Beds', value: hostelData.TotalOccupiedBeds },
-                            { label: 'Available Beds', value: hostelData.TotalAvailableBeds }
-                        ]}
-                        chartColors={[theme.palette.primary.main, theme.palette.secondary.main]}
-                    />
-                </Grid>
-            ))}
-        </Grid> */}
-
-
         </Grid>
-      );
-}
+
+        <Grid item xs={12}>
+          <Container>
+            <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
+              <Typography variant="h3">Hostel List</Typography>
+              <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
+                <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+                  Add Hostel
+                </Button>
+              </Stack>
+            </Stack>
+            <TableStyle>
+              <Box width="100%">
+                <Card style={{ height: '500px', paddingTop: '15px' }}>
+                  {hosteldata && (
+                    <DataGrid
+                      rows={hosteldata}
+                      columns={columns}
+                      getRowId={(row) => row?._id}
+                      slots={{ toolbar: GridToolbar }}
+                      slotProps={{ toolbar: { showQuickFilter: true } }}
+                    />
+                  )}
+                </Card>
+              </Box>
+            </TableStyle>
+          </Container>
+        </Grid>
+      </Grid>
+    </>
+  );
+};
 
 export default SuperAdminDashboard;

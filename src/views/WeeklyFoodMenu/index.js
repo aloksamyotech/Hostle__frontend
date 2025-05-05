@@ -34,27 +34,9 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import * as React from 'react';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-const HeaderCell = styled(MuiTableCell)(({ theme }) => ({
-  backgroundColor: theme.palette.grey[200],
-  color: theme.palette.common.black,
-  fontWeight: 'bold',
-  padding: theme.spacing(1)
-}));
-
-const TableCell = styled(MuiTableCell)(({ theme }) => ({
-  padding: theme.spacing(1),
-  borderBottom: `1px solid ${theme.palette.divider}`
-}));
-
-const TableRow = styled(MuiTableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}));
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
+import { useNavigate } from 'react-router-dom';
 
 const WeeklyFoodMenu = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -78,6 +60,7 @@ const WeeklyFoodMenu = () => {
     fetchFoodMenuData(hostelId);
   };
 
+  const navigate = useNavigate();
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   //Get Admin Obj Id Which is Seted In Cookies
@@ -201,14 +184,35 @@ const WeeklyFoodMenu = () => {
     <>
       <FoodMenu open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} editFoodItem={editFoodItem} />
       <Container>
-        <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
-          <Typography variant="h3">Weekly Food Menu</Typography>
-          <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-              Add New
-            </Button>
+        <Box
+          sx={{
+            backgroundColor: 'white',
+            height: '50px',
+            width: '100%',
+            display: 'flex',
+            borderRadius: '10px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 25px',
+            mb: '20px'
+          }}
+        >
+          <Stack direction="row" alignItems="center">
+            <IconButton onClick={() => navigate('/dashboard/default')}>
+              <HomeIcon color="primary" />
+            </IconButton>
+            <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+            <Typography variant="h5">Weekly Food Menu List</Typography>
           </Stack>
-        </Stack>
+
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Card>
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+                Add MenuItem
+              </Button>
+            </Card>
+          </Stack>
+        </Box>
 
         <TableStyle>
           <Box width="100%">

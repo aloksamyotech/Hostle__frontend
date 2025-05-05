@@ -47,7 +47,7 @@ import {
   // ==============================|| SUPER ADMIN DASHBOARD MENU ITEMS ||============================== //
   
   const superdashboard = {
-    title: 'Dashboard-Menu',
+    // title: 'Dashboard-Menu',
     type: 'SuperAdmin',
     children: [
       {

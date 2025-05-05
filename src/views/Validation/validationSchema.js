@@ -153,11 +153,11 @@ export const hostelNewValidationSchema = Yup.object({
     .required('Phone number is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
   password: Yup.string().max(20, 'Password must be at most 20 characters').required('Password is required'),
-  state: Yup.string().required('State is required'),
-  city: Yup.string().required('City is required'),
-  address: Yup.string().required('Address is required'),
-  hostelphoto: Yup.string().required('Photo is required'),
-  aadharphoto: Yup.string().required('Photo is required')
+  address: Yup.string().max(150, 'Address must be at most 150 characters').required('Address is required')
+  // state: Yup.string().required('State is required'),
+  // city: Yup.string().required('City is required'),
+  // hostelphoto: Yup.string().required('Photo is required'),
+  // aadharphoto: Yup.string().required('Photo is required')
 });
 
 export const editHostelValidationSchema = Yup.object({
@@ -175,11 +175,9 @@ export const editHostelValidationSchema = Yup.object({
   ownerPhoneNumber: Yup.string()
     .matches(/^\d{10}$/, 'Phone number must be 10 digits')
     .required('Phone number is required'),
-  state: Yup.string().required('State is required'),
-  city: Yup.string().required('City is required'),
-  address: Yup.string().required('Address is required'),
-  hostelphoto: Yup.string().required('Photo is required'),
-  aadharphoto: Yup.string().required('Photo is required')
+  address: Yup.string().required('Address is required')
+  // hostelphoto: Yup.string().required('Photo is required'),
+  // aadharphoto: Yup.string().required('Photo is required')
 });
 
 export const roomValidationSchema = Yup.object({
@@ -193,8 +191,9 @@ export const roomValidationSchema = Yup.object({
   roomPrice: Yup.number()
     .typeError('Room price must be a number')
     .positive('Room price must be a positive number')
-    .required('Room price is required'),
-  roomphoto: Yup.mixed().required('Room Photos is required')
+    .max(100000, 'Room price cannot exceed ₹1,00,000')
+    .required('Room price is required')
+  // roomphoto: Yup.mixed().required('Room Photos is required')
 });
 
 export const roomTypeValidationSchema = Yup.object({
@@ -231,7 +230,6 @@ export const addStudentValidationSchema = Yup.object({
 });
 
 export const addReservedBedValidationSchema = Yup.object({
-  roomCategory: Yup.string().required('Room Type is required'),
   roomType: Yup.string().required('Room Type is required'),
   roomNumber: Yup.string().required('Room No is required'),
   bedNumber: Yup.string().required('Bed No is required'),
@@ -326,9 +324,13 @@ export const visitorValidationSchema = Yup.object({
     .matches(/^[A-Za-z\s]+$/, 'Name must contain only letters')
     .required('Visitor Name is required'),
   phoneNumber: Yup.string()
-    .matches(/^[6-9]\d{9}$/, 'Invalid phone number')
+    .matches(/^[0-9]{10}$/, 'Invalid phone number')
     .required('Phone Number is required'),
-  dateTime: Yup.string().required('Date Time is required')
+  dateTime: Yup.string().required('Date Time is required'),
+  visitorduration: Yup.number()
+    .typeError('Visit Duration must be a number')
+    .max(24, 'Visit Duration cannot be more than 24 hours')
+    .required('Visit Duration is required')
 });
 
 const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
@@ -371,8 +373,8 @@ export const productConsumeValidationSchema = Yup.object().shape({
 export const addExpenseValidationSchema = Yup.object().shape({
   expenseTitle: Yup.string().required('Expense Title is required'),
   price: Yup.number().required('Price is required').positive('Price must be a positive number'),
-  date: Yup.date().required('Date is required'),
-  billPhoto: Yup.mixed().required('Bill Photo is required')
+  date: Yup.date().required('Date is required')
+  // billPhoto: Yup.mixed().required('Bill Photo is required')
 });
 
 export const editExpenseValidationSchema = Yup.object().shape({

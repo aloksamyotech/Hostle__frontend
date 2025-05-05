@@ -33,7 +33,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
-import { render } from '@fullcalendar/core/preact';
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 
 const Hostel = () => {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ const Hostel = () => {
   const fetchHostelData = async () => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/hostel/list`);
-      console.log('response==>', response);
+    
       setHostelData(response.data.result);
       setTotalCount(response.data.totalRecodes);
     } catch (error) {
@@ -110,10 +111,10 @@ const Hostel = () => {
   const handleConfirmDelete = async () => {
     try {
       const response = await axios.delete(`${REACT_APP_BACKEND_URL}/hostel/delete/${deleteHostelId}`);
-      console.log('handleConfirmDelete :', response);
+    
 
       if (response.status === 200) {
-        console.log('Hostel Data Delete Successfully !!');
+     
         toast.success('Hostel Data Delete Successfully !!');
       } else {
         toast.error('Failed to Delete Hostel Data !!');
@@ -129,7 +130,7 @@ const Hostel = () => {
   };
 
   const handleChangePage = (event, newPage) => {
-    console.log('New Page:', newPage);
+ 
     setPage(newPage);
   };
 
@@ -150,7 +151,7 @@ const Hostel = () => {
     {
       field: 'hostelName',
       headerName: 'Hostel Name',
-      flex: 1,
+      flex: 1.5,
       cellClassName: 'name-column--cell name-column--cell--capitalize',
       renderCell: (params) => {
         return (
@@ -158,27 +159,41 @@ const Hostel = () => {
             <Typography variant="body1" fontWeight="bold">
               {params.row.hostelName}
             </Typography>
+          </Box>
+        );
+      }
+    },
+    {
+      field: 'hostelPhoneNumber',
+      headerName: 'Hostel ContactNo.',
+      flex: 1.5
+    },
+    {
+      field: 'email',
+      headerName: 'Email Id',
+      flex: 1.5
+    },
+    {
+      field: 'ownerName',
+      headerName: 'Owner Name',
+      flex: 1.5,
+      renderCell: (params) => {
+        return (
+          <Box>
+            <Typography variant="body1" fontWeight="bold">
+              {params.row.ownerName}
+            </Typography>
             <Typography variant="body2" color="textSecondary">
-              {params.row.hostelPhoneNumber}
+              {params.row.ownerPhoneNumber}
             </Typography>
           </Box>
         );
       }
     },
     {
-      field: 'ownerName',
-      headerName: 'Owner Name',
-      flex: 1
-    },
-    {
-      field: 'ownerPhoneNumber',
-      headerName: 'Owner ContactNo.',
-      flex: 1
-    },
-    {
       field: 'address',
       headerName: 'Address',
-      flex: 2
+      flex: 1.5
     },
     {
       field: 'action',
@@ -196,18 +211,39 @@ const Hostel = () => {
     <>
       <AddHostel open={openAdd} handleClose={handleCloseAdd} editHostelData={editHostel} />
       <Container>
-        <Stack direction="row" alignItems="center" mb={5} justifyContent="space-between">
-          <Typography variant="h4">Hostel Basic Information</Typography>
+        <Box
+          sx={{
+            backgroundColor: 'white',
+            height: '50px',
+            width: '100%',
+            display: 'flex',
+            borderRadius: '10px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 25px',
+            mb: '20px'
+          }}
+        >
           <Stack direction="row" alignItems="center">
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-              Add New
-            </Button>
+            <IconButton onClick={() => navigate('/superadmindashboard/default')}>
+              <HomeIcon color='primary'/>
+            </IconButton>
+            <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+            <Typography variant="h5">Hostel List</Typography>
           </Stack>
-        </Stack>
+
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Card>
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+                Add Hostel
+              </Button>
+            </Card>
+          </Stack>
+        </Box>
 
         <TableStyle>
           <Box width="100%">
-            <Card style={{ height: '600px', paddingTop: '15px' }}>
+            <Card style={{ height: '500px', paddingTop: '15px' }}>
               {hostelData && (
                 <DataGrid
                   rows={hostelData}

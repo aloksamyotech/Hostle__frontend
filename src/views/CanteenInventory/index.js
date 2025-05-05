@@ -34,27 +34,9 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
-
-const HeaderCell = styled(MuiTableCell)(({ theme }) => ({
-  backgroundColor: theme.palette.grey[200],
-  color: theme.palette.common.black,
-  fontWeight: 'bold',
-  padding: theme.spacing(1)
-}));
-
-const TableCell = styled(MuiTableCell)(({ theme }) => ({
-  padding: theme.spacing(1),
-  borderBottom: `1px solid ${theme.palette.divider}`
-}));
-
-const TableRow = styled(MuiTableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}));
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
+import { useNavigate } from 'react-router';
 
 const CanteenInventory = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -68,10 +50,10 @@ const CanteenInventory = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [anchorEl, setAnchorEl] = useState(null);
   const [rowData, setRowData] = useState();
-
   const [openImportModal, setOpenImportModal] = useState(false);
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const navigate = useNavigate();
 
   const handleOpenAdd = () => {
     setOpenAdd(true);
@@ -91,35 +73,35 @@ const CanteenInventory = () => {
     }
     fetchInventory(HosId);
   }, []);
-  console.log('hostelId=========>', hostelId);
+  
 
   //Fetching Data Here
   const fetchInventory = async (hostelId) => {
     try {
-      console.log('URL=>', `${REACT_APP_BACKEND_URL}/canteen_inventory/index/${hostelId}`);
+    
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/canteen_inventory/index/${hostelId}`);
-      console.log('response fetch ===> ', response);
+      
       setAllInventory(response.data.result);
       setTotalCount(response.data.totalRecodes);
     } catch (error) {
       console.error('Error fetching inventory data:', error);
     }
   };
-  console.log('allInventory==>', allInventory);
+ 
 
   // Handle view action here
   const handleEdit = (id) => {
-    console.log(`Edit clicked for ID: ${id}`);
+  
     setOpenAdd(true);
     let inventory = allInventory.find((inventory) => inventory._id === id);
-    console.log('inventory==>', inventory);
+   
     setEditInventory(inventory);
   };
-  console.log('editInventory=>', editInventory);
+
 
   // Handle view action here
   const handleDelete = (id) => {
-    console.log(`Delete clicked for ID: ${id}`);
+   
     setOpenDeleteDialog(true);
     setDeleteInventoryId(id);
   };
@@ -130,9 +112,9 @@ const CanteenInventory = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/canteen_inventory/delete/${deleteInventoryId}`);
+    
       let response = await axios.delete(`${REACT_APP_BACKEND_URL}/canteen_inventory/delete/${deleteInventoryId}`);
-      console.log('delete =====> response =====>', response);
+    
 
       setOpenDeleteDialog(false);
       fetchInventory(hostelId);
@@ -143,7 +125,7 @@ const CanteenInventory = () => {
 
   // Handle Pages
   const handleChangePage = (event, newPage) => {
-    console.log('New Page:', newPage);
+   
     setPage(newPage);
   };
 
@@ -166,11 +148,11 @@ const CanteenInventory = () => {
       const worksheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      console.log('jsonData ====>', jsonData);
+    
 
       try {
         const response = await axios.post(`${REACT_APP_BACKEND_URL}/canteen_inventory/importFile/${hostelId}`, jsonData);
-        console.log('yha hai response ==>', response);
+      
         if (response.status === 200) {
           fetchInventory(hostelId);
         } else {
@@ -240,14 +222,35 @@ const CanteenInventory = () => {
     <>
       <AddInventory open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} editInventory={editInventory} />
       <Container>
-        <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
-          <Typography variant="h3">Canteen Inventory</Typography>
-          <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-              Add New
-            </Button>
+        <Box
+          sx={{
+            backgroundColor: 'white',
+            height: '50px',
+            width: '100%',
+            display: 'flex',
+            borderRadius: '10px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 25px',
+            mb: '20px'
+          }}
+        >
+          <Stack direction="row" alignItems="center">
+            <IconButton onClick={() => navigate('/dashboard/default')}>
+              <HomeIcon color="primary" />
+            </IconButton>
+            <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+            <Typography variant="h5">Canteen Inventory List</Typography>
           </Stack>
-        </Stack>
+
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Card>
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+                Add Inventory Item
+              </Button>
+            </Card>
+          </Stack>
+        </Box>
 
         <TableStyle>
           <Box width="100%">

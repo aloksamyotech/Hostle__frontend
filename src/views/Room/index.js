@@ -26,7 +26,6 @@ import Iconify from '../../ui-component/iconify';
 import AddRoom from './AddRoom';
 import { EditOutlined, DeleteOutline } from '@mui/icons-material';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import TableStyle from '../../ui-component/TableStyle';
@@ -36,6 +35,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
 import ViewBeds from './ViewBeds';
 import { useTheme } from '@mui/material/styles';
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
+import { useNavigate } from 'react-router-dom';
 
 const Room = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -268,14 +270,35 @@ const Room = () => {
     <>
       <AddRoom open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} rowData={rowData} />
       <Container>
-        <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
-          <Typography variant="h3">Room Basic Details</Typography>
-          <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-              Add New
-            </Button>
+        <Box
+          sx={{
+            backgroundColor: 'white',
+            height: '50px',
+            width: '100%',
+            display: 'flex',
+            borderRadius: '10px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 25px',
+            mb: '20px'
+          }}
+        >
+          <Stack direction="row" alignItems="center">
+            <IconButton onClick={() => navigate('/dashboard/default')}>
+              <HomeIcon color="primary" />
+            </IconButton>
+            <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+            <Typography variant="h5">Room List</Typography>
           </Stack>
-        </Stack>
+
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Card>
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+                Add Room
+              </Button>
+            </Card>
+          </Stack>
+        </Box>
 
         <TableStyle>
           <Box width="100%">

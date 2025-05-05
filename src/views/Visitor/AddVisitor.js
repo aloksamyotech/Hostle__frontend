@@ -41,7 +41,8 @@ const AddVisotor = (props) => {
       studentId: '',
       visitorName: '',
       phoneNumber: '',
-      dateTime: ''
+      dateTime: '',
+      visitorduration: '',
     },
     validationSchema: visitorValidationSchema,
     onSubmit: async (values) => {
@@ -137,6 +138,20 @@ const AddVisotor = (props) => {
                   onChange={formik.handleChange}
                   error={formik.touched.dateTime && !!formik.errors.dateTime}
                   helperText={formik.touched.dateTime && formik.errors.dateTime}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Visit Duration</FormLabel>
+                <TextField
+                  id="visitorduration"
+                  name="visitorduration"
+                  size="small"
+                  fullWidth
+                  value={formik.values.visitorduration}
+                  onChange={formik.handleChange}
+                  error={formik.touched.visitorduration && !!formik.errors.visitorduration}
+                  helperText={formik.touched.visitorduration && formik.errors.visitorduration}
                 />
               </Grid>
             </Grid>

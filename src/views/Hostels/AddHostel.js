@@ -26,15 +26,12 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const AddHostel = (props) => {
   const { open, handleClose, editHostelData } = props;
-
-  console.log('props==========>', props);
-
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
+  
 
   const [selectedState, setSelectedState] = useState('');
-
   const [showPassword, setShowPassword] = useState(false);
+  const [hostelPhotoPreview, setHostelPhotoPreview] = useState('');
+  const [aadharPhotoPreview, setAadharPhotoPreview] = useState('');
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -46,8 +43,6 @@ const AddHostel = (props) => {
       ownerPhoneNumber: '',
       email: '',
       password: '',
-      state: '',
-      city: '',
       address: '',
       hostelphoto: '',
       aadharphoto: ''
@@ -56,8 +51,7 @@ const AddHostel = (props) => {
     validationSchema: editHostelData ? editHostelValidationSchema : hostelNewValidationSchema,
 
     onSubmit: async (values) => {
-      console.log('Form is valid =======>', values);
-
+    
       const formData = new FormData();
 
       Object.keys(values).forEach((key) => {
@@ -91,10 +85,10 @@ const AddHostel = (props) => {
         }
 
         if (response.status === 201) {
-          console.log('Hostel Data Add Successfully !!');
+       
           toast.success('Hostel Data Add Successfully !!');
         } else if (response.status === 200) {
-          console.log('Hostel Data Update Successfully !!');
+        
           toast.success('Hostel Data Update Successfully !!');
         } else {
           toast.error('Failed to Save Hostel Data !!');
@@ -102,6 +96,8 @@ const AddHostel = (props) => {
         }
         handleClose();
         formik.resetForm();
+        setHostelPhotoPreview('');
+        setAadharPhotoPreview('');
       } catch (error) {
         console.log('Found Error =>', error);
       }
@@ -112,7 +108,6 @@ const AddHostel = (props) => {
     const countryCode = 'IN';
     const fetchAllStates = async () => {
       const allStates = State.getStatesOfCountry(countryCode);
-      setStates(allStates);
     };
     fetchAllStates();
   }, []);
@@ -127,7 +122,6 @@ const AddHostel = (props) => {
     if (selectedState) {
       const fetchCities = async () => {
         const allCities = City.getCitiesOfState('IN', selectedState);
-        setCities(allCities);
       };
       fetchCities();
     }
@@ -137,7 +131,6 @@ const AddHostel = (props) => {
     if (open) {
       formik.resetForm();
       setSelectedState('');
-      setCities([]);
     }
   }, [open]);
 
@@ -148,15 +141,15 @@ const AddHostel = (props) => {
         hostelPhoneNumber: editHostelData.hostelPhoneNumber || '',
         ownerName: editHostelData.ownerName || '',
         ownerPhoneNumber: editHostelData.ownerPhoneNumber || '',
-        // email: editHostelData.email || '',
-        // password: '',
         state: editHostelData.state || '',
         city: editHostelData.city || '',
         address: editHostelData.address || '',
-        hostelphoto: editHostelData.hostelphoto || '',
-        aadharphoto: editHostelData.aadharphoto || ''
+        hostelphoto: '',
+        aadharphoto: ''
       });
       setSelectedState(editHostelData.state || '');
+      setHostelPhotoPreview(`${REACT_APP_BACKEND_URL}${editHostelData.hostelphoto}`);
+      setAadharPhotoPreview(`${REACT_APP_BACKEND_URL}${editHostelData.aadharphoto}`);
     }
   }, [open, editHostelData]);
 
@@ -166,7 +159,15 @@ const AddHostel = (props) => {
         <DialogTitle id="scroll-dialog-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h6">Hostel Basic Information</Typography>
           <Typography>
-            <ClearIcon onClick={handleClose} style={{ cursor: 'pointer' }} />
+            <ClearIcon
+              onClick={() => {
+                handleClose();
+                setHostelPhotoPreview('');
+                setAadharPhotoPreview('');
+                formik.resetForm();
+              }}
+              style={{ cursor: 'pointer' }}
+            />
           </Typography>
         </DialogTitle>
 
@@ -232,7 +233,7 @@ const AddHostel = (props) => {
               {editHostelData ? null : (
                 <>
                   <Grid item xs={12} sm={6}>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Email Id</FormLabel>
                     <TextField
                       id="email"
                       name="email"
@@ -273,7 +274,23 @@ const AddHostel = (props) => {
                 </>
               )}
 
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12}>
+                <FormLabel>Address</FormLabel>
+                <TextField
+                  id="address"
+                  name="address"
+                  size="small"
+                  multiline
+                  fullWidth
+                  rows={4}
+                  value={formik.values.address}
+                  onChange={formik.handleChange}
+                  error={formik.touched.address && !!formik.errors.address}
+                  helperText={formik.touched.address && formik.errors.address}
+                />
+              </Grid>
+
+              {/* <Grid item xs={12} sm={6}>
                 <FormLabel>Hostel Photo</FormLabel>
                 <TextField
                   id="hostelphoto"
@@ -303,48 +320,42 @@ const AddHostel = (props) => {
                 {formik.touched.aadharphoto && formik.errors.aadharphoto && (
                   <FormHelperText error>{formik.errors.aadharphoto}</FormHelperText>
                 )}
-              </Grid>
+              </Grid> */}
 
               <Grid item xs={12} sm={6}>
-                <FormLabel>State</FormLabel>
-                <Select id="state" name="state" size="small" fullWidth value={formik.values.state} onChange={handleStateChange}>
-                  <MenuItem value="">Select State</MenuItem>
-                  {states.map((state) => (
-                    <MenuItem key={state.isoCode} value={state.isoCode}>
-                      {state.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {formik.touched.state && formik.errors.state ? <FormHelperText error>{formik.errors.state}</FormHelperText> : null}
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <FormLabel>City</FormLabel>
-                <Select id="city" name="city" size="small" fullWidth value={formik.values.city} onChange={formik.handleChange}>
-                  <MenuItem value="">Select City</MenuItem>
-                  {cities.map((city) => (
-                    <MenuItem key={city.name} value={city.name}>
-                      {city.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {formik.touched.city && formik.errors.city ? <FormHelperText error>{formik.errors.city}</FormHelperText> : null}
-              </Grid>
-
-              <Grid item xs={12}>
-                <FormLabel>Address</FormLabel>
+                <FormLabel>Hostel Photo</FormLabel>
                 <TextField
-                  id="address"
-                  name="address"
+                  id="hostelphoto"
+                  name="hostelphoto"
+                  type="file"
                   size="small"
-                  multiline
-                  fullWidth
-                  rows={4}
-                  value={formik.values.address}
-                  onChange={formik.handleChange}
-                  error={formik.touched.address && !!formik.errors.address}
-                  helperText={formik.touched.address && formik.errors.address}
+                  onChange={(event) => {
+                    const file = event.currentTarget.files[0];
+                    formik.setFieldValue('hostelphoto', file);
+                    setHostelPhotoPreview(URL.createObjectURL(file));
+                  }}
                 />
+                {hostelPhotoPreview && (
+                  <img src={hostelPhotoPreview} alt="Hostel Preview" style={{ marginTop: 8, maxHeight: 80, display: 'block' }} />
+                )}
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <FormLabel>Aadhar Card Photo</FormLabel>
+                <TextField
+                  id="aadharphoto"
+                  name="aadharphoto"
+                  type="file"
+                  size="small"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files[0];
+                    formik.setFieldValue('aadharphoto', file);
+                    setAadharPhotoPreview(URL.createObjectURL(file));
+                  }}
+                />
+                {aadharPhotoPreview && (
+                  <img src={aadharPhotoPreview} alt="Aadhar Preview" style={{ marginTop: 8, maxHeight: 80, display: 'block' }} />
+                )}
               </Grid>
             </Grid>
           </form>
@@ -354,7 +365,16 @@ const AddHostel = (props) => {
           <Button onClick={formik.handleSubmit} variant="contained" color="primary" type="submit">
             Save
           </Button>
-          <Button onClick={handleClose} variant="outlined" color="error">
+          <Button
+            onClick={() => {
+              handleClose();
+              setHostelPhotoPreview('');
+              setAadharPhotoPreview('');
+              formik.resetForm();
+            }}
+            variant="outlined"
+            color="error"
+          >
             Cancel
           </Button>
         </DialogActions>

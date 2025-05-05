@@ -38,7 +38,7 @@ const AddPayment = (props) => {
   const fetchStudents = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
-      const activeStudents = response.data.result.filter((item) => item.status === 'active');
+      const activeStudents = response.data.result.filter((item) => item.status === 'active' && item.paymentStatus === 'pending');
       setStudentList(activeStudents);
     } catch (error) {
       console.error('Error fetching room data:', error);
@@ -124,24 +124,6 @@ const AddPayment = (props) => {
     }
   });
 
-  // useEffect(() => {
-  //   if (paymentdata !== null) {
-  //     console.log("paymentData :",paymentdata);
-
-  //     const paymentAmount = parseFloat(formik.values.paymentAmount) || 0;
-  //     const totalRent = paymentdata?.remainingAmount;
-  //     const remaining = totalRent - paymentAmount;
-  //     console.log('vaishnaviiiiiiiiiii remaining :', remaining);
-
-  //     formik.setFieldValue('remainingAmount', remaining);
-  //   } else {
-  //     const totalRent = parseFloat(formik.values.totalRent) || 0;
-  //     const paymentAmount = parseFloat(formik.values.paymentAmount) || 0;
-  //     const remaining = totalRent - paymentAmount;
-  //     formik.setFieldValue('remainingAmount', remaining);
-  //   }
-  // }, [formik.values.paymentAmount]);
-
   useEffect(() => {
     const total = paymentdata?.remainingAmount ?? (parseFloat(formik.values.totalRent) || 0);
     const paid = parseFloat(formik.values.paymentAmount) || 0;
@@ -154,7 +136,13 @@ const AddPayment = (props) => {
     <Dialog open={open} onClose={handleClose} aria-labelledby="add-payment-dialog-title">
       <DialogTitle id="add-payment-dialog-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant="h6">Add Payment</Typography>
-        <ClearIcon onClick={handleClose} style={{ cursor: 'pointer' }} />
+        <ClearIcon
+          onClick={() => {
+            handleClose();
+            formik.resetForm();
+          }}
+          style={{ cursor: 'pointer' }}
+        />
       </DialogTitle>
       <DialogContent dividers>
         <form onSubmit={formik.handleSubmit}>
@@ -278,7 +266,14 @@ const AddPayment = (props) => {
             <Button variant="contained" color="primary" type="submit">
               Save
             </Button>
-            <Button onClick={handleClose} variant="outlined" color="error">
+            <Button
+              onClick={() => {
+                handleClose();
+                formik.resetForm();
+              }}
+              variant="outlined"
+              color="error"
+            >
               Cancel
             </Button>
           </DialogActions>

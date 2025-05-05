@@ -36,30 +36,13 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 
-const HeaderCell = styled(MuiTableCell)(({ theme }) => ({
-  backgroundColor: theme.palette.grey[200],
-  color: theme.palette.common.black,
-  fontWeight: 'bold',
-  padding: theme.spacing(1)
-}));
-
-const TableCell = styled(MuiTableCell)(({ theme }) => ({
-  padding: theme.spacing(1),
-  borderBottom: `1px solid ${theme.palette.divider}`
-}));
-
-const TableRow = styled(MuiTableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}));
 
 const ResidentComplaints = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const navigate = useNavigate();
 
   const [openAdd, setOpenAdd] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -91,35 +74,35 @@ const ResidentComplaints = () => {
     }
     fetchAllComplaint(HosId);
   }, []);
-  console.log('hostelId ===>', hostelId);
+ 
 
   // Fetch All Complaints Here
   const fetchAllComplaint = async (hostelId) => {
     try {
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/student_complaint/index/${hostelId}`);
+      
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/student_complaint/index/${hostelId}`, {});
-      console.log('complaint response ===>', response);
+     
       setAllComplaints(response.data.result);
       setTotalCount(response.data.totalRecodes);
     } catch (error) {
       console.error('Error fetching student data:', error);
     }
   };
-  console.log('allComplaints=>', allComplaints);
+  
 
   // Handle Edit Action Here
   const handleEdit = (id) => {
-    console.log(`Edit clicked for ID: ${id}`);
+  
     setOpenAdd(true);
     let complaint = allComplaints.find((complaint) => complaint._id === id);
-    console.log('complaint==>', complaint);
+  
     setEditComplaint(complaint);
   };
-  console.log('editComplaint=>', editComplaint);
+  
 
   // Handle Delete Action Here
   const handleDelete = (id) => {
-    console.log(`Delete clicked for ID: ${id}`);
+   
     setOpenDeleteDialog(true);
     setDeleteStudentId(id);
   };
@@ -130,13 +113,13 @@ const ResidentComplaints = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/student_complaint/deleteData/${deleteStudentId}`);
+    
       let response = await axios.delete(`${REACT_APP_BACKEND_URL}/student_complaint/deleteData/${deleteStudentId}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get('Admin_Token')}`
         }
       });
-      console.log('delete =====> response =====>', response);
+    
 
       setOpenDeleteDialog(false);
       fetchAllComplaint(hostelId);
@@ -147,7 +130,6 @@ const ResidentComplaints = () => {
 
   // Handle Pages
   const handleChangePage = (event, newPage) => {
-    console.log('New Page:', newPage);
     setPage(newPage);
   };
 
@@ -267,67 +249,35 @@ const ResidentComplaints = () => {
     <>
       <AddComplaint open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} editComplaint={editComplaint} />
       <Container>
-        <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
-          <Typography variant="h3">Student Complaint</Typography>
-          <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-              Add New
-            </Button>
+        <Box
+          sx={{
+            backgroundColor: 'white',
+            height: '50px',
+            width: '100%',
+            display: 'flex',
+            borderRadius: '10px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 25px',
+            mb: '20px'
+          }}
+        >
+          <Stack direction="row" alignItems="center">
+            <IconButton onClick={() => navigate('/dashboard/default')}>
+              <HomeIcon color="primary" />
+            </IconButton>
+            <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+            <Typography variant="h5">Students Complaint List</Typography>
           </Stack>
-        </Stack>
-        {/* <TableStyle>
-          <Box width="100%">
+
+          <Stack direction="row" alignItems="center" spacing={2}>
             <Card>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <HeaderCell>Student Contact Details</HeaderCell>
-                      <HeaderCell>Room No</HeaderCell>
-                      <HeaderCell>Date</HeaderCell>
-                      <HeaderCell>Complaint Discription</HeaderCell>
-                      <HeaderCell>Status</HeaderCell>
-                      <HeaderCell>Action</HeaderCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {allComplaints.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell>
-                          {row.studentName}
-                          <br />
-                          {row.studentPhoneNo}{' '}
-                        </TableCell>
-                        <TableCell>{row.roomNumber}</TableCell>
-                        <TableCell>{moment(row.datetime).format('YYYY-MM-DD')}</TableCell>
-                        <TableCell>{row.problemDescription}</TableCell>
-                        <TableCell>{row.status}</TableCell>
-                        <TableCell>
-                          <Stack direction="row">
-                            <IconButton onClick={() => handleEdit(row._id)} aria-label="edit" style={{ color: 'green' }}>
-                              <EditOutlined />
-                            </IconButton>
-                            <IconButton onClick={() => handleDelete(row._id)} aria-label="delete" style={{ color: 'red' }}>
-                              <DeleteOutline />
-                            </IconButton>
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <TablePagination
-                component="div"
-                count={totalCount}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+                Add Complaint
+              </Button>
             </Card>
-          </Box>
-        </TableStyle> */}
+          </Stack>
+        </Box>
 
         <TableStyle>
           <Box width="100%">

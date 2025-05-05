@@ -25,27 +25,9 @@ import { styled } from '@mui/material/styles';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import * as React from 'react';
-
-const HeaderCell = styled(MuiTableCell)(({ theme }) => ({
-  backgroundColor: theme.palette.grey[200],
-  color: theme.palette.common.black,
-  fontWeight: 'bold',
-  padding: theme.spacing(1)
-}));
-
-const TableCell = styled(MuiTableCell)(({ theme }) => ({
-  padding: theme.spacing(1),
-  borderBottom: `1px solid ${theme.palette.divider}`
-}));
-
-const TableRow = styled(MuiTableRow)(({ theme }) => ({
-  '&:nth-of-type(even)': {
-    backgroundColor: theme.palette.action.hover
-  },
-  '&:last-child td, &:last-child th': {
-    border: 0
-  }
-}));
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
+import { useNavigate } from 'react-router-dom';
 
 const Visitors = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -59,6 +41,8 @@ const Visitors = () => {
   const [rowData, setRowData] = useState();
 
   const handleOpenAdd = () => setOpenAdd(true);
+
+  const navigate = useNavigate();
 
   const handleCloseAdd = () => {
     setOpenAdd(false);
@@ -129,8 +113,35 @@ const Visitors = () => {
       renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
     },
     {
+      field: 'visitorName',
+      headerName: 'Visitor Name',
+      cellClassName: 'name-column--cell--capitalize',
+      flex: 1
+    },
+    {
+      field: 'phoneNumber',
+      headerName: 'Visitor Phone No',
+      flex: 1
+    },
+    {
+      field: 'visitorduration',
+      headerName: 'Visit Duration (In Hr)',
+      flex: 1.2,
+      renderCell: (params) => {
+        return params.row.roomData?.visitorduration;
+      }
+    },
+    {
+      field: 'dateTime',
+      headerName: 'Date',
+      flex: 1,
+      renderCell: (params) => {
+        return moment(params.row.dateTime).format('YYYY-MM-DD');
+      }
+    },
+    {
       field: 'studentName',
-      headerName: 'Name',
+      headerName: 'Student Name',
       flex: 1,
       cellClassName: 'name-column--cell--capitalize',
       renderCell: (params) => {
@@ -151,92 +162,47 @@ const Visitors = () => {
     },
     {
       field: 'roomNumber',
-      headerName: 'Room Number',
+      headerName: 'RoomNo.',
       flex: 1,
       renderCell: (params) => {
         return params.row.roomData?.roomNumber;
       }
-    },
-    {
-      field: 'visitorName',
-      headerName: 'Visitor Name',
-      cellClassName: 'name-column--cell--capitalize',
-      flex: 1
-    },
-    {
-      field: 'phoneNumber',
-      headerName: 'Visitor Phone No',
-      flex: 1
-    },
-    {
-      field: 'dateTime',
-      headerName: 'Date',
-      flex: 1,
-      renderCell: (params) => {
-        return moment(params.row.dateTime).format('YYYY-MM-DD');
-      }
     }
-
-    // {
-    //   field: 'action',
-    //   headerName: 'Action',
-    //   flex: 1,
-    //   renderCell: (params) => (
-    //     <IconButton onClick={(event) => handleClick(event, params.row)}>
-    //       <MoreVertIcon />
-    //     </IconButton>
-    //   )
-    // }
   ];
 
   return (
     <>
       <AddVisotor open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} />
       <Container>
-        <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
-          <Typography variant="h3">Visitor Basic Information</Typography>
-          <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-              Add New
-            </Button>
+        <Box
+          sx={{
+            backgroundColor: 'white',
+            height: '50px',
+            width: '100%',
+            display: 'flex',
+            borderRadius: '10px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 25px',
+            mb: '20px'
+          }}
+        >
+          <Stack direction="row" alignItems="center">
+            <IconButton onClick={() => navigate('/dashboard/default')}>
+              <HomeIcon color="primary" />
+            </IconButton>
+            <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+            <Typography variant="h5">Visitor List</Typography>
           </Stack>
-        </Stack>
-        {/* <TableStyle>
-          <Box width="100%">
+
+          <Stack direction="row" alignItems="center" spacing={2}>
             <Card>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <HeaderCell>Student Name</HeaderCell>
-                      <HeaderCell>Visitor Name</HeaderCell>
-                      <HeaderCell>Phone No</HeaderCell>
-                      <HeaderCell>Date</HeaderCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {allVisitors.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell>{row.studentName}</TableCell>
-                        <TableCell>{row.visitorName}</TableCell>
-                        <TableCell>{row.phoneNumber}</TableCell>
-                        <TableCell>{moment(row.dateTime).format('YYYY-MM-DD')}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <TablePagination
-                component="div"
-                count={totalCount}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+                Add Visitor
+              </Button>
             </Card>
-          </Box>
-        </TableStyle> */}
+          </Stack>
+        </Box>
 
         <TableStyle>
           <Box width="100%">

@@ -31,11 +31,15 @@ import moment from 'moment';
 import TableStyle from '../../ui-component/TableStyle';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileDetails = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
-
   const [paymentData, setPaymentData] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
 
@@ -166,13 +170,34 @@ const ProfileDetails = () => {
 
   return (
     <Container>
-      <Box mb={1} display="flex" alignItems="center">
-        <Link to="/dashboard/student_reservation" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <IconButton edge="start" color="inherit">
-            <ArrowBack />
+      <Box
+        sx={{
+          backgroundColor: 'white',
+          height: '50px',
+          width: '100%',
+          display: 'flex',
+          borderRadius: '10px',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '0 25px',
+          mb: '20px'
+        }}
+      >
+        <Stack direction="row" alignItems="center">
+          <IconButton onClick={() => navigate('/dashboard/default')}>
+            <HomeIcon color="primary" />
           </IconButton>
-        </Link>
-        <Typography variant="h4">View all Details of {studentName}</Typography>
+          <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+          <IconButton onClick={() => navigate(`/dashboard/student_reservation`)}>
+            <Typography variant="h5">Student List</Typography>
+          </IconButton>
+          <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+          <Typography variant="h5">Student Details</Typography>
+        </Stack>
+
+        <Button variant="contained" color="primary" size="small" onClick={() => navigate(-1)} startIcon={<ArrowBackIosIcon />}>
+          Back
+        </Button>
       </Box>
 
       <Box sx={{ width: '100%' }}>
@@ -184,100 +209,6 @@ const ProfileDetails = () => {
           </Tabs>
         </Box>
       </Box>
-
-      {/* {activeTab === 0 && (
-        <>
-          <Card style={{ borderTopLeftRadius: '0px', borderTopRightRadius: '0px', marginTop: '10px' }}>
-            <Box p={3}>
-              <Typography variant="h4">Profile Details</Typography>
-              {profileData && (
-                <Grid container spacing={4} style={{ marginTop: '1vh' }}>
-                  <Grid item xs={12} sm={4}>
-                    {[
-                      { label: 'Student Name', value: profileData.studentName },
-                      { label: 'Student PhoneNo', value: profileData.studentPhoneNo },
-                      { label: 'Email Id', value: profileData.email },
-                      { label: 'Date Of Birth', value: moment(profileData.dateOfBirth).format('DD-MM-YYYY') },
-                      { label: 'Gender', value: profileData.gender },
-                      { label: 'Fathers Name', value: profileData.fathersName },
-                      { label: 'Fathers PhoneNo', value: profileData.fathersPhoneNo },
-                      { label: 'Address', value: profileData.address + '   ' + profileData.city + ' ' + profileData.state },
-                      { label: 'Start Date', value: moment(profileData.startDate).format('DD-MM-YYYY') },
-                      { label: 'End Date', value: moment(profileData.endDate).format('DD-MM-YYYY') }
-                    ].map((info, index) => (
-                      <Box key={index} mb={2}>
-                        <Typography variant="body1">{info.label}:</Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          {info.value || '--'}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Grid>
-
-                  <Grid item xs={12} sm={4}>
-                    {[
-                      { label: 'Room Number', value: profileData.roomNumber },
-                      { label: 'Library Facility', value: profileData.isLibrary === 'true' ? 'yes' : 'no' },
-                      { label: 'Food Facility', value: profileData.isFood === 'true' ? 'yes' : 'no' },
-                      { label: 'Library Amount', value: profileData.libraryAmount },
-                      { label: 'Food Amount', value: profileData.foodAmount },
-                      { label: 'Hostel Monthly Rent:', value: profileData.hostelRent },
-                      { label: 'Advance Payment', value: profileData.advancePayment },
-                      { label: 'Monthly Total Rent ', value: profileData.MonthlyTotalAmmount },
-                      { label: 'Total Rent till EndMonth', value: profileData.totalAmount }
-                    ].map((info, index) => (
-                      <Box key={index} mb={2}>
-                        <Typography variant="body1">{info.label}:</Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          {info.value || '--'}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Grid>
-
-                  <Grid item xs={12} sm={4}>
-                    <Typography variant="h6">Studnet Photo</Typography>
-                    {profileData.studentphoto && (
-                      <CardMedia
-                        component="img"
-                        height="200"
-                        image={`${REACT_APP_BACKEND_URL}/uploads/students/${profileData.studentphoto}` || 'path/to/placeholder.jpg'}
-                        alt="studentphoto"
-                        style={{ width: 150, height: 150, marginTop: 20, marginBottom: 20 }}
-                        onError={(e) => {
-                          console.error('Image failed to load:', e.target.src);
-                          e.target.src = 'path/to/placeholder.jpg';
-                        }}
-                      />
-                    )}
-
-                    <Typography variant="h6">Studnet AadharCard Photo</Typography>
-                    {profileData.aadharcardphoto && (
-                      <a
-                        href={`${REACT_APP_BACKEND_URL}/uploads/students/${profileData.aadharcardphoto}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <CardMedia
-                          component="img"
-                          height="200"
-                          image={`${REACT_APP_BACKEND_URL}/uploads/students/${profileData.aadharcardphoto}`}
-                          alt="aadharcardphoto"
-                          style={{ width: 150, height: 150, marginTop: 20, marginBottom: 20 }}
-                          onError={(e) => {
-                            console.error('Image failed to load:', e.target.src);
-                            e.target.src = 'path/to/placeholder.jpg';
-                          }}
-                        />
-                      </a>
-                    )}
-                  </Grid>
-                </Grid>
-              )}
-            </Box>
-          </Card>
-        </>
-      )} */}
 
       {activeTab === 0 && (
         <Box sx={{ flexGrow: 1, overflowX: 'auto', mt: 2 }}>
@@ -293,43 +224,42 @@ const ProfileDetails = () => {
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
                       <Typography variant="h6">Room Number:</Typography>
-                      <Typography>{profileData?.roomNumber || 'N/A'}</Typography>
+                      <Typography>{profileData?.roomNumber || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Room Type:</Typography>
-                      <Typography>{profileData?.roomType || 'N/A'} seater</Typography>
+                      <Typography>{profileData?.roomType || '- -'} seater</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Bed Number:</Typography>
-                      <Typography>{profileData?.bedNumber || 'N/A'} </Typography>
+                      <Typography>{profileData?.bedNumber || '- -'} </Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Monthly Room Rent:</Typography>
-                      <Typography>{profileData?.roomRent || 'N/A'}</Typography>
+                      <Typography>{profileData?.roomRent || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Total Stay Months:</Typography>
-                      <Typography>{profileData?.stayMonths || 'N/A'}</Typography>
+                      <Typography>{profileData?.stayMonths || '- -'}</Typography>
                     </Grid>
 
                     <Grid item xs={6}>
                       <Typography variant="h6">Total Rent till EndMonth:</Typography>
-                      <Typography>{profileData?.totalRent || 'N/A'}</Typography>
+                      <Typography>{profileData?.totalRent || '- -'}</Typography>
                     </Grid>
 
                     <Grid item xs={6}>
                       <Typography variant="h6">Advance Payment:</Typography>
-                      <Typography>{profileData?.advanceAmount || 'N/A'}</Typography>
+                      <Typography>{profileData?.advanceAmount || '- -'}</Typography>
                     </Grid>
-
 
                     <Grid item xs={6}>
                       <Typography variant="h6">Food Amount:</Typography>
-                      <Typography>{profileData?.foodFee || 'N/A'}</Typography>
+                      <Typography>{profileData?.foodFee || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Library Amount:</Typography>
-                      <Typography>{profileData?.libraryFee || 'N/A'}</Typography>
+                      <Typography>{profileData?.libraryFee || '- -'}</Typography>
                     </Grid>
 
                     <Grid item xs={6}>
@@ -356,60 +286,60 @@ const ProfileDetails = () => {
                   <Grid container spacing={2}>
                     <Grid item xs={6}>
                       <Typography variant="h6">Student Name:</Typography>
-                      <Typography>{profileData?.studentId?.studentName || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.studentName || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Contact No :</Typography>
-                      <Typography>{profileData?.studentId?.studentContact || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.studentContact || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Email:</Typography>
-                      <Typography>{profileData?.studentId?.mailId || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.mailId || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Gender:</Typography>
-                      <Typography>{profileData?.studentId?.gender || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.gender || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">DOB:</Typography>
-                      <Typography>{moment(profileData?.studentId?.dob).format('DD-MM-YYYY') || 'N/A'}</Typography>
+                      <Typography>{moment(profileData?.studentId?.dob).format('DD-MM-YYYY') || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Fathers Name:</Typography>
-                      <Typography>{profileData?.studentId?.fatherName || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.fatherName || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Fathers Phone No:</Typography>
-                      <Typography>{profileData?.studentId?.fatherContact || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.fatherContact || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Address:</Typography>
-                      <Typography>{profileData?.studentId?.address || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.address || '- -'}</Typography>
                     </Grid>
 
                     {/* Additional fields */}
                     <Grid item xs={6}>
                       <Typography variant="h6">Course/Occupation:</Typography>
-                      <Typography>{profileData?.studentId?.courseOccupation || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.courseOccupation || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Guardian Name:</Typography>
-                      <Typography>{profileData?.studentId?.guardianName || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.guardianName || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Guardian Contact No:</Typography>
-                      <Typography>{profileData?.studentId?.guardianContactNo || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.guardianContactNo || '- -'}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="h6">Guardian Address:</Typography>
-                      <Typography>{profileData?.studentId?.guardiansAddress || 'N/A'}</Typography>
+                      <Typography>{profileData?.studentId?.guardiansAddress || '- -'}</Typography>
                     </Grid>
 
                     <Grid item xs={6}>
                       <Typography variant="h6">Student Photo:</Typography>
                       <Typography style={{ color: 'black', marginTop: '7px' }}>
                         <a
-                          href={`${REACT_APP_BACKEND_URL}/uploads/students/${profileData?.studentId?.aadharPhoto}`}
+                          href={`${REACT_APP_BACKEND_URL}${profileData?.studentId?.aadharPhoto}`}
                           target="_blank"
                           rel="noreferrer"
                           style={{ textDecoration: 'none' }}
@@ -424,7 +354,7 @@ const ProfileDetails = () => {
                       <Typography variant="h6">Aadhar Proof:</Typography>
                       <Typography style={{ color: 'black', marginTop: '7px' }}>
                         <a
-                          href={`${REACT_APP_BACKEND_URL}/uploads/students/${profileData?.studentId?.aadharPhoto}`}
+                          href={`${REACT_APP_BACKEND_URL}${profileData?.studentId?.aadharPhoto}`}
                           target="_blank"
                           rel="noreferrer"
                           style={{ textDecoration: 'none' }}

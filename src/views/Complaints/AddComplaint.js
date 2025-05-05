@@ -20,7 +20,7 @@ import { ToastContainer, toast } from 'react-toastify';
 
 const AddComplaint = (props) => {
   const { open, handleClose, hostelId, editComplaint } = props;
-  console.log(' AddComplaint props====>', props);
+
 
   const [studentList, setStudentList] = useState([]);
 
@@ -41,20 +41,20 @@ const AddComplaint = (props) => {
 
   const formik = useFormik({
     initialValues: {
-      studentId: editComplaint?.studentId || '',
-      datetime: moment(editComplaint?.datetime).format('YYYY-MM-DD') || '',
+      studentId: editComplaint?.studentInfo?._id || '',
+      datetime: moment(editComplaint?.datetime).format('YYYY-MM-DD'),
       problemDescription: editComplaint?.problemDescription || '',
       status: editComplaint?.status || ''
     },
     enableReinitialize: true,
     validationSchema: studentComplaintValidationSchema,
     onSubmit: async (values) => {
-      console.log('Hyyyyyyy Form values:====>', values);
+   
 
       try {
         let response;
         if (editComplaint) {
-          console.log('URL=>', `${REACT_APP_BACKEND_URL}/student_complaint/edit/${editComplaint._id}`);
+         
           response = await axios.put(`${REACT_APP_BACKEND_URL}/student_complaint/edit/${editComplaint._id}`, values, {
             headers: {
               Authorization: `Bearer ${Cookies.get('Admin_Token')}`
@@ -69,7 +69,7 @@ const AddComplaint = (props) => {
         }
 
         if (response.status === 201) {
-          console.log('Complaint Add Successfully !!');
+        
           toast.success('Complaint Add Successfully !!');
         } else {
           console.error('Failed to save data');
@@ -77,8 +77,9 @@ const AddComplaint = (props) => {
         }
 
         handleClose();
+        formik.resetForm();
       } catch (error) {
-        console.log('Error Found', error);
+      
         toast.success('Something went wrong !!');
       }
     }

@@ -34,6 +34,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
 import AddRoomType from './AddRoomType';
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 
 const RoomType = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -172,14 +174,44 @@ const RoomType = () => {
     <>
       <AddRoomType open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} rowData={rowData} />
       <Container>
-        <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
+        <Box
+          sx={{
+            backgroundColor: 'white',
+            height: '50px',
+            width: '100%',
+            display: 'flex',
+            borderRadius: '10px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 25px',
+            mb: '20px'
+          }}
+        >
+          <Stack direction="row" alignItems="center">
+            <IconButton onClick={() => navigate('/dashboard/default')}>
+              <HomeIcon color="primary" />
+            </IconButton>
+            <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+            <Typography variant="h5">Room Types List</Typography>
+          </Stack>
+
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Card>
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}  onClick={handleOpenAdd}>
+                Add Room Type
+              </Button>
+            </Card>
+          </Stack>
+        </Box>
+
+        {/* <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
           <Typography variant="h3">Room Types Details</Typography>
           <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
             <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
               Add New
             </Button>
           </Stack>
-        </Stack>
+        </Stack> */}
 
         <TableStyle>
           <Box width="100%">

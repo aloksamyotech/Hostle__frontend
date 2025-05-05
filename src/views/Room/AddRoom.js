@@ -16,17 +16,14 @@ import { useFormik } from 'formik';
 import { roomValidationSchema } from 'views/Validation/validationSchema';
 import { useEffect } from 'react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
-import { ToastContainer, toast } from 'react-toastify';
 import { useState } from 'react';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
-import { format } from 'date-fns';
+import { toast } from 'react-toastify';
 
 const AddRoom = (props) => {
+  console.log('AddRoom props========>', props);
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const { open, handleClose, hostelId, rowData } = props;
- 
-  
 
   const [roomType, setRoomType] = useState([]);
   const [roomPhotos, setRoomPhotos] = useState([]);
@@ -34,8 +31,8 @@ const AddRoom = (props) => {
 
   const formik = useFormik({
     initialValues: {
-      roomTypeId : rowData?.roomTypeId || '',
-      roomType: rowData?.roomTypeId || '',
+      roomTypeId: rowData?.roomTypeId || '',
+      roomType: rowData?.roomType || '',
       roomNumber: rowData?.roomNumber || '',
       noOfBeds: rowData?.noOfBeds || '',
       roomPrice: rowData?.roomPrice || '',
@@ -45,13 +42,11 @@ const AddRoom = (props) => {
     enableReinitialize: true,
 
     onSubmit: async (values) => {
+      console.log('values :::::', values);
 
-      console.log("values :::::", values);
-      
       try {
         const formData = new FormData();
         formData.append('roomTypeId', values.roomTypeId);
-        formData.append('roomCategory', values.roomCategory);
         formData.append('roomType', values.roomType);
         formData.append('roomNumber', values.roomNumber);
         formData.append('noOfBeds', values.noOfBeds);
@@ -77,6 +72,8 @@ const AddRoom = (props) => {
           });
         }
 
+        console.log('hiiiiiiiiiii response ==>', response);
+
         if (response.status === 201) {
           toast.success('Room Details Added Successfully !!');
           setRoomPhotos([]);
@@ -101,6 +98,13 @@ const AddRoom = (props) => {
   useEffect(() => {
     fetchRoomTypesData(hostelId);
   }, [open]);
+
+  useEffect(() => {
+    if (rowData && rowData.roomphoto?.length > 0) {
+      const fullImageUrls = rowData.roomphoto.map((img) => (img.startsWith('http') ? img : `${REACT_APP_BACKEND_URL}${img}`));
+      setPreviews(fullImageUrls);
+    }
+  }, [rowData]);
 
   const fetchRoomTypesData = async (hostelId) => {
     try {
@@ -147,8 +151,10 @@ const AddRoom = (props) => {
           <Typography>
             <ClearIcon
               onClick={() => {
-                formik.resetForm();
                 handleClose();
+                formik.resetForm();
+                setRoomPhotos([]);
+                setPreviews([]);
               }}
               style={{ cursor: 'pointer' }}
             />
@@ -161,20 +167,19 @@ const AddRoom = (props) => {
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Room Type</FormLabel>
                 <Select
-                  id="roomType"
-                  name="roomType"
+                  id="roomTypeId"
+                  name="roomTypeId"
                   size="small"
                   fullWidth
                   value={formik.values.roomTypeId}
                   onChange={(e) => {
                     const selectedId = e.target.value;
-                    const selected = roomType.find((type) => type._id === selectedId);
+                    const selectedType = roomType.find((type) => type._id === selectedId);
 
-                    formik.setFieldValue('roomTypeId', selected._id); // store the unique ID
-                    formik.setFieldValue('roomType', selected.roomType); // store the string like "single"
-                    formik.setFieldValue('roomCategory', selected.roomCategory); // store the string like "AC"
+                    formik.setFieldValue('roomTypeId', selectedId);
+                    formik.setFieldValue('roomType', selectedType?.roomType || '');
                   }}
-                  error={formik.touched.roomType && !!formik.errors.roomType}
+                  error={formik.touched.roomTypeId && !!formik.errors.roomTypeId}
                 >
                   <MenuItem value="">Select Room Type</MenuItem>
                   {roomType.map((type) => (
@@ -286,8 +291,10 @@ const AddRoom = (props) => {
               </Button>
               <Button
                 onClick={() => {
-                  formik.resetForm();
                   handleClose();
+                  formik.resetForm();
+                  setRoomPhotos([]);
+                  setPreviews([]);
                 }}
                 variant="outlined"
                 color="error"

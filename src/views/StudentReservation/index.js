@@ -42,6 +42,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
 import { render } from '@fullcalendar/core/preact';
 import EditReservation from './EditReservation';
+import HomeIcon from '@mui/icons-material/Home';
+import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 
 const StudentReservation = () => {
   const [page, setPage] = useState(0);
@@ -238,75 +240,35 @@ const StudentReservation = () => {
       <EditReservation open={openEdit} handleClose={handleCloseEdit} hostelId={hostelId} rowData={rowData} />
       <AddNewReservation open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} />
       <Container>
-        <Stack direction="row" alignItems="center" mb={5} justifyContent={'space-between'}>
-          <Typography variant="h3">Student Details</Typography>
-          <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-              Add New
-            </Button>
+        <Box
+          sx={{
+            backgroundColor: 'white',
+            height: '50px',
+            width: '100%',
+            display: 'flex',
+            borderRadius: '10px',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0 25px',
+            mb: '20px'
+          }}
+        >
+          <Stack direction="row" alignItems="center">
+            <IconButton onClick={() => navigate('/dashboard/default')}>
+              <HomeIcon color="primary" />
+            </IconButton>
+            <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
+            <Typography variant="h5">Student List</Typography>
           </Stack>
-        </Stack>
 
-        {/* <TableStyle>
-          <Box width="100%" sx={{ mt: '10px' }}>
+          <Stack direction="row" alignItems="center" spacing={2}>
             <Card>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <HeaderCell>Student Contact Details</HeaderCell>
-                      <HeaderCell>Room No</HeaderCell>
-                      <HeaderCell>Start Date</HeaderCell>
-                      <HeaderCell>End Date</HeaderCell>
-                      <HeaderCell>Address</HeaderCell>
-                      <HeaderCell>Action</HeaderCell>
-                    </TableRow>
-                  </TableHead>
-
-                  <TableBody>
-                    {filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                      <TableRow key={row._id}>
-                        <TableCell style={{ cursor: 'pointer' }} onClick={() => handleNavigate(row._id)}>
-                          <span style={{ textDecoration: 'underline', color: 'blue' }}>{row.studentName}</span>
-                          <br />
-                          {row.email}
-                          <br />
-                          {row.studentPhoneNo}
-                        </TableCell>
-                        <TableCell>{moment(row.startDate).format('DD-MM-YYYY')}</TableCell>
-                        <TableCell>{moment(row.endDate).format('DD-MM-YYYY')}</TableCell>
-                        <TableCell>{row.roomNumber}</TableCell>
-                        <TableCell sx={{ whiteSpace: 'normal', wordWrap: 'normal' }}>
-                          {row.city} {row.state} {row.address}
-                        </TableCell>
-                        <TableCell>
-                          <Stack direction="row">
-                            <IconButton onClick={() => handleEdit(row._id)} aria-label="edit" style={{ color: 'green' }}>
-                              <EditOutlined />
-                            </IconButton>
-                            <IconButton onClick={() => handleDelete(row._id)} aria-label="delete" style={{ color: 'red' }}>
-                              <DeleteOutline />
-                            </IconButton>
-                            <Switch checked={status[row._id]} color="primary" onChange={() => handleStatusToggle(row._id)} />
-                          </Stack>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-
-              <TablePagination
-                component="div"
-                count={totalCount}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-              />
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+                Add student
+              </Button>
             </Card>
-          </Box>
-        </TableStyle> */}
+          </Stack>
+        </Box>
 
         <TableStyle>
           <Box width="100%">
