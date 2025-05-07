@@ -36,6 +36,8 @@ const WeeklyFoodMenu = Loadable(lazy(() => import('views/WeeklyFoodMenu')));
 const RoomType = Loadable(lazy(() => import('views/RoomType')));
 
 const ViewBeds = Loadable(lazy(() => import('views/Room/ViewBeds')));
+import Report from 'views/Report';
+
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -75,6 +77,15 @@ const SubAdminRoutes = {
         {
           path: 'complaints',
           element: <Complaints />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'report',
+          element: <Report />
         }
       ]
     },

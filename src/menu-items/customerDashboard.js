@@ -88,6 +88,15 @@ const subdashboard = {
     },
     {
       id: '05',
+      title: 'Report',
+      type: 'item',
+      url: '/dashboard/report',
+      icon: icons.IconCategory,
+      breadcrumbs: false
+    },
+
+    {
+      id: '06',
       title: 'Student Complaints',
       type: 'item',
       url: '/dashboard/complaints',
@@ -95,7 +104,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '06',
+      id: '07',
       title: 'Visitor Details',
       type: 'item',
       url: '/dashboard/visitor',
@@ -103,7 +112,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '07',
+      id: '08',
       title: 'Inventory',
       type: 'collapse',
       icon: icons.IconCategory,
@@ -136,7 +145,7 @@ const subdashboard = {
     },
 
     {
-      id: '08',
+      id: '09',
       title: "Expenditure's",
       type: 'item',
       url: '/dashboard/expenditures',
@@ -144,7 +153,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '09',
+      id: '10',
       title: 'Notice Board',
       type: 'item',
       url: '/dashboard/notice_board',
@@ -152,7 +161,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '10',
+      id: '11',
       title: 'Weekly Food Menu',
       type: 'item',
       url: '/dashboard/weekly_foodmenu',

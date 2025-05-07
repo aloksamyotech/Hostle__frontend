@@ -64,16 +64,16 @@ const EditReservation = (props) => {
         console.log('------ edit response --------->', response);
 
         if (response.status === 200) {
-          toast.success('Student Reservation Update Successfully !!');
+          toast.success('Bed details updated successfully !!');
         } else {
-          toast.error('Something went wrong while reservation !!');
+          toast.error('Failed to update bed details !!');
         }
 
         handleClose();
         formik.resetForm();
       } catch (error) {
         console.log('Error=>', error);
-        toast.error('Something went wrong while edit reservation !!');
+        toast.error('Something went wrong !!');
       }
     }
   });
@@ -109,22 +109,6 @@ const EditReservation = (props) => {
       }
     }
   }, [rowData, roomNumbers]);
-
-  // useEffect(() => {
-  //   const { startDate, endDate, foodFee, libraryFee } = formik.values;
-  //   if (startDate && endDate) {
-  //     const months = monthDiffInclusive(startDate, endDate);
-  //     formik.setFieldValue('stayMonths', months);
-
-  //     const roomRent = selectedRoomData?.roomPrice || 0;
-  //     const foodFee = Number(formik.values.foodFee || 0);
-  //     const libraryFee = Number(formik.values.libraryFee || 0);
-
-  //     const facilityFeePerMonth = foodFee + libraryFee;
-  //     const totalRent = months * (roomRent + facilityFeePerMonth);
-  //     formik.setFieldValue('totalRent', totalRent);
-  //   }
-  // }, [formik.values.roomNumber]);
 
   useEffect(() => {
     const { startDate, endDate } = formik.values;
@@ -250,7 +234,7 @@ const EditReservation = (props) => {
                 {formik.touched.roomNumber && formik.errors.roomNumber && <FormHelperText error>{formik.errors.roomNumber}</FormHelperText>}
               </Grid>
 
-              <Grid item xs={12} sm={6} md={6}>
+              {/* <Grid item xs={12} sm={6} md={6}>
                 <FormLabel component="legend">Bed Numbers</FormLabel>
                 <FormGroup row>
                   {selectedRoomData?.beds?.length > 0 ? (
@@ -284,6 +268,35 @@ const EditReservation = (props) => {
                     </>
                   )}
                 </FormGroup>
+              </Grid> */}
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Bed Numbers</FormLabel>
+                <Select
+                  labelId="bedNumber-label"
+                  id="bedNumber"
+                  name="bedNumber"
+                  size="small"
+                  fullWidth
+                  value={formik.values.bedNumber}
+                  onChange={formik.handleChange}
+                  // disabled={!selectedRoomData?.beds?.length}
+                >
+                  {selectedRoomData?.beds?.length > 0 ? (
+                    selectedRoomData.beds.map(
+                      (bed) => (
+                        // bed.status === 'available' ? (
+                        <MenuItem key={bed.bedNumber} value={bed.bedNumber}>
+                          Bed {bed.bedNumber} ({bed.status})
+                        </MenuItem>
+                      )
+                      // ) : null
+                    )
+                  ) : (
+                    <MenuItem disabled>No beds available</MenuItem>
+                  )}
+                </Select>
+                {formik.touched.bedNumber && formik.errors.bedNumber && <FormHelperText error>{formik.errors.bedNumber}</FormHelperText>}
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>

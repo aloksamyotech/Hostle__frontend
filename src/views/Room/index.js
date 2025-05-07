@@ -19,7 +19,8 @@ import {
   DialogActions,
   TablePagination,
   MenuItem,
-  Popover
+  Popover,
+  Chip
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Iconify from '../../ui-component/iconify';
@@ -165,52 +166,83 @@ const Room = () => {
       filterable: false,
       renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
     },
+
     {
       field: 'roomNumber',
       headerName: 'Room No',
-      flex: 1,
-      cellClassName: 'name-column--cell name-column--cell--capitalize',
+      flex: 2,
       renderCell: (params) => {
-        return (
-          <Box>
-            <Box onClick={() => handleNavigate(params.row._id)}>{params.value}</Box>
-          </Box>
-        );
-      }
-    },
-    {
-      field: 'roomType',
-      headerName: 'Room Type',
-      flex: 1.5,
-      renderCell: (params) => {
-        const roomType = params.row.roomType;
-        const roomCategory = params.row.roomCategory;
+        const { roomNumber, roomType, roomCategory } = params.row;
         const isAC = roomCategory === 'AC';
 
         return (
-          <Button
-            variant="contained"
+          <Chip
+            label={
+              <div style={{ textAlign: 'center' }}>
+                <div>{`${roomType}/${roomCategory}`}</div>
+                <div>{roomNumber}</div>
+              </div>
+            }
+            onClick={() => handleNavigate(params.row._id)}
+            color={isAC ? 'success' : 'primary'}
+            variant="outlined"
             size="small"
             sx={{
-              backgroundColor: isAC ? theme.palette.primary.main : '#be4732',
-              color: 'white',
-              textTransform: 'none',
-              fontWeight: 400,
-              borderRadius: '8px',
-              width: '130px',
-              height: '32px',
-              fontSize: '0.75rem',
-              opacity: 1,
-              pointerEvents: 'none',
-              px: 1.5
+              width: '140px',
+              height: 'auto',
+              whiteSpace: 'normal'
             }}
-            disableElevation
-          >
-            {capitalizeWords(roomType)} | {roomCategory}
-          </Button>
+          />
         );
       }
     },
+
+    // {
+    //   field: 'roomNumber',
+    //   headerName: 'Room No',
+    //   flex: 1,
+    //   cellClassName: 'name-column--cell name-column--cell--capitalize',
+    //   renderCell: (params) => {
+    //     return (
+    //       <Box>
+    //         <Box onClick={() => handleNavigate(params.row._id)}>{params.value}</Box>
+    //       </Box>
+    //     );
+    //   }
+    // },
+    // {
+    //   field: 'roomType',
+    //   headerName: 'Room Type',
+    //   flex: 1.5,
+    //   renderCell: (params) => {
+    //     const roomType = params.row.roomType;
+    //     const roomCategory = params.row.roomCategory;
+    //     const isAC = roomCategory === 'AC';
+
+    //     return (
+    //       <Button
+    //         variant="contained"
+    //         size="small"
+    //         sx={{
+    //           backgroundColor: isAC ? theme.palette.primary.main : '#be4732',
+    //           color: 'white',
+    //           textTransform: 'none',
+    //           fontWeight: 400,
+    //           borderRadius: '8px',
+    //           width: '130px',
+    //           height: '32px',
+    //           fontSize: '0.75rem',
+    //           opacity: 1,
+    //           pointerEvents: 'none',
+    //           px: 1.5
+    //         }}
+    //         disableElevation
+    //       >
+    //         {capitalizeWords(roomType)} | {roomCategory}
+    //       </Button>
+    //     );
+    //   }
+    // },
     {
       field: 'noOfBeds',
       headerName: 'No Of Beds',

@@ -14,6 +14,7 @@ import { addExpenseValidationSchema, editExpenseValidationSchema } from 'views/V
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
+import { toast } from 'react-toastify';
 
 const AllExpenses = (props) => {
   const { open, handleClose, hostelId, editExpense } = props;
@@ -26,14 +27,14 @@ const AllExpenses = (props) => {
       expenseTitle: '',
       price: '',
       date: '',
-      billPhoto: '', 
+      billPhoto: ''
     },
     validationSchema: editExpense ? editExpenseValidationSchema : addExpenseValidationSchema,
     onSubmit: async (values) => {
-      console.log("Form is valid ====>", values);
+      console.log('Form is valid ====>', values);
 
       const formData = new FormData();
-      Object.keys(values).forEach(key => {
+      Object.keys(values).forEach((key) => {
         if (key === 'billPhoto') {
           formData.append('billPhoto', values.billPhoto);
         } else {
@@ -44,27 +45,49 @@ const AllExpenses = (props) => {
       try {
         let response;
         if (editExpense) {
-          response = await axios.put(`${REACT_APP_BACKEND_URL}/expense/edit/${editExpense._id}`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
+          try {
+            response = await axios.put(`${REACT_APP_BACKEND_URL}/expense/edit/${editExpense._id}`, formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+
+            if (response.status === 200) {
+              console.log("Expenditure's Edit Successfully !!");
+              toast.success("Expenditure's Edit Successfully !!");
+            } else {
+              console.error('Failed to edit data');
+              toast.error('Failed to edit data');
             }
-          });
+          } catch (error) {
+            console.log('Error in edit Expense', error);
+            toast.error('Error in edit Expense');
+          }
         } else {
-          response = await axios.post(`${REACT_APP_BACKEND_URL}/expense/add/${hostelId}`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
+          try {
+            response = await axios.post(`${REACT_APP_BACKEND_URL}/expense/add/${hostelId}`, formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+            if (response.status === 201) {
+              console.log("Expenditure's Add Successfully !!");
+              toast.success("Expenditure's Add Successfully !!");
+            } else {
+              console.error('Failed to save data');
+              toast.error('Failed to save data');
             }
-          });
+          } catch (error) {
+            console.log('Error in add Expense', error);
+            toast.error('Error in add Expense');
+          }
         }
 
-        if (response.status === 201 || response.status === 200) {
-          console.log("Expenditure's Add Successfully !!");
-          handleClose();
-        } else {
-          console.error('Failed to save data');
-        }
+        handleClose();
+        formik.resetForm();
       } catch (error) {
-        console.log("Found Error =>", error);
+        console.log('Found Error =>', error);
+        toast.error('Error in add Expense');
       }
     }
   });
@@ -75,7 +98,7 @@ const AllExpenses = (props) => {
         expenseTitle: editExpense.expenseTitle || '',
         price: editExpense.price || '',
         date: moment(editExpense.date).format('YYYY-MM-DD'),
-        billPhoto: '', 
+        billPhoto: ''
       });
       setExistingImgFile(editExpense.billPhoto);
     }
@@ -91,9 +114,7 @@ const AllExpenses = (props) => {
   return (
     <div>
       <Dialog open={open} onClose={handleClose} aria-labelledby="scroll-dialog-title" aria-describedby="scroll-dialog-description">
-        <DialogTitle
-          id="scroll-dialog-title"
-          style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <DialogTitle id="scroll-dialog-title" style={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h6">All Expenditures</Typography>
           <Typography>
             <ClearIcon onClick={handleClose} style={{ cursor: 'pointer' }} />
@@ -154,19 +175,15 @@ const AllExpenses = (props) => {
                   name="billPhoto"
                   type="file"
                   onChange={(event) => {
-                    formik.setFieldValue("billPhoto", event.currentTarget.files[0]);
-                    setExistingImgFile(null); 
+                    formik.setFieldValue('billPhoto', event.currentTarget.files[0]);
+                    setExistingImgFile(null);
                   }}
                 />
-                {existingImgFile && !formik.values.billPhoto && (
-                  <Typography>Current file: {existingImgFile}</Typography>
-                )}
+                {existingImgFile && !formik.values.billPhoto && <Typography>Current file: {existingImgFile}</Typography>}
                 {formik.values.billPhoto && formik.values.billPhoto.name && (
                   <Typography>Selected file: {formik.values.billPhoto.name}</Typography>
                 )}
-                {formik.touched.billPhoto && formik.errors.billPhoto && (
-                  <FormHelperText error>{formik.errors.billPhoto}</FormHelperText>
-                )}
+                {formik.touched.billPhoto && formik.errors.billPhoto && <FormHelperText error>{formik.errors.billPhoto}</FormHelperText>}
               </Grid>
             </Grid>
           </form>
@@ -195,4 +212,3 @@ const AllExpenses = (props) => {
 };
 
 export default AllExpenses;
-

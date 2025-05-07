@@ -10,6 +10,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useNavigate } from 'react-router-dom';
+import moment from 'moment';
 
 const ViewHostel = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -36,8 +37,8 @@ const ViewHostel = () => {
 
     const fetchStudents = async () => {
       try {
-        const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/getAllReservedStudents/${hostelDetails?._id}`);
-        console.log('this is in tab  student response :', response);
+        const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/getAllReservedStudents/${id}`);
+        console.log('this is in tab  student response -->', response);
         setStudents(response?.data?.data || []);
       } catch (error) {
         console.error('Error fetching students:', error);
@@ -50,6 +51,10 @@ const ViewHostel = () => {
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
+  };
+
+  const handleNavigate = (id) => {
+    navigate(`/dashboard/student_reservation/view_profile/${id}`);
   };
 
   const columns = [
@@ -83,10 +88,10 @@ const ViewHostel = () => {
       field: 'studentName',
       headerName: 'Student Name',
       flex: 1,
-      cellClassName: 'name-column--cell name-column--cell--capitalize',
+      cellClassName: 'name-column--cell--capitalize',
       renderCell: (params) => {
         return (
-          <Box onClick={() => handleNavigate(params.row.studentId._id)} sx={{ cursor: 'pointer' }}>
+          <Box>
             <Typography variant="body1" fontWeight="bold">
               {params.row.studentId?.studentName}
             </Typography>
@@ -101,7 +106,7 @@ const ViewHostel = () => {
     {
       field: 'email',
       headerName: 'Email',
-      flex: 1,
+      flex: 1.5,
       renderCell: (params) => {
         return params.row.studentId?.mailId;
       }

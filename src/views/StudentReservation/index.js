@@ -96,6 +96,7 @@ const StudentReservation = () => {
 
   const handleCloseEdit = () => {
     setOpenEdit(false);
+    handleClose();
   };
 
   const handleNavigate = (id) => {
@@ -313,7 +314,6 @@ const StudentReservation = () => {
         <MenuItem
           onClick={() => {
             handleOpenEdit();
-            handleClose();
           }}
         >
           <EditIcon fontSize="small" sx={{ mr: 1 }} />

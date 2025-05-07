@@ -21,7 +21,6 @@ import { ToastContainer, toast } from 'react-toastify';
 const AddComplaint = (props) => {
   const { open, handleClose, hostelId, editComplaint } = props;
 
-
   const [studentList, setStudentList] = useState([]);
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -49,38 +48,48 @@ const AddComplaint = (props) => {
     enableReinitialize: true,
     validationSchema: studentComplaintValidationSchema,
     onSubmit: async (values) => {
-   
-
       try {
         let response;
         if (editComplaint) {
-         
-          response = await axios.put(`${REACT_APP_BACKEND_URL}/student_complaint/edit/${editComplaint._id}`, values, {
-            headers: {
-              Authorization: `Bearer ${Cookies.get('Admin_Token')}`
+          try {
+            response = await axios.put(`${REACT_APP_BACKEND_URL}/student_complaint/edit/${editComplaint._id}`, values, {
+              headers: {
+                Authorization: `Bearer ${Cookies.get('Admin_Token')}`
+              }
+            });
+            if (response.status === 200) {
+              toast.success('Complaint Updated Successfully !!');
+            } else {
+              toast.error('Failed to update complaint !!');
             }
-          });
+          } catch (error) {
+            console.log('Error:', error);
+            toast.error('Something went wrong !!');
+          }
         } else {
-          response = await axios.post(`${REACT_APP_BACKEND_URL}/student_complaint/add/${hostelId}`, values, {
-            headers: {
-              Authorization: `Bearer ${Cookies.get('Admin_Token')}`
-            }
-          });
-        }
+          try {
+            response = await axios.post(`${REACT_APP_BACKEND_URL}/student_complaint/add/${hostelId}`, values, {
+              headers: {
+                Authorization: `Bearer ${Cookies.get('Admin_Token')}`
+              }
+            });
 
-        if (response.status === 201) {
-        
-          toast.success('Complaint Add Successfully !!');
-        } else {
-          console.error('Failed to save data');
-          toast.success('Something went wrong while add complaint !!');
+            if (response.status === 201) {
+              toast.success('Complaint Added Successfully !!');
+            } else {
+              toast.error('Failed to add complaint !!');
+            }
+          } catch (error) {
+            console.log('Error:', error);
+            toast.error('Something went wrong !!');
+          }
         }
 
         handleClose();
         formik.resetForm();
       } catch (error) {
-      
-        toast.success('Something went wrong !!');
+        console.log('Error:', error);
+        toast.error('Something went wrong !!');
       }
     }
   });

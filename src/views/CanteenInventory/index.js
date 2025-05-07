@@ -91,10 +91,9 @@ const CanteenInventory = () => {
 
   // Handle view action here
   const handleEdit = (id) => {
-  
     setOpenAdd(true);
     let inventory = allInventory.find((inventory) => inventory._id === id);
-   
+
     setEditInventory(inventory);
   };
 

@@ -47,6 +47,7 @@ import { IconLogout, IconSearch, IconSettings, IconUser } from '@tabler/icons';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import Login from 'views/pages/authentication/authentication3/Login3';
+import UserProfile from './Profile';
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -62,6 +63,7 @@ const ProfileSection = () => {
   const [notification, setNotification] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
+  const [openProfile, setOpenProfile] = useState(false);
 
   const [openDeleteDialog, setDeleteDialog] = useState(false);
 
@@ -123,6 +125,9 @@ const ProfileSection = () => {
 
   const prevOpen = useRef(open);
 
+  const handleOpenForProfile = () => setOpenProfile(true);
+  const handleCloseForProfile = () => setOpenProfile(false);
+
   // useEffect(() => {
   //   if (prevOpen.current === true && open === false) {
   //     anchorRef.current.focus();
@@ -144,6 +149,7 @@ const ProfileSection = () => {
 
   return (
     <>
+    <UserProfile open={openProfile} handleClose={handleCloseForProfile}/>
       <Chip
         sx={{
           height: '48px',
@@ -247,6 +253,17 @@ const ProfileSection = () => {
                           }
                         }}
                       >
+                        <ListItemButton
+                          sx={{ borderRadius: `${customization.borderRadius}px` }}
+                          selected={selectedIndex === 4}
+                          onClick={handleOpenForProfile}
+                        >
+                          <ListItemIcon>
+                            <IconUser stroke={1.5} size="1.3rem" />
+                          </ListItemIcon>
+                          <ListItemText primary={<Typography variant="body2">Profile</Typography>} />
+                        </ListItemButton>
+
                         <ListItemButton
                           sx={{ borderRadius: `${customization.borderRadius}px` }}
                           selected={selectedIndex === 4}

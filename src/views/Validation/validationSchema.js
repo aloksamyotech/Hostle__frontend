@@ -193,8 +193,40 @@ export const roomValidationSchema = Yup.object({
     .positive('Room price must be a positive number')
     .max(100000, 'Room price cannot exceed ₹1,00,000')
     .required('Room price is required')
-  // roomphoto: Yup.mixed().required('Room Photos is required')
 });
+
+
+
+export const roomEditValidationSchema = (occupiedBeds
+
+) =>
+  
+   
+  Yup.object({
+    roomType: Yup.string().required('Select Room Type is required'),
+    roomNumber: Yup.string()
+      .max(20, 'Room number must not exceed 20 characters')
+      .required('Room number is required'),
+    noOfBeds: Yup.number()
+      .typeError('No of Beds must be a number')
+      .positive('No of Beds must be a positive number')
+      .max(10, 'No of Beds cannot be more than 10')
+      .required('No of Beds is required')
+      .test(
+        'beds-not-less-than-occupied',
+        `No of Beds cannot be less than occupied beds (${occupiedBeds})`,
+        function (value) {
+          if (value === undefined || value === null) return false;
+          return value > occupiedBeds;
+        }
+      ),
+    roomPrice: Yup.number()
+      .typeError('Room price must be a number')
+      .positive('Room price must be a positive number')
+      .max(100000, 'Room price cannot exceed ₹1,00,000')
+      .required('Room price is required')
+  });
+
 
 export const roomTypeValidationSchema = Yup.object({
   roomType: Yup.string().required('Room Type is required'),
@@ -237,8 +269,17 @@ export const addReservedBedValidationSchema = Yup.object({
   startDate: Yup.date().required('Start Date is required'),
   endDate: Yup.date().min(Yup.ref('startDate'), 'End Date cannot be before Start Date').required('End Date is required'),
   stayMonths: Yup.number().typeError('Account of Stay Months must be a number').required('Account of Stay Months is required'),
+  // totalRent: Yup.number().typeError('Total Rent must be a number').required('Total Rent is required'),
+  // advanceAmount: Yup.number().typeError('Advance Amount must be a number').required('Advance Amount is required'),
+
   totalRent: Yup.number().typeError('Total Rent must be a number').required('Total Rent is required'),
-  advanceAmount: Yup.number().typeError('Advance Amount must be a number').required('Advance Amount is required'),
+  advanceAmount: Yup.number()
+    .typeError('Advance Amount must be a number')
+    .required('Advance Amount is required')
+    .test('is-less-than-total', 'Advance Amount cannot be greater than Total Rent', function (value) {
+      const { totalRent } = this.parent;
+      return value <= totalRent;
+    }),
 
   studentName: Yup.string()
     .matches(/^[A-Za-z\s]+$/, 'Student Name can only contain letters')
@@ -258,21 +299,21 @@ export const addReservedBedValidationSchema = Yup.object({
     .matches(/^[0-9]{10}$/, 'Father Contact No must be exactly 10 digits')
     .required('Father Contact No is required'),
 
-  guardianName: Yup.string()
-    .matches(/^[A-Za-z\s]+$/, 'Guardian Name can only contain letters')
-    .max(30, 'Guardian Name must be at most 30 characters')
-    .required('Guardian Name is required'),
+  // guardianName: Yup.string()
+  //   .matches(/^[A-Za-z\s]+$/, 'Guardian Name can only contain letters')
+  //   .max(30, 'Guardian Name must be at most 30 characters')
+  //   .required('Guardian Name is required'),
 
-  guardianContactNo: Yup.string()
-    .matches(/^[0-9]{10}$/, 'Guardian Contact No must be exactly 10 digits')
-    .required('Guardian Contact No is required'),
+  // guardianContactNo: Yup.string()
+  //   .matches(/^[0-9]{10}$/, 'Guardian Contact No must be exactly 10 digits')
+  //   .required('Guardian Contact No is required'),
 
-  guardiansAddress: Yup.string().max(100, 'Address must be at most 100 characters').required('Address is required'),
+  // guardiansAddress: Yup.string().max(100, 'Address must be at most 100 characters').required('Address is required'),
 
   dob: Yup.date().max(new Date(), 'Date of Birth cannot be a future date').required('Date of Birth is required'),
   gender: Yup.string().required('Gender is required'),
   mailId: Yup.string().required('Main ID is required'),
-  courseOccupation: Yup.string().max(100, 'Course Occupation must be at most 100 characters').required('Course / Occupation is required'),
+  // courseOccupation: Yup.string().max(100, 'Course Occupation must be at most 100 characters').required('Course / Occupation is required'),
   address: Yup.string().max(100, 'Address must be at most 100 characters').required('Address is required')
 });
 

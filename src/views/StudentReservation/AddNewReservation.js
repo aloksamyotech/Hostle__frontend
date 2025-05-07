@@ -75,8 +75,6 @@ const AddNewReservation = (props) => {
 
     validationSchema: addReservedBedValidationSchema,
     onSubmit: async (values) => {
-      console.log('values are  1234 :::::::::::: ===>', values);
-
       const formData = new FormData();
 
       formData.append('roomCategory', values.roomCategory);
@@ -89,11 +87,8 @@ const AddNewReservation = (props) => {
       formData.append('stayMonths', values.stayMonths);
       formData.append('totalRent', values.totalRent);
       formData.append('advanceAmount', values.advanceAmount);
-      // formData.append('paymentMethod', values.paymentMethod);
-
       formData.append('foodFee', values.foodFee);
       formData.append('libraryFee', values.libraryFee);
-
       formData.append('studentName', values.studentName);
       formData.append('studentContact', values.studentContact);
       formData.append('fatherName', values.fatherName);
@@ -121,20 +116,17 @@ const AddNewReservation = (props) => {
             'Content-Type': 'multipart/form-data'
           }
         });
-        console.log('------ response --------->', response);
 
         if (response.status === 201) {
-          toast.success('Student Reservation Successfully !!');
-          handleClose();
-          formik.resetForm();
+          toast.success('Bed assigned to the student successfully');
         } else {
-          toast.error('Something went wrong while reservation !!');
+          toast.error('Failed to assign bed to the student');
         }
         handleClose();
         formik.resetForm();
       } catch (error) {
         console.log('Error=>', error);
-        toast.error('Something went wrong while reservation !!');
+        toast.error('Something went wrong !!');
       }
     }
   });
@@ -230,7 +222,6 @@ const AddNewReservation = (props) => {
                   Room Information
                 </Typography>
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Room Category</FormLabel>
                 <Select
@@ -250,7 +241,6 @@ const AddNewReservation = (props) => {
                   <FormHelperText error>{formik.errors.roomCategory}</FormHelperText>
                 )}
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Room Type</FormLabel>
                 <Select
@@ -273,7 +263,6 @@ const AddNewReservation = (props) => {
                 </Select>
                 {formik.touched.roomType && formik.errors.roomType && <FormHelperText error>{formik.errors.roomType}</FormHelperText>}
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Room Number</FormLabel>
                 <Select
@@ -305,38 +294,7 @@ const AddNewReservation = (props) => {
                 </Select>
                 {formik.touched.roomNumber && formik.errors.roomNumber && <FormHelperText error>{formik.errors.roomNumber}</FormHelperText>}
               </Grid>
-
               {/* <Grid item xs={12} sm={6} md={6}>
-                <FormLabel component="legend">Bed Numbers</FormLabel>
-
-                <FormGroup row>
-                  {selectedRoomData?.beds.map((bed) => (
-                    <FormControlLabel
-                      key={bed.bedNumber}
-                      control={
-                        <Checkbox
-                          name="bedNumber"
-                          value={bed.bedNumber}
-                          checked={formik.values.bedNumber === bed.bedNumber}
-                          disabled={bed.status !== 'available'}
-                          onChange={(e) => {
-                            const value = parseInt(e.target.value, 10);
-                            if (e.target.checked) {
-                              formik.setFieldValue('bedNumber', value);
-                            } else {
-                              formik.setFieldValue('bedNumber', null);
-                            }
-                          }}
-                        />
-                      }
-                      label={`Bed ${bed.bedNumber} (${bed.status})`}
-                    />
-                  ))}
-                </FormGroup>
-                {formik.touched.bedNumber && formik.errors.bedNumber && <FormHelperText error>{formik.errors.bedNumber}</FormHelperText>}
-              </Grid> */}
-
-              <Grid item xs={12} sm={6} md={6}>
                 <FormLabel component="legend">Bed Numbers</FormLabel>
                 <FormGroup row>
                   {selectedRoomData?.beds?.length > 0 ? (
@@ -370,8 +328,34 @@ const AddNewReservation = (props) => {
                     </>
                   )}
                 </FormGroup>
-              </Grid>
+              </Grid> */}
 
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Bed Numbers</FormLabel>
+                <Select
+                  labelId="bedNumber-label"
+                  id="bedNumber"
+                  name="bedNumber"
+                  size="small"
+                  fullWidth
+                  value={formik.values.bedNumber || ''}
+                  onChange={formik.handleChange}
+                  disabled={!selectedRoomData?.beds?.length}
+                >
+                  {selectedRoomData?.beds?.length > 0 ? (
+                    selectedRoomData.beds.map((bed) =>
+                      bed.status === 'available' ? (
+                        <MenuItem key={bed.bedNumber} value={bed.bedNumber}>
+                          Bed {bed.bedNumber} ({bed.status})
+                        </MenuItem>
+                      ) : null
+                    )
+                  ) : (
+                    <MenuItem disabled>No beds available</MenuItem>
+                  )}
+                </Select>
+                {formik.touched.bedNumber && formik.errors.bedNumber && <FormHelperText error>{formik.errors.bedNumber}</FormHelperText>}
+              </Grid>
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Room Rent (Per Month)</FormLabel>
                 <TextField
@@ -389,7 +373,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.roomRent && formik.errors.roomRent}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Start Date</FormLabel>
                 <TextField
@@ -405,7 +388,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.startDate && formik.errors.startDate}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>End Date</FormLabel>
                 <TextField
@@ -421,7 +403,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.endDate && formik.errors.endDate}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>No. of Stay Months</FormLabel>
                 <TextField
@@ -438,7 +419,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.stayMonths && formik.errors.stayMonths}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Advance Amount</FormLabel>
                 <TextField
@@ -453,7 +433,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.advanceAmount && formik.errors.advanceAmount}
                 />
               </Grid>
-
               {/* <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Payment Method</FormLabel>
                 <TextField
@@ -473,7 +452,6 @@ const AddNewReservation = (props) => {
                   <MenuItem value="Net-Banking">Net-Banking</MenuItem>
                 </TextField>
               </Grid> */}
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Total Rent</FormLabel>
                 <TextField
@@ -486,14 +464,12 @@ const AddNewReservation = (props) => {
                   disabled
                 />
               </Grid>
-
               {/* Other Facility Information Title */}
               <Grid item xs={12}>
                 <Typography variant="h6" gutterBottom>
                   Other Facility (Optional)
                 </Typography>
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormControlLabel
                   control={
@@ -522,7 +498,6 @@ const AddNewReservation = (props) => {
                   onChange={formik.handleChange}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormControlLabel
                   control={
@@ -551,14 +526,12 @@ const AddNewReservation = (props) => {
                   onChange={formik.handleChange}
                 />
               </Grid>
-
               {/* Student Information Title */}
               <Grid item xs={12}>
                 <Typography variant="h6" gutterBottom>
                   Student Information
                 </Typography>
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Student Name</FormLabel>
                 <TextField
@@ -572,7 +545,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.studentName && formik.errors.studentName}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Student Contact No.</FormLabel>
                 <TextField
@@ -586,7 +558,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.studentContact && formik.errors.studentContact}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Fathers Name</FormLabel>
                 <TextField
@@ -600,7 +571,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.fatherName && formik.errors.fatherName}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Fathers Contact No.</FormLabel>
                 <TextField
@@ -614,7 +584,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.fatherContact && formik.errors.fatherContact}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Date of Birth</FormLabel>
                 <TextField
@@ -630,7 +599,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.dob && formik.errors.dob}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Gender</FormLabel>
                 <TextField
@@ -649,7 +617,6 @@ const AddNewReservation = (props) => {
                   <MenuItem value="Other">Other</MenuItem>
                 </TextField>
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Email ID</FormLabel>
                 <TextField
@@ -663,7 +630,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.mailId && formik.errors.mailId}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Course / Occupation</FormLabel>
                 <TextField
@@ -677,7 +643,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.courseOccupation && formik.errors.courseOccupation}
                 />
               </Grid>
-
               <Grid item xs={12} sm={12} md={12}>
                 <FormLabel>Full Address</FormLabel>
                 <TextField
@@ -693,7 +658,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.address && formik.errors.address}
                 />
               </Grid>
-
               {/* Uploads */}
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Upload Student Photo</FormLabel>
@@ -719,7 +683,6 @@ const AddNewReservation = (props) => {
                   </div>
                 )}
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Upload AadharCard Photo</FormLabel>
                 <Input
@@ -744,7 +707,6 @@ const AddNewReservation = (props) => {
                   </div>
                 )}
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Local Guardians Name</FormLabel>
                 <TextField
@@ -758,7 +720,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.guardianName && formik.errors.guardianName}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Local Guardians Contact No.</FormLabel>
                 <TextField
@@ -772,7 +733,6 @@ const AddNewReservation = (props) => {
                   helperText={formik.touched.guardianContactNo && formik.errors.guardianContactNo}
                 />
               </Grid>
-
               <Grid item xs={12} sm={12} md={12}>
                 <FormLabel>Local Guardians Full Address</FormLabel>
                 <TextField

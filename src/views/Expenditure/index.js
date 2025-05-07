@@ -55,13 +55,13 @@ const Expenditure = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [rowData, setRowData] = useState(null);
-  
 
   const handleOpenAdd = () => setOpenAdd(true);
 
   const handleCloseAdd = () => {
     setOpenAdd(false);
     fetchExpenses(hostelId);
+    handleClose();
   };
 
   useEffect(() => {
@@ -74,7 +74,6 @@ const Expenditure = () => {
 
   const fetchExpenses = async (hostelId) => {
     try {
-    
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/expense/index/${hostelId}`, {
         params: {
           startDate: startDate || undefined,
@@ -94,16 +93,14 @@ const Expenditure = () => {
 
   // Handle Edit Action Here
   const handleEdit = (id) => {
- 
     setOpenAdd(true);
     let expense = allExpenses.find((expense) => expense._id === id);
-  
+
     setEditExpense(expense);
   };
 
   // Handle Delete Action Here
   const handleDelete = (id) => {
-  
     setOpenDeleteDialog(true);
     setDeleteId(id);
   };
@@ -114,9 +111,7 @@ const Expenditure = () => {
 
   const handleConfirmDelete = async () => {
     try {
-   
       let response = await axios.delete(`${REACT_APP_BACKEND_URL}/expense/delete/${deleteId}`);
-    
 
       setOpenDeleteDialog(false);
       fetchExpenses(hostelId);

@@ -38,24 +38,28 @@ const AddRoomType = (props) => {
       try {
         let response;
         if (rowData) {
-          response = await axios.put(`${REACT_APP_BACKEND_URL}/roomTypes/update/${rowData._id}`, values);
-
-          if (response.status === 200) {
-            toast.success('Room-Types Details Updated Successfully !!');
-          } else {
-            toast.error('Failed to Updated Room-Types Details');
+          try {
+            response = await axios.put(`${REACT_APP_BACKEND_URL}/roomTypes/update/${rowData._id}`, values);
+            if (response.status === 200) {
+              toast.success('Room-Types Details Updated Successfully !!');
+            } else {
+              toast.error('Failed to update room type !!');
+            }
+          } catch (error) {
+            console.log('Error:', error);
+            toast.error('Something went wrong !!');
           }
         } else {
-          response = await axios.post(`${REACT_APP_BACKEND_URL}/roomTypes/add/${hostelId}`, values);
-          console.log('hyyyyy :', response);
-
-          if (response.status === 400) {
-            toast.success('This room type and category combination already exists.');
-          }
-          if (response.status === 201) {
-            toast.success('Room-Types Details Added Successfully !!');
-          } else {
-            toast.error('Failed to Added Room-Types Details');
+          try {
+            response = await axios.post(`${REACT_APP_BACKEND_URL}/roomTypes/add/${hostelId}`, values);
+            if (response.status === 201) {
+              toast.success('Room-Types Details Added Successfully !!');
+            } else {
+              toast.error('Failed to add room type !!');
+            }
+          } catch (error) {
+            console.log('Error:', error);
+            toast.error('Something went wrong !!');
           }
         }
 
@@ -79,10 +83,13 @@ const AddRoomType = (props) => {
         >
           <Typography variant="h6">Add New Room Type</Typography>
           <Typography>
-            <ClearIcon  onClick={() => {
-                  formik.resetForm();
-                  handleClose();
-                }} style={{ cursor: 'pointer' }} />
+            <ClearIcon
+              onClick={() => {
+                formik.resetForm();
+                handleClose();
+              }}
+              style={{ cursor: 'pointer' }}
+            />
           </Typography>
         </DialogTitle>
 

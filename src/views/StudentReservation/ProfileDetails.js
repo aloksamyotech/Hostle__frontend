@@ -21,7 +21,8 @@ import {
   Tab,
   Tabs,
   Grid,
-  CardMedia
+  CardMedia,
+  Chip
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { ArrowBack } from '@mui/icons-material';
@@ -29,17 +30,19 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import moment from 'moment';
 import TableStyle from '../../ui-component/TableStyle';
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useNavigate } from 'react-router-dom';
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 
 const ProfileDetails = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
+  const [studentPaymentData, setStudentPaymentData] = useState([]);
+
   const [paymentData, setPaymentData] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
 
@@ -64,7 +67,7 @@ const ProfileDetails = () => {
 
   useEffect(() => {
     fetchStudentDetails();
-    fetchStudentPaymentData();
+    fetchPaymentData();
     fetchVisitorData();
   }, [id]);
 
@@ -78,35 +81,66 @@ const ProfileDetails = () => {
       console.error('Error fetching reserved student details:', error);
     }
   };
-  console.log('profileData===>', profileData);
-
-  const fetchStudentPaymentData = async () => {
+  
+  const fetchPaymentData = async () => {
     try {
-      console.log('Making API With This URL==>', `${REACT_APP_BACKEND_URL}/student_payment/paymenthistory/${id}`);
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/student_payment/paymenthistory/${id}`);
-      console.log('API Payment Data response=>', response);
-      setPaymentData(response.data.result);
-      setTotalCount(response.data.totalRecodes);
+      console.log('response ----> fetchPaymentData ---> :', response);
+      setStudentPaymentData(response.data.result);
     } catch (error) {
-      console.error('Error fetching student payment details:', error);
+      console.error('Error fetching payment data:', error);
     }
   };
 
   const fetchVisitorData = async () => {
     try {
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/visitor/list/${id}`);
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/visitor/list/${id}`);
-      console.log(' fetchVisitorData response===>', response);
       setVisitorData(response.data.result);
-      setTotalVisitorCount(response.data.totalRecodes);
     } catch (error) {
       console.error('Error fetching visitors data:', error);
     }
   };
 
-  console.log('visitorData===>', visitorData);
-  console.log('paymentData===>', paymentData);
-  console.log('studentName===>', studentName);
+  const columns1 = [
+      {
+        field: 'sno',
+        headerName: 'S. No.',
+        width: 80,
+        sortable: false,
+        filterable: false,
+        renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
+      },
+      {
+        field: 'visitorName',
+        headerName: 'Visitor Name',
+        cellClassName: 'name-column--cell--capitalize',
+        flex: 1
+      },
+      {
+        field: 'phoneNumber',
+        headerName: 'Visitor Phone No',
+        flex: 1
+      },
+      {
+        field: 'visitorduration',
+        headerName: 'Visit Duration (In Hr)',
+        flex: 1.2,
+        renderCell: (params) => {
+          return `${params.row.visitorduration} hr`;
+        }
+      },
+      {
+        field: 'dateTime',
+        headerName: 'Date',
+        flex: 1,
+        renderCell: (params) => {
+          return moment(params.row.dateTime).format('YYYY-MM-DD');
+        }
+      },
+    
+    ];
+
+ 
 
   // Handle Pages
   const handleChangePage = (event, newPage) => {
@@ -122,49 +156,61 @@ const ProfileDetails = () => {
 
   const columns = [
     {
-      field: 'month',
-      headerName: 'Month',
-      flex: 1
+      field: 'sno',
+      headerName: 'S. No.',
+      width: 80,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => params.api.getAllRowIds().indexOf(params.id) + 1
     },
     {
-      field: 'paymentDate',
-      headerName: 'Date',
-      flex: 1
+      field: 'date',
+      headerName: 'Payment Date',
+      flex: 1,
+      renderCell: (params) => moment(params.row.date).format('YYYY-MM-DD') || ''
     },
+    {
+      field: 'totalRent',
+      headerName: 'Total Rent',
+      flex: 1,
+      renderCell: (params) => ` ₹ ${params.row.totalRent}` || 0
+    },
+
     {
       field: 'paidAmount',
-      headerName: 'Monthly Paid Amount',
-      flex: 1
+      headerName: 'Paid Amount',
+      flex: 1,
+      renderCell: (params) => ` ₹ ${params.row.paymentAmount}` || 0
     },
     {
-      field: 'monthlyPending',
-      headerName: 'Monthly Pending Amount',
-      flex: 1
+      field: 'remainingAmount',
+      headerName: 'Pending Amount',
+      flex: 1,
+      renderCell: (params) => ` ₹ ${params.row.remainingAmount}` || 0
     },
+
     {
-      field: 'totalAmmount',
-      headerName: 'Total Amount',
-      flex: 1
-    },
-    {
-      field: 'totalPending',
-      headerName: 'Total Pending Amount',
-      flex: 1
-    },
-    {
-      field: 'paymentType',
-      headerName: 'Payment Method',
-      flex: 1
-    },
-    {
-      field: 'paymentAttachment',
-      headerName: 'Attachment',
-      flex: 1
-    },
-    {
-      field: 'Status',
-      headerName: 'Total Amount',
-      flex: 1
+      field: 'paymentStatus',
+      headerName: 'Payment Status',
+      flex: 1,
+      renderCell: (params) => {
+        const status = params.row.paymentStatus || 'Pending';
+        const isPending = status.toLowerCase() === 'pending';
+
+        return (
+          <Chip
+            label={status}
+            color={isPending ? 'error' : 'success'}
+            variant="outlined"
+            size="small"
+            sx={{
+              width: '100px',
+              justifyContent: 'center',
+              textTransform: 'capitalize'
+            }}
+          />
+        );
+      }
     }
   ];
 
@@ -376,90 +422,11 @@ const ProfileDetails = () => {
       {activeTab === 1 && (
         <>
           <TableStyle>
-            <Box width="100%" sx={{ mt: '10px' }}>
-              <Card>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Month</TableCell>
-                        <TableCell>Date</TableCell>
-                        <TableCell>Monthly Paid Amount</TableCell>
-                        <TableCell>Monthly Pending Amount</TableCell>
-                        <TableCell>Total Amount</TableCell>
-                        <TableCell>Total Pending Amount</TableCell>
-                        <TableCell>Payment Method</TableCell>
-                        <TableCell>Attachment</TableCell>
-                        <TableCell>Status</TableCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {paymentData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                        <TableRow key={row.id}>
-                          <TableCell>{row.month}</TableCell>
-                          <TableCell>{moment(row.paymentDate).format('DD-MM-YYYY')}</TableCell>
-                          <TableCell>{row.paidAmount}</TableCell>
-                          {row.monthlyPending > 0 ? (
-                            <>
-                              <TableCell sx={{ color: 'red' }}>{row.monthlyPending}</TableCell>
-                            </>
-                          ) : (
-                            <>
-                              <TableCell>{row.monthlyPending}</TableCell>
-                            </>
-                          )}
-                          <TableCell>{row.totalAmmount}</TableCell>
-                          <TableCell>{row.totalPending}</TableCell>
-                          <TableCell>{row.paymentType}</TableCell>
-                          <TableCell>
-                            {row.paymentAttachment && (
-                              <a
-                                href={`${REACT_APP_BACKEND_URL}/uploads/payment/${row.paymentAttachment}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {row.paymentAttachment}
-                              </a>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <Stack direction="row" alignItems="center">
-                              {row.monthlyPending > 0 ? (
-                                <Typography variant="body2" color="red">
-                                  Pending
-                                </Typography>
-                              ) : (
-                                <Typography variant="body2" color="green">
-                                  Complete
-                                </Typography>
-                              )}
-                            </Stack>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-
-                <TablePagination
-                  component="div"
-                  count={totalCount}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </Card>
-            </Box>
-          </TableStyle>
-
-          {/* <TableStyle>
             <Box width="100%">
               <Card style={{ height: '600px', paddingTop: '15px' }}>
-                {paymentData && (
+                {studentPaymentData && (
                   <DataGrid
-                    rows={paymentData}
+                    rows={studentPaymentData}
                     columns={columns}
                     getRowId={(row) => row?._id}
                     slots={{ toolbar: GridToolbar }}
@@ -468,45 +435,24 @@ const ProfileDetails = () => {
                 )}
               </Card>
             </Box>
-          </TableStyle> */}
+          </TableStyle>
         </>
       )}
 
       {activeTab === 2 && (
         <>
           <TableStyle>
-            <Box width="100%" sx={{ mt: '10px' }}>
-              <Card>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Phone No.</TableCell>
-                        <TableCell>Date & Time</TableCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {visitorData.map((row) => (
-                        <TableRow key={row.id}>
-                          <TableCell>{row.visitorName}</TableCell>
-                          <TableCell>{row.phoneNumber}</TableCell>
-                          <TableCell>{moment(row.dateTime).format('DD-MM-YYYY HH:mm')}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-
-                {/* <TablePagination
-                  component="div"
-                  count={totalCount}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                /> */}
+            <Box width="100%">
+              <Card style={{ height: '600px', paddingTop: '15px' }}>
+                {visitorData && (
+                  <DataGrid
+                    rows={visitorData}
+                    columns={columns1}
+                    getRowId={(row) => row?._id}
+                    slots={{ toolbar: GridToolbar }}
+                    slotProps={{ toolbar: { showQuickFilter: true } }}
+                  />
+                )}
               </Card>
             </Box>
           </TableStyle>

@@ -13,7 +13,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useFormik } from 'formik';
-import { roomValidationSchema } from 'views/Validation/validationSchema';
+import { roomValidationSchema, roomEditValidationSchema } from 'views/Validation/validationSchema';
 import { useEffect } from 'react';
 import axios from 'axios';
 import { useState } from 'react';
@@ -24,6 +24,8 @@ const AddRoom = (props) => {
   console.log('AddRoom props========>', props);
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const { open, handleClose, hostelId, rowData } = props;
+
+  console.log('edit rowData :', rowData);
 
   const [roomType, setRoomType] = useState([]);
   const [roomPhotos, setRoomPhotos] = useState([]);
@@ -38,12 +40,10 @@ const AddRoom = (props) => {
       roomPrice: rowData?.roomPrice || '',
       roomphoto: []
     },
-    validationSchema: roomValidationSchema,
+    validationSchema: rowData ? roomEditValidationSchema(rowData?.occupiedBeds) : roomValidationSchema,
     enableReinitialize: true,
-
     onSubmit: async (values) => {
       console.log('values :::::', values);
-
       try {
         const formData = new FormData();
         formData.append('roomTypeId', values.roomTypeId);
@@ -59,32 +59,43 @@ const AddRoom = (props) => {
         let response;
 
         if (rowData) {
-          response = await axios.put(`${REACT_APP_BACKEND_URL}/room/edit/${rowData?._id}`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
+          try {
+            response = await axios.put(`${REACT_APP_BACKEND_URL}/room/edit/${rowData?._id}`, formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+
+            if (response.status === 200) {
+              toast.success('Room Details Updated Successfully !!');
+            } else {
+              toast.error('Failed to update room details !!');
             }
-          });
+          } catch (error) {
+            console.log('Error:', error);
+            toast.error('Something went wrong !!');
+          }
         } else {
-          response = await axios.post(`${REACT_APP_BACKEND_URL}/room/add/${hostelId}`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
+          try {
+            response = await axios.post(`${REACT_APP_BACKEND_URL}/room/add/${hostelId}`, formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            });
+
+            if (response.status === 201) {
+              toast.success('Room Details Add Successfully !!');
+            } else {
+              toast.error('Failed to add room details !!');
             }
-          });
+          } catch (error) {
+            console.log('Error:', error);
+            toast.error('Something went wrong !!');
+          }
         }
 
-        console.log('hiiiiiiiiiii response ==>', response);
-
-        if (response.status === 201) {
-          toast.success('Room Details Added Successfully !!');
-          setRoomPhotos([]);
-          setPreviews([]);
-        } else if (response.status === 200) {
-          toast.success('Room Details Update Successfully !!');
-          setRoomPhotos([]);
-          setPreviews([]);
-        } else {
-          toast.error('Failed to Add Room Details');
-        }
+        setRoomPhotos([]);
+        setPreviews([]);
 
         handleClose();
         formik.resetForm();

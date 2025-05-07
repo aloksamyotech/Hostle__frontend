@@ -42,7 +42,7 @@ const AddVisotor = (props) => {
       visitorName: '',
       phoneNumber: '',
       dateTime: '',
-      visitorduration: '',
+      visitorduration: ''
     },
     validationSchema: visitorValidationSchema,
     onSubmit: async (values) => {
@@ -51,7 +51,6 @@ const AddVisotor = (props) => {
       try {
         let response;
         response = await axios.post(`${REACT_APP_BACKEND_URL}/visitor/add/${hostelId}`, values);
-        console.log('visitor response :::::: ====>', response);
 
         if (response.status === 201) {
           toast.success('visitor addes successfully!!');
@@ -62,7 +61,8 @@ const AddVisotor = (props) => {
         handleClose();
         formik.resetForm();
       } catch (error) {
-        console.log('Found Error =>', error);
+        console.log('Error:', error);
+        toast.error('Something went wrong !!');
       }
     }
   });

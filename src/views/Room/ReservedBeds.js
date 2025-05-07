@@ -73,8 +73,6 @@ const ReservedBeds = (props) => {
 
     validationSchema: addReservedBedValidationSchema,
     onSubmit: async (values) => {
-      console.log('values are :::::::::::: ===>', values);
-
       const formData = new FormData();
 
       formData.append('roomType', values.roomType);
@@ -86,11 +84,8 @@ const ReservedBeds = (props) => {
       formData.append('stayMonths', values.stayMonths);
       formData.append('totalRent', values.totalRent);
       formData.append('advanceAmount', values.advanceAmount);
-      // formData.append('paymentMethod', values.paymentMethod);
-
       formData.append('foodFee', values.foodFee);
       formData.append('libraryFee', values.libraryFee);
-
       formData.append('studentName', values.studentName);
       formData.append('studentContact', values.studentContact);
       formData.append('fatherName', values.fatherName);
@@ -122,12 +117,13 @@ const ReservedBeds = (props) => {
         if (response.status === 201) {
           toast.success('Bed assigned to the student successfully');
         } else {
-          toast.error('Failed to assign bed');
+          toast.error('Failed to assign bed to the student');
         }
         handleClose();
         formik.resetForm();
       } catch (error) {
         console.log('Error=>', error);
+        toast.error('Something went wrong !!');
       }
     }
   });
