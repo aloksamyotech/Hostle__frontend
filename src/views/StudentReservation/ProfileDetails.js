@@ -300,6 +300,14 @@ const ProfileDetails = () => {
                     </Grid>
 
                     <Grid item xs={6}>
+                      <Typography variant="h6">Final Total Rent:</Typography>
+                      <Typography>{profileData?.finalTotalRent || '- -'}</Typography>
+                    </Grid>
+
+
+
+
+                    <Grid item xs={6}>
                       <Typography variant="h6">Food Amount:</Typography>
                       <Typography>{profileData?.foodFee || '- -'}</Typography>
                     </Grid>

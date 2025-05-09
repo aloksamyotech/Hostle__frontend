@@ -32,7 +32,8 @@ import moment from 'moment';
 
 const EditReservation = (props) => {
   const { open, handleClose, rowData, hostelId } = props;
-  console.log('EditReservation props :', props);
+  // console.log('EditReservation props :', props);
+  console.log('EditReservation rowData :', rowData);
 
   const [roomTypes, setRoomTypes] = useState([]);
   const [roomNumbers, setRoomNumbers] = useState([]);
@@ -51,7 +52,9 @@ const EditReservation = (props) => {
       stayMonths: rowData?.stayMonths || '',
       foodFee: rowData?.foodFee || '',
       libraryFee: rowData?.libraryFee || '',
-      totalRent: rowData?.totalRent || ''
+      totalRent: rowData?.totalRent || '',
+      finalTotalRent: rowData?.finalTotalRent || '',
+      advanceAmount: rowData?.advanceAmount || ''
     },
 
     validationSchema: editReservedBedValidationSchema,
@@ -116,15 +119,25 @@ const EditReservation = (props) => {
       const months = monthDiffInclusive(startDate, endDate);
       formik.setFieldValue('stayMonths', months);
 
-      const roomRent = selectedRoomData?.roomPrice || 0;
-      const foodFee = Number(formik.values.foodFee || 0);
-      const libraryFee = Number(formik.values.libraryFee || 0);
+      if (selectedRoomData.roomNumber !== rowData?.roomNumber) {
+        const roomRent = selectedRoomData?.roomPrice || 0;
+        const foodFee = Number(formik.values.foodFee || 0);
+        const libraryFee = Number(formik.values.libraryFee || 0);
 
-      const facilityFeePerMonth = foodFee + libraryFee;
-      const totalRent = months * (roomRent + facilityFeePerMonth);
-      formik.setFieldValue('totalRent', totalRent);
+        const facilityFeePerMonth = foodFee + libraryFee;
+        const totalRent = months * (roomRent + facilityFeePerMonth);
+        console.log('this is totalRent :', totalRent);
+        formik.setFieldValue('totalRent', totalRent);
+        formik.setFieldValue('finalTotalRent', totalRent - formik.values.advanceAmount);
+      } else {
+        const roomRent = rowData?.finalTotalRent || 0;
+        const months = monthDiffInclusive(formik.values.startDate, formik.values.endDate);
+        const totalRent = months * roomRent;
+        formik.setFieldValue('totalRent', rowData?.totalRent);
+        formik.setFieldValue('finalTotalRent', totalRent);
+      }
     }
-  }, [formik.values.roomNumber, selectedRoomData, formik.values.startDate, formik.values.endDate]);
+  }, [formik.values.roomNumber, formik.values.startDate, formik.values.endDate]);
 
   function monthDiffInclusive(start, end) {
     const s = new Date(start),
@@ -233,42 +246,6 @@ const EditReservation = (props) => {
                 </Select>
                 {formik.touched.roomNumber && formik.errors.roomNumber && <FormHelperText error>{formik.errors.roomNumber}</FormHelperText>}
               </Grid>
-
-              {/* <Grid item xs={12} sm={6} md={6}>
-                <FormLabel component="legend">Bed Numbers</FormLabel>
-                <FormGroup row>
-                  {selectedRoomData?.beds?.length > 0 ? (
-                    selectedRoomData.beds.map((bed) => (
-                      <FormControlLabel
-                        key={bed.bedNumber}
-                        control={
-                          <Checkbox
-                            name="bedNumber"
-                            value={bed.bedNumber}
-                            checked={formik.values.bedNumber === bed.bedNumber}
-                            disabled={bed.status !== 'available'}
-                            onChange={(e) => {
-                              const value = parseInt(e.target.value, 10);
-                              if (e.target.checked) {
-                                formik.setFieldValue('bedNumber', value);
-                              } else {
-                                formik.setFieldValue('bedNumber', null);
-                              }
-                            }}
-                          />
-                        }
-                        label={`Bed ${bed.bedNumber} (${bed.status})`}
-                      />
-                    ))
-                  ) : (
-                    <>
-                      {[1, 2, 3].map((num) => (
-                        <FormControlLabel key={num} control={<Checkbox disabled />} label={`Bed ${num}`} />
-                      ))}
-                    </>
-                  )}
-                </FormGroup>
-              </Grid> */}
 
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Bed Numbers</FormLabel>
@@ -404,6 +381,32 @@ const EditReservation = (props) => {
                   value={formik.values.totalRent}
                   onChange={formik.handleChange}
                   disabled
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Advance Amount</FormLabel>
+                <TextField
+                  id="advanceAmount"
+                  name="advanceAmount"
+                  size="small"
+                  fullWidth
+                  value={formik.values.advanceAmount}
+                  onChange={formik.handleChange}
+                  disabled
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Final Total Rent</FormLabel>
+                <TextField
+                  id="finalTotalRent"
+                  name="finalTotalRent"
+                  size="small"
+                  fullWidth
+                  value={formik.values.finalTotalRent}
+                  onChange={formik.handleChange}
+                  disabled={rowData?.roomNumber === formik.values.roomNumber}
                 />
               </Grid>
             </Grid>

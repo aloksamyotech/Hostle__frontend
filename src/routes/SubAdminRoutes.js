@@ -38,7 +38,6 @@ const RoomType = Loadable(lazy(() => import('views/RoomType')));
 const ViewBeds = Loadable(lazy(() => import('views/Room/ViewBeds')));
 import Report from 'views/Report';
 
-
 // ==============================|| MAIN ROUTING ||============================== //
 
 const SubAdminRoutes = {

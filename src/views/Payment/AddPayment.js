@@ -60,7 +60,7 @@ const AddPayment = (props) => {
       console.log('paymentData ---------->', paymentData);
       setPaymentData(paymentData);
 
-      const totalRent = assignedData?.totalRent || 0;
+      const totalRent = assignedData?.finalTotalRent || 0;
       const remainingAmount = paymentData != null ? paymentData.remainingAmount : totalRent;
 
       formik.setValues({
@@ -73,7 +73,9 @@ const AddPayment = (props) => {
         roomRent: assignedData?.roomRent || '',
         foodFee: assignedData?.foodFee || '',
         libraryFee: assignedData?.libraryFee || '',
-        totalRent: totalRent,
+        totalRent: assignedData?.totalRent || '',
+        advanceAmount: assignedData?.advanceAmount || '',
+        finalTotalRent: assignedData?.finalTotalRent || '',
         remainingAmount: remainingAmount
       });
     } catch (error) {
@@ -96,6 +98,8 @@ const AddPayment = (props) => {
       foodFee: '',
       libraryFee: '',
       totalRent: '',
+      advanceAmount: '',
+      finalTotalRent: '',
       remainingAmount: '',
       paymentMethod: '',
       date: '',
@@ -125,7 +129,7 @@ const AddPayment = (props) => {
   });
 
   useEffect(() => {
-    const total = paymentdata?.remainingAmount ?? (parseFloat(formik.values.totalRent) || 0);
+    const total = paymentdata?.remainingAmount ?? (parseFloat(formik.values.finalTotalRent) || 0);
     const paid = parseFloat(formik.values.paymentAmount) || 0;
     const remaining = total - paid;
 
@@ -210,6 +214,16 @@ const AddPayment = (props) => {
             <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Total Rent</FormLabel>
               <TextField name="totalRent" value={formik.values.totalRent} size="small" fullWidth disabled />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Advance Amount</FormLabel>
+              <TextField name="advanceAmount" value={formik.values.advanceAmount} size="small" fullWidth disabled />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Final Amount</FormLabel>
+              <TextField name="finalTotalRent" value={formik.values.finalTotalRent} size="small" fullWidth disabled />
             </Grid>
 
             <Grid item xs={12} sm={6} md={6}>

@@ -195,38 +195,25 @@ export const roomValidationSchema = Yup.object({
     .required('Room price is required')
 });
 
-
-
-export const roomEditValidationSchema = (occupiedBeds
-
-) =>
-  
-   
+export const roomEditValidationSchema = (occupiedBeds) =>
   Yup.object({
     roomType: Yup.string().required('Select Room Type is required'),
-    roomNumber: Yup.string()
-      .max(20, 'Room number must not exceed 20 characters')
-      .required('Room number is required'),
+    roomNumber: Yup.string().max(20, 'Room number must not exceed 20 characters').required('Room number is required'),
     noOfBeds: Yup.number()
       .typeError('No of Beds must be a number')
       .positive('No of Beds must be a positive number')
       .max(10, 'No of Beds cannot be more than 10')
       .required('No of Beds is required')
-      .test(
-        'beds-not-less-than-occupied',
-        `No of Beds cannot be less than occupied beds (${occupiedBeds})`,
-        function (value) {
-          if (value === undefined || value === null) return false;
-          return value > occupiedBeds;
-        }
-      ),
+      .test('beds-not-less-than-occupied', `No of Beds cannot be less than occupied beds (${occupiedBeds})`, function (value) {
+        if (value === undefined || value === null) return false;
+        return value > occupiedBeds;
+      }),
     roomPrice: Yup.number()
       .typeError('Room price must be a number')
       .positive('Room price must be a positive number')
       .max(100000, 'Room price cannot exceed ₹1,00,000')
       .required('Room price is required')
   });
-
 
 export const roomTypeValidationSchema = Yup.object({
   roomType: Yup.string().required('Room Type is required'),
@@ -269,17 +256,30 @@ export const addReservedBedValidationSchema = Yup.object({
   startDate: Yup.date().required('Start Date is required'),
   endDate: Yup.date().min(Yup.ref('startDate'), 'End Date cannot be before Start Date').required('End Date is required'),
   stayMonths: Yup.number().typeError('Account of Stay Months must be a number').required('Account of Stay Months is required'),
-  // totalRent: Yup.number().typeError('Total Rent must be a number').required('Total Rent is required'),
-  // advanceAmount: Yup.number().typeError('Advance Amount must be a number').required('Advance Amount is required'),
 
   totalRent: Yup.number().typeError('Total Rent must be a number').required('Total Rent is required'),
+  // advanceAmount: Yup.number()
+  //   .typeError('Advance Amount must be a number')
+  //   .test('is-less-than-total', 'Advance Amount cannot be greater than Total Rent', function (value) {
+  //     const { totalRent } = this.parent;
+  //     return value <= totalRent;
+  //   }),
+
   advanceAmount: Yup.number()
     .typeError('Advance Amount must be a number')
-    .required('Advance Amount is required')
-    .test('is-less-than-total', 'Advance Amount cannot be greater than Total Rent', function (value) {
+    .nullable() 
+    .transform((value, originalValue) => (originalValue === '' ? null : value)) 
+    .test('is-valid-advance', 'Advance Amount must be positive and not greater than Total Rent', function (value) {
       const { totalRent } = this.parent;
-      return value <= totalRent;
+      if (value == null) return true; 
+      return value > 0 && value <= totalRent;
     }),
+
+  finalTotalRent: Yup.number()
+    .typeError('Final Total Amount must be a number')
+    .required('Final Total Amount is required')
+    .positive('Amount must be positive')
+    .max(Yup.ref('totalRent'), 'Final Total cannot be greater than Total Rent'),
 
   studentName: Yup.string()
     .matches(/^[A-Za-z\s]+$/, 'Student Name can only contain letters')

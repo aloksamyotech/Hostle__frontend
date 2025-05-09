@@ -17,6 +17,7 @@ import themes from 'themes';
 import NavigationScroll from 'layout/NavigationScroll';
 import SubAdminRoutes from 'routes/SubAdminRoutes';
 import SuperAdminRoutes from 'routes/SuperAdminRoutes';
+import BillRoute from 'routes/BillRoutes';
 
 import MainLayout from 'layout/MainLayout';
 
@@ -27,7 +28,10 @@ const AppRoutes = ({ role }) => {
   console.log('role in app.js =>', role);
 
   if (role === 'Customer') {
-    routes = SubAdminRoutes.children;
+    // routes = SubAdminRoutes.children;
+    routes = [...SubAdminRoutes.children, ...BillRoute.children];
+    console.log("this is customer ==>", routes);
+    
   } else if (role === 'SuperAdmin') {
     routes = SuperAdminRoutes.children;
   } else {

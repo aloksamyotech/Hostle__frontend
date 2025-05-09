@@ -38,6 +38,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import GenerateBill from './GenerateBill';
 
 const PaymentList = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -54,6 +55,8 @@ const PaymentList = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [rowData, setRowData] = useState(null);
 
+  const [openGenerateBill, setOpenGenerateBill] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,12 +71,12 @@ const PaymentList = () => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/student_payment/list/${hostelId}`);
       setStudentPaymentData(response.data.result);
+      console.log("this is setStudentPaymentData :::", response.data.result);
+      
     } catch (error) {
       console.error('Error fetching payment data:', error);
     }
   };
-
-  console.log('fetchPaymentData tudentPaymentData :::::::', studentPaymentData);
 
   const handleOpenAdd = () => {
     setOpenAddPayment(true);
@@ -82,6 +85,17 @@ const PaymentList = () => {
   const handleCloseAddPayment = () => {
     setOpenAddPayment(false);
     fetchPaymentData(hostelId);
+  };
+
+  const handleOpenGenerateBill = (event, row) => {
+    // setOpenGenerateBill(true);
+    setRowData(row);
+    navigate(`/paymentslip/view/${row._id}`);
+  };
+
+  const handleCloseGenerateBill = () => {
+    setOpenGenerateBill(false);
+    setRowData(null);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -180,6 +194,13 @@ const PaymentList = () => {
     },
 
     {
+      field: 'finalTotalRent',
+      headerName: 'Final TotalRent',
+      flex: 1,
+      renderCell: (params) => ` ₹ ${params.row.finalTotalRent}` || 0
+    },
+
+    {
       field: 'paidAmount',
       headerName: 'Paid Amount',
       flex: 1,
@@ -214,11 +235,34 @@ const PaymentList = () => {
           />
         );
       }
+    },
+    {
+      field: 'generateBill',
+      headerName: 'Generate Bill',
+      flex: 1.5,
+      renderCell: (params) => {
+        return (
+          <Button
+            variant="contained"
+            onClick={(event) => handleOpenGenerateBill(event, params.row)}
+            sx={{
+              backgroundColor: '#4CAF50', 
+              color: '#fff',
+              '&:hover': {
+                backgroundColor: '#45A049' 
+              }
+            }}
+          >
+            Generate Bill
+          </Button>
+        );
+      }
     }
   ];
 
   return (
     <>
+      <GenerateBill open={openGenerateBill} handleClose={handleCloseGenerateBill} hostelId={hostelId} rowData={rowData} />
       <AddPayment open={openAddPayment} handleClose={handleCloseAddPayment} hostelId={hostelId} currentStudent={currentStudent} />
       <Container>
         <Box

@@ -33,10 +33,12 @@ import Cookies from 'js-cookie';
 import { State, City } from 'country-state-city';
 import { addReservedBedValidationSchema } from 'views/Validation/validationSchema';
 
+
 const ReservedBeds = (props) => {
   const { open, handleClose, hostelId, editStudent, roomData, bedNo } = props;
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const [originalFinalRent, setOriginalFinalRent] = useState();
 
   const formik = useFormik({
     initialValues: {
@@ -48,6 +50,7 @@ const ReservedBeds = (props) => {
       endDate: '',
       stayMonths: '',
       totalRent: '',
+      finalTotalRent: '',
       advanceAmount: '',
 
       foodFacility: false,
@@ -83,6 +86,7 @@ const ReservedBeds = (props) => {
       formData.append('endDate', values.endDate);
       formData.append('stayMonths', values.stayMonths);
       formData.append('totalRent', values.totalRent);
+      formData.append('finalTotalRent', values.finalTotalRent);
       formData.append('advanceAmount', values.advanceAmount);
       formData.append('foodFee', values.foodFee);
       formData.append('libraryFee', values.libraryFee);
@@ -154,6 +158,8 @@ const ReservedBeds = (props) => {
       console.log('calculate total rent :', totalRent);
 
       formik.setFieldValue('totalRent', totalRent);
+      formik.setFieldValue('finalTotalRent', totalRent);
+      setOriginalFinalRent(totalRent);
     }
   }, [
     formik.values.startDate,
@@ -315,41 +321,6 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Advance Amount</FormLabel>
-                <TextField
-                  id="advanceAmount"
-                  name="advanceAmount"
-                  type="number"
-                  size="small"
-                  fullWidth
-                  value={formik.values.advanceAmount}
-                  onChange={formik.handleChange}
-                  error={formik.touched.advanceAmount && !!formik.errors.advanceAmount}
-                  helperText={formik.touched.advanceAmount && formik.errors.advanceAmount}
-                />
-              </Grid>
-
-              {/* <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Payment Method</FormLabel>
-                <TextField
-                  id="paymentMethod"
-                  name="paymentMethod"
-                  size="small"
-                  fullWidth
-                  select
-                  value={formik.values.paymentMethod}
-                  onChange={formik.handleChange}
-                  error={formik.touched.paymentMethod && !!formik.errors.paymentMethod}
-                  helperText={formik.touched.paymentMethod && formik.errors.paymentMethod}
-                >
-                  <MenuItem value="Cash">Cash</MenuItem>
-                  <MenuItem value="UPI">UPI</MenuItem>
-                  <MenuItem value="Card">Card</MenuItem>
-                  <MenuItem value="Net-Banking">Net-Banking</MenuItem>
-                </TextField>
-              </Grid> */}
-
-              <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Total Rent</FormLabel>
                 <TextField
                   id="totalRent"
@@ -424,6 +395,45 @@ const ReservedBeds = (props) => {
                   disabled={!formik.values.libraryFacility}
                   value={formik.values.libraryFee}
                   onChange={formik.handleChange}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Advance Amount</FormLabel>
+                <TextField
+                  id="advanceAmount"
+                  name="advanceAmount"
+                  type="number"
+                  size="small"
+                  fullWidth
+                  value={formik.values.advanceAmount}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    formik.setFieldValue('advanceAmount', value);
+                    const remainingAmount = Number(originalFinalRent) - Number(value);
+                    console.log('remainingAmount :', remainingAmount);
+                    formik.setFieldValue('finalTotalRent', remainingAmount);
+                  }}
+                  error={formik.touched.advanceAmount && !!formik.errors.advanceAmount}
+                  helperText={formik.touched.advanceAmount && formik.errors.advanceAmount}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Final Total Rent</FormLabel>
+                <TextField
+                  id="finalTotalRent"
+                  name="finalTotalRent"
+                  size="small"
+                  fullWidth
+                  value={formik.values.finalTotalRent}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    formik.setFieldValue('finalTotalRent', value);
+                    setOriginalFinalRent(value);
+                  }}
+                  error={formik.touched.finalTotalRent && !!formik.errors.finalTotalRent}
+                  helperText={formik.touched.finalTotalRent && formik.errors.finalTotalRent}
                 />
               </Grid>
 
