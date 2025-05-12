@@ -6,19 +6,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { useRoutes, Routes, Route } from 'react-router-dom';
-
-// routing
 import Login from 'views/pages/authentication/authentication3/Login3';
-
-// defaultTheme
 import themes from 'themes';
-
-// project imports
 import NavigationScroll from 'layout/NavigationScroll';
 import SubAdminRoutes from 'routes/SubAdminRoutes';
 import SuperAdminRoutes from 'routes/SuperAdminRoutes';
 import BillRoute from 'routes/BillRoutes';
-
 import MainLayout from 'layout/MainLayout';
 
 // ==============================|| APP ||============================== //
@@ -30,10 +23,7 @@ const AppRoutes = ({ role }) => {
   if (role === 'Customer') {
     // routes = SubAdminRoutes.children;
     routes = [...SubAdminRoutes.children, ...BillRoute.children];
-    console.log("this is customer ==>", routes);
-    
-  } else if (role === 'SuperAdmin') {
-    routes = SuperAdminRoutes.children;
+    console.log('this is customer ==>', routes);
   } else {
     routes = [{ path: '*', element: <Login /> }];
   }

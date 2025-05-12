@@ -44,7 +44,8 @@ import { render } from '@fullcalendar/core/preact';
 import EditReservation from './EditReservation';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
-
+import ChangeStatus from './ChangePassword';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 
 const StudentReservation = () => {
   const [page, setPage] = useState(0);
@@ -61,7 +62,7 @@ const StudentReservation = () => {
   const [rowData, setRowData] = useState();
   const [studentData, setStudentsData] = useState([]);
   const [openEdit, setOpenEdit] = useState(false);
-  
+  const [openChangePassword, setChangePassword] = useState(false);
 
   const navigate = useNavigate();
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -91,7 +92,15 @@ const StudentReservation = () => {
     setOpenAdd(false);
   };
 
+  const handleOpenChangePassword = () => {
+    setChangePassword(true);
+  };
 
+  const handleCloseChangePassword = () => {
+    setChangePassword(false);
+    handleClose();
+    fetchStudents(hostelId);
+  };
 
   const handleOpenEdit = () => {
     setOpenEdit(true);
@@ -242,7 +251,7 @@ const StudentReservation = () => {
 
   return (
     <>
-     
+      <ChangeStatus open={openChangePassword} handleClose={handleCloseChangePassword} rowData={rowData} />
       <EditReservation open={openEdit} handleClose={handleCloseEdit} hostelId={hostelId} rowData={rowData} />
       <AddNewReservation open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} />
       <Container>
@@ -324,15 +333,10 @@ const StudentReservation = () => {
           <EditIcon fontSize="small" sx={{ mr: 1 }} />
           Edit
         </MenuItem>
-        {/* <MenuItem
-          onClick={() => {
-            handleDelete(rowData._id);
-            handleClose();
-          }}
-        >
-          <DeleteIcon fontSize="small" sx={{ mr: 1, color: 'red' }} />
-          Delete
-        </MenuItem> */}
+        <MenuItem onClick={() => handleOpenChangePassword()}>
+          <ChangeCircleIcon style={{ marginRight: '8px', color: 'blue' }} />
+          Change Status
+        </MenuItem>
       </Popover>
     </>
   );

@@ -59,7 +59,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
         </ButtonBase>
       </Box>
 
-      {user.role === 'Customer' ? (
+      {user?.role === 'Customer' ? (
         <Typography variant="h3" sx={{ mx: 2, color: '#2C69D1' }}>
           {' '}
           Welcome to {user?.hostelName} !

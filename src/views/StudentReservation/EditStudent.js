@@ -33,8 +33,10 @@ import moment from 'moment';
 
 const EditStudent = (props) => {
   const { open, handleClose, profileData } = props;
-  console.log('EditStudent props :', props);
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
+  const [studentPhotoPreview, setstudentPhotoPreview] = useState('');
+  const [aadharPhotoPreview, setaadharPhotoPreview] = useState('');
 
   const formik = useFormik({
     initialValues: {
@@ -57,8 +59,9 @@ const EditStudent = (props) => {
     // validationSchema: addReservedBedValidationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
-      const formData = new FormData();
+      console.log('this is student data ------------------>', values);
 
+      const formData = new FormData();
       formData.append('studentName', values.studentName);
       formData.append('studentContact', values.studentContact);
       formData.append('fatherName', values.fatherName);
@@ -81,6 +84,14 @@ const EditStudent = (props) => {
       }
 
       try {
+        const response = await axios.put(`${REACT_APP_BACKEND_URL}/sudent_reservation/edit/${profileData?.studentId?._id}`, formData);
+
+        if (response.status === 200) {
+          toast.success('Student details updated successfully !!');
+        } else {
+          toast.error('Failed to update Student details !!');
+        }
+
         handleClose();
         formik.resetForm();
       } catch (error) {
@@ -89,6 +100,17 @@ const EditStudent = (props) => {
       }
     }
   });
+
+  useEffect(() => {
+    if (open && profileData) {
+      if (profileData.studentId.studentPhoto && !studentPhotoPreview) {
+        setstudentPhotoPreview(`${REACT_APP_BACKEND_URL}${profileData.studentId.studentPhoto}`);
+      }
+      if (profileData.studentId.aadharPhoto && !aadharPhotoPreview) {
+        setaadharPhotoPreview(`${REACT_APP_BACKEND_URL}${profileData.studentId.aadharPhoto}`);
+      }
+    }
+  }, [open, profileData]);
 
   return (
     <div>
@@ -246,50 +268,36 @@ const EditStudent = (props) => {
               {/* Uploads */}
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Upload Student Photo</FormLabel>
-                <Input
+                <TextField
                   id="studentPhoto"
                   name="studentPhoto"
                   type="file"
-                  onChange={(event) => formik.setFieldValue('studentPhoto', event.currentTarget.files[0])}
+                  size="small"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files[0];
+                    formik.setFieldValue('studentPhoto', file);
+                    setstudentPhotoPreview(URL.createObjectURL(file));
+                  }}
                 />
-                {formik.touched.studentPhoto && formik.errors.studentPhoto && (
-                  <div
-                    style={{
-                      color: '#f44336',
-                      fontSize: '0.75rem',
-                      marginTop: '4px',
-                      marginRight: '14px',
-                      marginLeft: '14px',
-                      fontFamily: 'Roboto,sans-serif',
-                      fontWeight: '400'
-                    }}
-                  >
-                    {formik.errors.studentPhoto}
-                  </div>
+                {studentPhotoPreview && (
+                  <img src={studentPhotoPreview} alt="Student Preview" style={{ marginTop: 8, maxHeight: 80, display: 'block' }} />
                 )}
               </Grid>
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Upload AadharCard Photo</FormLabel>
-                <Input
+                <TextField
                   id="aadharPhoto"
                   name="aadharPhoto"
                   type="file"
-                  onChange={(event) => formik.setFieldValue('aadharPhoto', event.currentTarget.files[0])}
+                  size="small"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files[0];
+                    formik.setFieldValue('aadharPhoto', file);
+                    setaadharPhotoPreview(URL.createObjectURL(file));
+                  }}
                 />
-                {formik.touched.aadharPhoto && formik.errors.aadharPhoto && (
-                  <div
-                    style={{
-                      color: '#f44336',
-                      fontSize: '0.75rem',
-                      marginTop: '4px',
-                      marginRight: '14px',
-                      marginLeft: '14px',
-                      fontFamily: 'Roboto,sans-serif',
-                      fontWeight: '400'
-                    }}
-                  >
-                    {formik.errors.aadharPhoto}
-                  </div>
+                {aadharPhotoPreview && (
+                  <img src={aadharPhotoPreview} alt="Aadhar Preview" style={{ marginTop: 8, maxHeight: 80, display: 'block' }} />
                 )}
               </Grid>
               <Grid item xs={12} sm={6} md={6}>
