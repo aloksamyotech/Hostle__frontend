@@ -45,6 +45,7 @@ import EditReservation from './EditReservation';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 
+
 const StudentReservation = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -60,6 +61,7 @@ const StudentReservation = () => {
   const [rowData, setRowData] = useState();
   const [studentData, setStudentsData] = useState([]);
   const [openEdit, setOpenEdit] = useState(false);
+  
 
   const navigate = useNavigate();
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -88,6 +90,8 @@ const StudentReservation = () => {
   const handleCloseAdd = () => {
     setOpenAdd(false);
   };
+
+
 
   const handleOpenEdit = () => {
     setOpenEdit(true);
@@ -238,6 +242,7 @@ const StudentReservation = () => {
 
   return (
     <>
+     
       <EditReservation open={openEdit} handleClose={handleCloseEdit} hostelId={hostelId} rowData={rowData} />
       <AddNewReservation open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} />
       <Container>

@@ -155,7 +155,7 @@ const PaymentList = () => {
     {
       field: 'studentName',
       headerName: 'Student Name',
-      flex: 1,
+      flex: 1.5,
       renderCell: (params) => {
         const name = params.row.studentData?.studentName || '';
         const contact = params.row.studentData?.studentContact || '';
@@ -239,7 +239,7 @@ const PaymentList = () => {
     {
       field: 'generateBill',
       headerName: 'Generate Bill',
-      flex: 1.5,
+      flex: 1.3,
       renderCell: (params) => {
         return (
           <Button

@@ -20,7 +20,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
   const theme = useTheme();
 
   const user = JSON.parse(Cookies.get('user'));
-  console.log('HosIdHosIdHosIdHosIdHosIdHosIdHosId :', user);
+  
 
   return (
     <>

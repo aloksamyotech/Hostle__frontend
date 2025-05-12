@@ -261,7 +261,6 @@ const Paymentslip = () => {
             </Typography>
             <Divider sx={{ marginBottom: 2 }} />
 
-            {/* Hostel Details */}
             <Typography variant="h5" gutterBottom>
               Hostel Details
             </Typography>
@@ -273,7 +272,6 @@ const Paymentslip = () => {
 
             <Divider sx={{ my: 2 }} />
 
-            {/* Student Details */}
             <Typography variant="h5" gutterBottom>
               Student Details
             </Typography>
@@ -282,7 +280,6 @@ const Paymentslip = () => {
 
             <Divider sx={{ my: 2 }} />
 
-            {/* Room Details */}
             <Typography variant="h5" gutterBottom>
               Room Details
             </Typography>
@@ -292,7 +289,6 @@ const Paymentslip = () => {
 
             <Divider sx={{ my: 2 }} />
 
-            {/* Payment Details Table */}
             <Typography variant="h5" gutterBottom>
               Payment Details
             </Typography>

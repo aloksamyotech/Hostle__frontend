@@ -163,7 +163,7 @@ const AddPayment = (props) => {
               >
                 {studentList.map((student) => (
                   <MenuItem key={student._id} value={student._id}>
-                    {student.studentName}
+                    {student.studentName} 
                   </MenuItem>
                 ))}
               </Select>

@@ -48,6 +48,7 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import Login from 'views/pages/authentication/authentication3/Login3';
 import UserProfile from './Profile';
+import ChangePassword from './ChangePassword';
 
 // ==============================|| PROFILE MENU ||============================== //
 
@@ -64,6 +65,7 @@ const ProfileSection = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
+  const [openChangePassword, setOpenChangePassword] = useState(false);
 
   const [openDeleteDialog, setDeleteDialog] = useState(false);
 
@@ -80,6 +82,9 @@ const ProfileSection = () => {
   const handleCloseDeleteDialog = () => {
     setDeleteDialog(false);
   };
+
+  const handleOpenChangePassword = () => setOpenChangePassword(true);
+  const handleCloseChangePassword = () => setOpenChangePassword(false);
 
   //Get Admin Obj Id Which is Seted In Cookies
   useEffect(() => {
@@ -149,7 +154,8 @@ const ProfileSection = () => {
 
   return (
     <>
-    <UserProfile open={openProfile} handleClose={handleCloseForProfile}/>
+      <ChangePassword open={openChangePassword} handleClose={handleCloseChangePassword} />
+      <UserProfile open={openProfile} handleClose={handleCloseForProfile} />
       <Chip
         sx={{
           height: '48px',
@@ -172,8 +178,6 @@ const ProfileSection = () => {
         }}
         icon={
           <Avatar
-            // src={User1}
-
             sx={{
               ...theme.typography.mediumAvatar,
               margin: '8px 0 8px 8px !important',
@@ -262,6 +266,17 @@ const ProfileSection = () => {
                             <IconUser stroke={1.5} size="1.3rem" />
                           </ListItemIcon>
                           <ListItemText primary={<Typography variant="body2">Profile</Typography>} />
+                        </ListItemButton>
+
+                        <ListItemButton
+                          sx={{ borderRadius: `${customization.borderRadius}px` }}
+                          selected={selectedIndex === 4}
+                          onClick={handleOpenChangePassword}
+                        >
+                          <ListItemIcon>
+                            <IconSettings stroke={1.5} size="1.3rem" />
+                          </ListItemIcon>
+                          <ListItemText primary={<Typography variant="body2">Change Password</Typography>} />
                         </ListItemButton>
 
                         <ListItemButton

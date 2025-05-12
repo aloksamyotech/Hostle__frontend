@@ -29,6 +29,7 @@ import * as yup from 'yup';
 import { toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
 
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -39,6 +40,10 @@ const UserProfile = (props) => {
   const { open, handleClose } = props;
   const [hostelId, setHostelId] = useState(null);
   const [userData, setUserData] = useState(null);
+
+  const [hostelPhotoPreview, setHostelPhotoPreview] = useState('');
+  const [aadharPhotoPreview, setAadharPhotoPreview] = useState('');
+
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   const fetchProfileData = async (hostelId) => {
@@ -84,7 +89,9 @@ const UserProfile = (props) => {
     ownerName: userData ? userData.ownerName : '',
     ownerPhoneNumber: userData ? userData.ownerPhoneNumber : '',
     address: userData ? userData.address : '',
-    email: userData ? userData.email : ''
+    email: userData ? userData.email : '',
+    hostelphoto: null,
+    aadharphoto: null
   };
 
   // Formik setup
@@ -96,7 +103,19 @@ const UserProfile = (props) => {
       console.log('values :', values);
 
       try {
-        const response = await axios.put(`${REACT_APP_BACKEND_URL}/hostel/edit/${userData._id}`, values);
+        const formData = new FormData();
+        formData.append('hostelName', values.hostelName);
+        formData.append('hostelPhoneNumber', values.hostelPhoneNumber);
+
+        formData.append('ownerName', values.ownerName);
+        formData.append('ownerPhoneNumber', values.ownerPhoneNumber);
+
+        formData.append('address', values.address);
+
+        formData.append('hostelphoto', values.hostelphoto);
+        formData.append('aadharphoto', values.aadharphoto);
+
+        const response = await axios.put(`${REACT_APP_BACKEND_URL}/hostel/edit/${userData._id}`, formData);
         console.log(' profile update response ===>', response);
 
         if (response.status === 200) {
@@ -110,6 +129,17 @@ const UserProfile = (props) => {
       }
     }
   });
+
+  useEffect(() => {
+    if (open && userData) {
+      if (userData.hostelphoto && !hostelPhotoPreview) {
+        setHostelPhotoPreview(`${REACT_APP_BACKEND_URL}${userData.hostelphoto}`);
+      }
+      if (userData.aadharphoto && !aadharPhotoPreview) {
+        setAadharPhotoPreview(`${REACT_APP_BACKEND_URL}${userData.aadharphoto}`);
+      }
+    }
+  }, [open, userData]);
 
   return (
     <div>
@@ -142,80 +172,9 @@ const UserProfile = (props) => {
           <ClearIcon onClick={handleClose} style={{ cursor: 'pointer' }} />
         </DialogTitle>
         <DialogContent dividers>
-          {/* <form onSubmit={formik.handleSubmit}>
-            <DialogContentText id="scroll-dialog-description" tabIndex={-1}>
-              <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
-              
-                <Grid item xs={12} sm={12} md={12}>
-                  <FormLabel>Name</FormLabel>
-                  <TextField
-                    id="name"
-                    name="name"
-                    size="small"
-                    fullWidth
-                    value={formik.values.name}
-                    onChange={formik.handleChange}
-                    error={formik.touched.name && Boolean(formik.errors.name)}
-                    helperText={formik.touched.name && formik.errors.name}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={12}>
-                  <FormLabel>Email</FormLabel>
-                  <TextField
-                    id="email"
-                    name="email"
-                    size="small"
-                    fullWidth
-                    disabled
-                    value={formik.values.email}
-                    onChange={formik.handleChange}
-                    error={formik.touched.email && Boolean(formik.errors.email)}
-                    helperText={formik.touched.email && formik.errors.email}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={12}>
-                  <FormLabel>Phone No</FormLabel>
-                  <TextField
-                    id="phone"
-                    name="phone"
-                    size="small"
-                    fullWidth
-                    type="number"
-                    value={formik.values.phone}
-                    onChange={formik.handleChange}
-                    error={formik.touched.phone && Boolean(formik.errors.phone)}
-                    helperText={formik.touched.phone && formik.errors.phone}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={12} md={12}>
-                  <FormLabel>Gender</FormLabel>
-                  <TextField
-                    id="gender"
-                    name="gender"
-                    size="small"
-                    select
-                    fullWidth
-                    value={formik.values.gender}
-                    onChange={formik.handleChange}
-                    error={formik.touched.gender && Boolean(formik.errors.gender)}
-                    helperText={formik.touched.gender && formik.errors.gender}
-                  >
-                    <MenuItem value="MALE">Male</MenuItem>
-                    <MenuItem value="FEMALE">Female</MenuItem>
-                    <MenuItem value="OTHERS">Other</MenuItem>
-                  </TextField>
-                </Grid>
-              </Grid>
-            </DialogContentText>
-          </form> */}
-
           <form onSubmit={formik.handleSubmit}>
             <DialogContentText id="scroll-dialog-description" tabIndex={-1}>
               <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
-                {/* Hostel Name */}
                 <Grid item xs={12}>
                   <FormLabel>Hostel Name</FormLabel>
                   <TextField
@@ -306,6 +265,44 @@ const UserProfile = (props) => {
                     value={formik.values.email}
                     onChange={formik.handleChange}
                   />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <FormLabel>Hostel Photo</FormLabel>
+                  <TextField
+                    id="hostelphoto"
+                    name="hostelphoto"
+                    type="file"
+                    size="small"
+                    fullWidth
+                    onChange={(event) => {
+                      const file = event.currentTarget.files[0];
+                      formik.setFieldValue('hostelphoto', file);
+                      setHostelPhotoPreview(URL.createObjectURL(file));
+                    }}
+                  />
+                  {hostelPhotoPreview && (
+                    <img src={hostelPhotoPreview} alt="Hostel Preview" style={{ marginTop: 8, maxHeight: 80, display: 'block' }} />
+                  )}
+                </Grid>
+
+                <Grid item xs={12}>
+                  <FormLabel>Aadhar Card Photo</FormLabel>
+                  <TextField
+                    id="aadharphoto"
+                    name="aadharphoto"
+                    type="file"
+                    size="small"
+                    fullWidth
+                    onChange={(event) => {
+                      const file = event.currentTarget.files[0];
+                      formik.setFieldValue('aadharphoto', file);
+                      setAadharPhotoPreview(URL.createObjectURL(file));
+                    }}
+                  />
+                  {aadharPhotoPreview && (
+                    <img src={aadharPhotoPreview} alt="Aadhar Preview" style={{ marginTop: 8, maxHeight: 80, display: 'block' }} />
+                  )}
                 </Grid>
               </Grid>
             </DialogContentText>

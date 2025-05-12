@@ -90,7 +90,7 @@ const FirebaseLogin = ({ ...others }) => {
               }
             }
           } catch (error) {
-            toast.error(error.message || 'Login failed');
+            toast.error('Login Failed');
           } finally {
             setIsSubmitting(false);
           }
@@ -173,7 +173,7 @@ const FirebaseLogin = ({ ...others }) => {
                 }}
                 onClick={() => handleCredentialClick('admin@gmail.com', 'admin@123', setFieldValue, handleSubmit)}
               >
-                <Typography variant="h5">Admin Credentials</Typography>
+                {/* <Typography variant="h5">Admin Credentials</Typography> */}
               </Box>
               {/* <Divider />
               <Box
@@ -189,22 +189,7 @@ const FirebaseLogin = ({ ...others }) => {
 
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
               <AnimateButton>
-                <Button
-                  disableElevation
-                  disabled={isSubmitting}
-                  size="large"
-                  type="submit"
-                  variant="contained"
-                  color="secondary"
-                  sx={{
-                    background: 'linear-gradient(45deg, #441572, #7c4bad)',
-                    borderRadius: '50px',
-                    '&:hover': {
-                      background: 'linear-gradient(to right, #4b6cb7, #182848)',
-                      boxShadow: '2'
-                    }
-                  }}
-                >
+                <Button disableElevation disabled={isSubmitting} size="large" type="submit" variant="contained" color="secondary">
                   {isSubmitting ? 'Logging in...' : 'Sign in'}
                 </Button>
               </AnimateButton>
