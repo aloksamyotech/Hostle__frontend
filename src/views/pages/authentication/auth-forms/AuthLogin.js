@@ -169,22 +169,15 @@ const FirebaseLogin = ({ ...others }) => {
               <Box
                 sx={{
                   cursor: 'pointer',
-                  p: 2
+                  p: 3,
+                  color: 'white',
+                  textAlign: 'center',
+                  borderRadius: 1
                 }}
-                onClick={() => handleCredentialClick('admin@gmail.com', 'admin@123', setFieldValue, handleSubmit)}
+                onClick={() => handleCredentialClick('sunrisehostel@gmail.com', '123456', setFieldValue, handleSubmit)}
               >
-                {/* <Typography variant="h5">Admin Credentials</Typography> */}
+                <Typography variant="h5">Login with Hostel Credentials</Typography>
               </Box>
-              {/* <Divider />
-              <Box
-                sx={{
-                  cursor: 'pointer',
-                  p: 2
-                }}
-                onClick={() => handleCredentialClick(setFieldValue, handleSubmit)}
-              >
-                <Typography variant="h5">User Credentials</Typography>
-              </Box> */}
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
