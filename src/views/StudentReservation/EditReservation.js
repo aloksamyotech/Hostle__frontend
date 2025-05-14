@@ -54,7 +54,8 @@ const EditReservation = (props) => {
       libraryFee: rowData?.libraryFee || '',
       totalRent: rowData?.totalRent || '',
       finalTotalRent: rowData?.finalTotalRent || '',
-      advanceAmount: rowData?.advanceAmount || ''
+      advanceAmount: rowData?.advanceAmount || 0,
+      discount: rowData?.discount || 0,
     },
 
     validationSchema: editReservedBedValidationSchema,
@@ -392,6 +393,19 @@ const EditReservation = (props) => {
                   size="small"
                   fullWidth
                   value={formik.values.advanceAmount}
+                  onChange={formik.handleChange}
+                  disabled
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Discount</FormLabel>
+                <TextField
+                  id="discount"
+                  name="discount"
+                  size="small"
+                  fullWidth
+                  value={formik.values.discount}
                   onChange={formik.handleChange}
                   disabled
                 />

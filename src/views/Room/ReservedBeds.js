@@ -33,7 +33,6 @@ import Cookies from 'js-cookie';
 import { State, City } from 'country-state-city';
 import { addReservedBedValidationSchema } from 'views/Validation/validationSchema';
 
-
 const ReservedBeds = (props) => {
   const { open, handleClose, hostelId, editStudent, roomData, bedNo } = props;
 
@@ -52,6 +51,7 @@ const ReservedBeds = (props) => {
       totalRent: '',
       finalTotalRent: '',
       advanceAmount: '',
+      discount: '',
 
       foodFacility: false,
       foodFee: 0,
@@ -88,6 +88,7 @@ const ReservedBeds = (props) => {
       formData.append('totalRent', values.totalRent);
       formData.append('finalTotalRent', values.finalTotalRent);
       formData.append('advanceAmount', values.advanceAmount);
+      formData.append('discount', values.discount);
       formData.append('foodFee', values.foodFee);
       formData.append('libraryFee', values.libraryFee);
       formData.append('studentName', values.studentName);
@@ -178,6 +179,19 @@ const ReservedBeds = (props) => {
       formik.setFieldValue('roomRent', roomData?.roomPrice || '');
     }
   }, [roomData, bedNo]);
+
+  const recalculateFinalRent = (advanceAmount, discount) => {
+    const a = Number(advanceAmount) || 0;
+    const d = Number(discount) || 0;
+
+    if (a < 0 || d < 0) {
+      formik.setFieldValue('finalTotalRent', originalFinalRent);
+      return;
+    }
+
+    const newFinal = originalFinalRent - a - d;
+    formik.setFieldValue('finalTotalRent', newFinal >= 0 ? newFinal : originalFinalRent);
+  };
 
   return (
     <div>
@@ -403,16 +417,13 @@ const ReservedBeds = (props) => {
                 <TextField
                   id="advanceAmount"
                   name="advanceAmount"
-                  type="number"
                   size="small"
                   fullWidth
                   value={formik.values.advanceAmount}
                   onChange={(e) => {
                     const value = e.target.value;
                     formik.setFieldValue('advanceAmount', value);
-                    const remainingAmount = Number(originalFinalRent) - Number(value);
-                    console.log('remainingAmount :', remainingAmount);
-                    formik.setFieldValue('finalTotalRent', remainingAmount);
+                    recalculateFinalRent(value, formik.values.discount);
                   }}
                   error={formik.touched.advanceAmount && !!formik.errors.advanceAmount}
                   helperText={formik.touched.advanceAmount && formik.errors.advanceAmount}
@@ -427,6 +438,9 @@ const ReservedBeds = (props) => {
                   size="small"
                   fullWidth
                   value={formik.values.finalTotalRent}
+                  InputProps={{
+                    readOnly: true
+                  }}
                   onChange={(e) => {
                     const value = e.target.value;
                     formik.setFieldValue('finalTotalRent', value);
@@ -434,6 +448,24 @@ const ReservedBeds = (props) => {
                   }}
                   error={formik.touched.finalTotalRent && !!formik.errors.finalTotalRent}
                   helperText={formik.touched.finalTotalRent && formik.errors.finalTotalRent}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Discount on Final Rent</FormLabel>
+                <TextField
+                  id="discount"
+                  name="discount"
+                  size="small"
+                  fullWidth
+                  value={formik.values.discount}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    formik.setFieldValue('discount', value);
+                    recalculateFinalRent(value, formik.values.advanceAmount);
+                  }}
+                  error={formik.touched.discount && !!formik.errors.discount}
+                  helperText={formik.touched.discount && formik.errors.discount}
                 />
               </Grid>
 

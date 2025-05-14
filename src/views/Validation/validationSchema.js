@@ -1,4 +1,5 @@
 // validationSchemas.js
+import { Discount } from '@mui/icons-material';
 import * as Yup from 'yup';
 
 const FILE_SIZE = 1024 * 1024; // 1 MB
@@ -258,20 +259,23 @@ export const addReservedBedValidationSchema = Yup.object({
   stayMonths: Yup.number().typeError('Account of Stay Months must be a number').required('Account of Stay Months is required'),
 
   totalRent: Yup.number().typeError('Total Rent must be a number').required('Total Rent is required'),
-  // advanceAmount: Yup.number()
-  //   .typeError('Advance Amount must be a number')
-  //   .test('is-less-than-total', 'Advance Amount cannot be greater than Total Rent', function (value) {
-  //     const { totalRent } = this.parent;
-  //     return value <= totalRent;
-  //   }),
-
   advanceAmount: Yup.number()
     .typeError('Advance Amount must be a number')
-    .nullable() 
-    .transform((value, originalValue) => (originalValue === '' ? null : value)) 
+    .nullable()
+    .transform((value, originalValue) => (originalValue === '' ? null : value))
     .test('is-valid-advance', 'Advance Amount must be positive and not greater than Total Rent', function (value) {
       const { totalRent } = this.parent;
-      if (value == null) return true; 
+      if (value == null) return true;
+      return value > 0 && value <= totalRent;
+    }),
+
+  discount: Yup.number()
+    .typeError('Discount Amount must be a number')
+    .nullable()
+    .transform((value, originalValue) => (originalValue === '' ? null : value))
+    .test('is-valid-discont', 'Discount Amount must be positive and not greater than Total Rent', function (value) {
+      const { totalRent } = this.parent;
+      if (value == null) return true;
       return value > 0 && value <= totalRent;
     }),
 
@@ -436,12 +440,27 @@ export const weeklyFoodValidationSchema = Yup.object().shape({
   foodDescription: Yup.string().required('Food Description is required')
 });
 
-export const paymentValidationSchema = Yup.object({
-  studentId: Yup.string().required('Student is required'),
-  paymentMethod: Yup.string().required('Payment Method is required'),
-  date: Yup.date().required('Date is required'),
-  paymentAmount: Yup.number()
-    .typeError('Amount must be a number')
-    .positive('Amount must be positive')
-    .required('Payment Amount is required')
-});
+export const paymentValidationSchema = (remainingAmt) =>
+  
+  
+  Yup.object({
+    studentId: Yup.string().required('Student is required'),
+    paymentMethod: Yup.string().required('Payment Method is required'),
+    date: Yup.date().required('Date is required'),
+    remainingAmount: Yup.string().required('Remaining Amount is required'),
+
+    paymentAmount: Yup.number()
+      .typeError('Amount must be a number')
+      .positive('Amount must be positive')
+      .required('Payment Amount is required')
+      .test(
+        'is-valid-paymentAmount',
+        `Payment Amount must not be greater than Remaining Amount (${remainingAmt})`,
+        function (value) {
+          if (value === undefined || remainingAmt === undefined) return true;
+          return value <= parseFloat(remainingAmt);
+        }
+      )
+  });
+
+

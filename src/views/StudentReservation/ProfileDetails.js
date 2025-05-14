@@ -38,6 +38,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useNavigate } from 'react-router-dom';
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import EditStudent from './EditStudent';
+import AddPayment from 'views/Payment/AddPayment';
 
 const ProfileDetails = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -56,6 +57,17 @@ const ProfileDetails = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [studentName, setStudentName] = useState('');
+  
+
+  const [openPayment, setOpenPayment] = useState(false);
+
+  const handleOpenPayment = () => {
+    setOpenPayment(true);
+  };
+
+  const handleClosePayment = () => {
+    setOpenPayment(false);
+  };
 
   const location = useLocation();
   const pathname = location.pathname;
@@ -80,7 +92,7 @@ const ProfileDetails = () => {
     fetchStudentDetails();
     fetchPaymentData();
     fetchVisitorData();
-  }, [id]);
+  }, [id,openPayment]);
 
   const fetchStudentDetails = async () => {
     try {
@@ -259,6 +271,7 @@ const ProfileDetails = () => {
   return (
     <>
       <EditStudent open={openUpdateStudent} handleClose={handleCloseUpdateStudent} profileData={profileData} />
+      <AddPayment open={openPayment} handleClose={handleClosePayment} />
       <Container>
         <Box
           sx={{
@@ -291,12 +304,15 @@ const ProfileDetails = () => {
         </Box>
 
         <Box sx={{ width: '100%' }}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', marginBottom: '0px' }}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', display: 'flex', alignItems: 'center' }}>
             <Tabs value={activeTab} onChange={handleTabChange} aria-label="basic tabs example">
               <Tab label="Profile Details" />
               <Tab label="Payment History" />
               <Tab label="Visitor History" />
             </Tabs>
+            <Button variant="contained" sx={{ marginLeft: 'auto' }} onClick={handleOpenPayment}>
+              Add Payment
+            </Button>
           </Box>
         </Box>
 
@@ -313,13 +329,12 @@ const ProfileDetails = () => {
                     <hr />
                     <Grid container spacing={2}>
                       <Grid item xs={6}>
-                        <Typography variant="h6">Room Number:</Typography>
-                        <Typography>{profileData?.roomNumber || '- -'}</Typography>
+                        <Typography variant="h6">Room Number and Type:</Typography>
+                        <Typography>
+                          {profileData?.roomNumber && profileData?.roomType ? `${profileData.roomNumber} / ${profileData.roomType}` : '- -'}
+                        </Typography>
                       </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="h6">Room Type:</Typography>
-                        <Typography>{profileData?.roomType || '- -'} seater</Typography>
-                      </Grid>
+
                       <Grid item xs={6}>
                         <Typography variant="h6">Bed Number:</Typography>
                         <Typography>{profileData?.bedNumber || '- -'} </Typography>
@@ -334,6 +349,15 @@ const ProfileDetails = () => {
                       </Grid>
 
                       <Grid item xs={6}>
+                        <Typography variant="h6">Food Amount:</Typography>
+                        <Typography>{profileData?.foodFee || '- -'}</Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="h6">Library Amount:</Typography>
+                        <Typography>{profileData?.libraryFee || '- -'}</Typography>
+                      </Grid>
+
+                      <Grid item xs={6}>
                         <Typography variant="h6">Total Rent till EndMonth:</Typography>
                         <Typography>{profileData?.totalRent || '- -'}</Typography>
                       </Grid>
@@ -344,17 +368,13 @@ const ProfileDetails = () => {
                       </Grid>
 
                       <Grid item xs={6}>
-                        <Typography variant="h6">Final Total Rent:</Typography>
-                        <Typography>{profileData?.finalTotalRent || '- -'}</Typography>
+                        <Typography variant="h6">Discount:</Typography>
+                        <Typography>{profileData?.discount || '- -'}</Typography>
                       </Grid>
 
                       <Grid item xs={6}>
-                        <Typography variant="h6">Food Amount:</Typography>
-                        <Typography>{profileData?.foodFee || '- -'}</Typography>
-                      </Grid>
-                      <Grid item xs={6}>
-                        <Typography variant="h6">Library Amount:</Typography>
-                        <Typography>{profileData?.libraryFee || '- -'}</Typography>
+                        <Typography variant="h6">Final Total Rent:</Typography>
+                        <Typography>{profileData?.finalTotalRent || '- -'}</Typography>
                       </Grid>
 
                       <Grid item xs={6}>

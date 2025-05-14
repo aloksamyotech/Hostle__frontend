@@ -68,7 +68,7 @@ const Paymentslip = () => {
   const loadImageAsBase64 = (url) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = 'anonymous'; // Important for cross-origin issues
+      img.crossOrigin = 'anonymous';
       img.onload = function () {
         const canvas = document.createElement('canvas');
         canvas.width = img.width;
@@ -84,31 +84,32 @@ const Paymentslip = () => {
     });
   };
 
-  const downloadInvoice = async (paymentData, roomData, hostelData, paymentDetails) => {
-    console.log('handel download invoice', paymentData, roomData, hostelData, paymentDetails);
-
+  const downloadInvoice = async (paymentData, roomData, hostelData) => {
     const doc = new jsPDF();
+    const topMargin = 7; // Space from top
+    const logoWidth = 25;
+    const logoHeight = 25;
 
     try {
-      const topMargin = 5;
-
       const base64Logo = await loadImageAsBase64('/HMS1.png');
-      doc.addImage(base64Logo, 'PNG', 14, 6 + topMargin, 30, 20);
+      // Position the logo on the left (x = 14) and y = topMargin
+      doc.addImage(base64Logo, 'PNG', 14, topMargin, logoWidth, logoHeight);
     } catch (error) {
       console.error('Image load failed:', error);
     }
 
-    // Title
+    // Payment Slip Header
     doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
-    doc.text('Payment Slip', doc.internal.pageSize.width - 14, 20, { align: 'right' });
+    doc.text('Payment Slip', doc.internal.pageSize.width / 2, 20, { align: 'center' });
 
-    // Date
+    // Date below header
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Date: ${moment().format('DD/MM/YYYY')}`, doc.internal.pageSize.width - 14, 28, { align: 'right' });
+    doc.text(`Date: ${moment().format('DD/MM/YYYY')}`, doc.internal.pageSize.width / 2, 28, { align: 'center' });
 
-    let currentY = 40;
+    // Add bottom margin AFTER Date
+    let currentY = 28 + 15;
 
     // Hostel Details
     doc.setFontSize(14);
@@ -119,34 +120,35 @@ const Paymentslip = () => {
     doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
     doc.text(`Name: ${hostelData?.hostelName}`, 14, (currentY += 6));
-    doc.text(`Owner: ${hostelData?.ownerName}`, 14, (currentY += 6));
     doc.text(`Contact: ${hostelData?.ownerPhoneNumber}`, 14, (currentY += 6));
     doc.text(`Address: ${hostelData?.address}`, 14, (currentY += 6));
 
-    // Student Details
     currentY += 10;
+
+    // Student Details Heading
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(14);
     doc.text('Student Details', 14, currentY);
+
+    // Room Details Heading (on the right)
+    doc.text('Room Details', 110, currentY);
+
     currentY += 6;
+
+    const leftX = 14;
+    const rightX = 110;
 
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(12);
-    doc.text(`Name: ${paymentData?.studentId?.studentName}`, 14, (currentY += 6));
-    doc.text(`Contact No: ${paymentData?.studentId?.studentContact}`, 14, (currentY += 6));
 
-    // Room Details
-    currentY += 10;
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(14);
-    doc.text('Room Details', 14, currentY);
-    currentY += 6;
+    doc.text(`Student Name: ${paymentData?.studentId?.studentName || 'N/A'}`, leftX, (currentY += 6));
+    doc.text(`Room No: ${roomData?.roomNumber || 'N/A'}`, rightX, currentY);
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(12);
-    doc.text(`Room No: ${roomData?.roomNumber}`, 14, (currentY += 6));
-    doc.text(`Room Type: ${roomData?.roomType}`, 14, (currentY += 6));
-    doc.text(`Bed No: ${roomData?.bedNumber}`, 14, (currentY += 6));
+    doc.text(`Contact No: ${paymentData?.studentId?.studentContact || 'N/A'}`, leftX, (currentY += 6));
+    doc.text(`Room Type: ${roomData?.roomType || 'N/A'}`, rightX, currentY);
+
+    doc.text(`Address: ${paymentData?.studentId?.address || 'N/A'}`, leftX, (currentY += 6));
+    doc.text(`Bed No: ${roomData?.bedNumber || 'N/A'}`, rightX, currentY);
 
     // Payment Details Table
     currentY += 10;
@@ -157,12 +159,13 @@ const Paymentslip = () => {
 
     const tableBody = [
       ['Total Rent', `Rs ${paymentData?.totalRent}`],
-      ['Advance Amount', `Rs ${paymentData?.advanceAmount}`],
+      ['Advance Amount', `Rs ${paymentData?.advanceAmount ?? 0} `],
+      ['Discount', `Rs ${paymentData?.discount ?? 0} `],
       ['Final Total Rent', `Rs ${paymentData?.finalTotalRent}`],
-      ['Paid Amount', `Rs ${paymentData?.paymentAmount}`],
-      ['Pending Amount', `Rs ${paymentData?.remainingAmount}`],
-      ['Payment Method', paymentDetails?.paymentMethod || 'N/A'],
-      ['Date', paymentDetails?.date ? moment(paymentDetails.date).format('DD/MM/YYYY') : 'N/A']
+      ['Paid Amount', ` Rs ${paymentData?.paymentAmount}`],
+      ['Pending Amount', ` Rs ${paymentData?.remainingAmount}`],
+      ['Payment Method', paymentData?.paymentMethod || 'N/A'],
+      ['Date', paymentData?.date ? moment(paymentData.date).format('DD/MM/YYYY') : 'N/A']
     ];
 
     autoTable(doc, {
@@ -171,8 +174,8 @@ const Paymentslip = () => {
       body: tableBody,
       theme: 'grid',
       headStyles: {
-        fillColor: [33, 150, 243],
-        textColor: 255
+        fillColor: [0, 0, 0], 
+        textColor: 255 
       },
       styles: {
         fontSize: 11,
@@ -194,38 +197,10 @@ const Paymentslip = () => {
     doc.save('payment-slip.pdf');
   };
 
-  // Static data
-  const hostelDetails = {
-    name: 'Sunrise Hostel',
-    owner: 'Mr. Rajesh Kumar',
-    contact: '+91 9876543210',
-    address: '123 MG Road, Pune, Maharashtra'
-  };
-
-  const studentDetails = {
-    name: 'Ankit Sharma',
-    contact: '+91 9123456789'
-  };
-
-  const roomDetails = {
-    roomNo: '203',
-    roomType: 'AC Deluxe',
-    bedNo: 'B2'
-  };
-
-  const paymentDetails = {
-    totalRent: 15000,
-    paidAmount: 10000,
-    pendingAmount: 5000,
-    paymentMethod: 'UPI',
-    date: currentDate
-  };
-
   return (
     <Container maxWidth={false} disableGutters>
       <Box
         sx={{
-          //  backgroundColor: 'white',
           height: '30px',
           width: '100%',
           display: 'flex',
@@ -253,7 +228,7 @@ const Paymentslip = () => {
           }}
         >
           <Paper elevation={3} sx={{ padding: '20px' }}>
-            <Typography variant="h4" align="center" gutterBottom>
+            <Typography variant="h3" align="center" gutterBottom>
               Payment Slip
             </Typography>
             <Typography variant="subtitle1" align="center" gutterBottom>
@@ -261,35 +236,67 @@ const Paymentslip = () => {
             </Typography>
             <Divider sx={{ marginBottom: 2 }} />
 
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h4" gutterBottom>
               Hostel Details
             </Typography>
-            <Typography>Name: {hostelData?.hostelName}</Typography>
 
-            <Typography>Owner: {hostelData?.ownerName}</Typography>
-            <Typography>Contact: {hostelData?.ownerPhoneNumber}</Typography>
-            <Typography>Address: {hostelData?.address}</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Typography>
+                  <strong>Name:</strong> {hostelData?.hostelName}
+                </Typography>
+                <Typography>
+                  <strong>Contact:</strong> {hostelData?.ownerPhoneNumber}
+                </Typography>
+              </Grid>
 
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="h5" gutterBottom>
-              Student Details
-            </Typography>
-            <Typography>Name: {paymentData?.studentId?.studentName}</Typography>
-            <Typography>Contact No: {paymentData?.studentId?.studentContact}</Typography>
-
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="h5" gutterBottom>
-              Room Details
-            </Typography>
-            <Typography>Room No: {roomData?.roomNumber}</Typography>
-            <Typography>Room Type: {roomData?.roomType}</Typography>
-            <Typography>Bed No: {roomData?.bedNumber}</Typography>
+              <Grid item xs={12} md={6}>
+                <Typography>
+                  <strong>Address:</strong> {hostelData?.address}
+                </Typography>
+              </Grid>
+            </Grid>
 
             <Divider sx={{ my: 2 }} />
 
-            <Typography variant="h5" gutterBottom>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h4" gutterBottom>
+                  Student Details
+                </Typography>
+                <Typography>
+                  <strong>Name:</strong> {paymentData?.studentId?.studentName}
+                </Typography>
+                <Typography>
+                  <strong>Contact No:</strong> {paymentData?.studentId?.studentContact}
+                </Typography>
+                <Typography>
+                  <strong>Address:</strong>
+                  {paymentData?.studentId?.address}
+                </Typography>
+              </Grid>
+
+              {/* Room Details - Right */}
+              <Grid item xs={12} md={6}>
+                <Typography variant="h4" gutterBottom>
+                  Room Details
+                </Typography>
+                <Typography>
+                  <strong>Room No:</strong>
+                  {roomData?.roomNumber}
+                </Typography>
+                <Typography>
+                  <strong>Room Type:</strong> {roomData?.roomType}
+                </Typography>
+                <Typography>
+                  <strong>Bed No:</strong> {roomData?.bedNumber}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Typography variant="h4" gutterBottom>
               Payment Details
             </Typography>
             <TableContainer>
@@ -297,41 +304,68 @@ const Paymentslip = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>
-                      <b>Description</b>
+                      <strong>Description</strong>
                     </TableCell>
                     <TableCell>
-                      <b>Amount (₹)</b>
+                      <strong>Amount (₹)</strong>
                     </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <TableRow>
-                    <TableCell>Total Rent</TableCell>
+                    <TableCell>
+                      <strong>Total Rent</strong>
+                    </TableCell>
                     <TableCell>₹ {paymentData?.totalRent} </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Advance Amount</TableCell>
-                    <TableCell>₹ {paymentData?.advanceAmount} </TableCell>
+                    <TableCell>
+                      {' '}
+                      <strong>Advance Amount</strong>
+                    </TableCell>
+                    <TableCell>₹ {paymentData?.advanceAmount || 0}</TableCell>
                   </TableRow>
+
                   <TableRow>
-                    <TableCell>Final Total Rent</TableCell>
+                    <TableCell>
+                      {' '}
+                      <strong>Discount</strong>
+                    </TableCell>
+                    <TableCell>₹ {paymentData?.discount || 0}</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell>
+                      {' '}
+                      <strong>Final Total Rent</strong>
+                    </TableCell>
                     <TableCell>₹ {paymentData?.finalTotalRent} </TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Paid Amount</TableCell>
+                    <TableCell>
+                      {' '}
+                      <strong>Paid Amount</strong>
+                    </TableCell>
                     <TableCell> ₹ {paymentData?.paymentAmount}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Pending Amount</TableCell>
+                    <TableCell>
+                      {' '}
+                      <strong>Pending Amount</strong>
+                    </TableCell>
                     <TableCell> ₹ {paymentData?.remainingAmount}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Payment Method</TableCell>
-                    <TableCell>{paymentDetails?.paymentMethod}</TableCell>
+                    <TableCell>
+                      <strong>Payment Method</strong>
+                    </TableCell>
+                    <TableCell>{paymentData?.paymentMethod || '- -'}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>{paymentDetails?.date}</TableCell>
+                    <TableCell>
+                      <strong>Date</strong>
+                    </TableCell>
+                    <TableCell>{moment(paymentData?.date).format('DD/MM/YYYY') || '- -'}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>
@@ -348,7 +382,7 @@ const Paymentslip = () => {
           pr: 3
         }}
       >
-        <Button variant="contained" color="primary" onClick={() => downloadInvoice(paymentData, roomData, hostelData, paymentDetails)}>
+        <Button variant="contained" color="primary" onClick={() => downloadInvoice(paymentData, roomData, hostelData)}>
           Print
         </Button>
       </Box>

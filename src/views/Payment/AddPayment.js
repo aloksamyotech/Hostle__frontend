@@ -26,14 +26,25 @@ import * as Yup from 'yup';
 import { paymentValidationSchema } from 'views/Validation/validationSchema';
 import moment from 'moment';
 import { ToastContainer, toast } from 'react-toastify';
+import Cookies from 'js-cookie';
+import { useLocation } from 'react-router-dom';
 
 const AddPayment = (props) => {
-  const { open, handleClose, hostelId, currentStudent } = props;
+  const { open, handleClose } = props;
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   const [studentList, setStudentList] = useState([]);
   const [paymentdata, setPaymentData] = useState();
+  const [hostelId, setHostelId] = useState(null);
+  const [remainingAmt, setRemainingAmt] = useState();
+
+  const location = useLocation();
+  const pathname = location.pathname;
+  const parts = pathname.split('/');
+  const id = parts[parts.length - 1];
+
+  console.log('id student payment payment -------->', id);
 
   const fetchStudents = async (hostelId) => {
     try {
@@ -51,17 +62,17 @@ const AddPayment = (props) => {
     try {
       const res1 = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/getStudent/${studentId}`);
       const assignedData = res1.data.data;
-      console.log('assignedData ---------->', assignedData);
 
       const res2 = await axios.get(`${REACT_APP_BACKEND_URL}/student_payment/getRemaningData/${studentId}`);
-      console.log('res2 :', res2);
 
       const paymentData = res2.data?.result;
-      console.log('paymentData ---------->', paymentData);
+
       setPaymentData(paymentData);
+     
 
       const totalRent = assignedData?.finalTotalRent || 0;
       const remainingAmount = paymentData != null ? paymentData.remainingAmount : totalRent;
+      setRemainingAmt(remainingAmount);
 
       formik.setValues({
         ...formik.values,
@@ -75,6 +86,7 @@ const AddPayment = (props) => {
         libraryFee: assignedData?.libraryFee || '',
         totalRent: assignedData?.totalRent || '',
         advanceAmount: assignedData?.advanceAmount || '',
+        discount: assignedData?.discount || '',
         finalTotalRent: assignedData?.finalTotalRent || '',
         remainingAmount: remainingAmount
       });
@@ -84,7 +96,20 @@ const AddPayment = (props) => {
   };
 
   useEffect(() => {
-    fetchStudents(hostelId);
+    const Hos_Id = Cookies.get('_Id');
+    if (Hos_Id) {
+      setHostelId(Hos_Id);
+    }
+    if (id) {
+      formik.setFieldValue('studentId', id);
+      handleStudentChange(id);
+      fetchStudents(Hos_Id);
+    } 
+    // else {
+    //   fetchStudents(Hos_Id);
+    // }
+
+    
   }, [open]);
 
   const formik = useFormik({
@@ -99,17 +124,16 @@ const AddPayment = (props) => {
       libraryFee: '',
       totalRent: '',
       advanceAmount: '',
+      discount: '',
       finalTotalRent: '',
       remainingAmount: '',
       paymentMethod: '',
       date: '',
       paymentAmount: ''
     },
-    validationSchema: paymentValidationSchema,
+    validationSchema: paymentValidationSchema(remainingAmt),
 
     onSubmit: async (values) => {
-      console.log('values :', values);
-
       try {
         const response = await axios.post(`${REACT_APP_BACKEND_URL}/student_payment/add/${hostelId}`, values);
 
@@ -134,6 +158,8 @@ const AddPayment = (props) => {
     const remaining = total - paid;
 
     formik.setFieldValue('remainingAmount', remaining);
+  
+
   }, [formik.values.paymentAmount]);
 
   return (
@@ -161,9 +187,11 @@ const AddPayment = (props) => {
                 size="small"
                 fullWidth
               >
+               
+                
                 {studentList.map((student) => (
                   <MenuItem key={student._id} value={student._id}>
-                    {student.studentName} 
+                    {student.studentName}
                   </MenuItem>
                 ))}
               </Select>
@@ -222,6 +250,11 @@ const AddPayment = (props) => {
             </Grid>
 
             <Grid item xs={12} sm={6} md={6}>
+              <FormLabel>Discount</FormLabel>
+              <TextField name="discount" value={formik.values.discount} size="small" fullWidth disabled />
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Final Amount</FormLabel>
               <TextField name="finalTotalRent" value={formik.values.finalTotalRent} size="small" fullWidth disabled />
             </Grid>
@@ -272,6 +305,8 @@ const AddPayment = (props) => {
                 fullWidth
                 required
                 inputProps={{ min: 0 }}
+                error={formik.touched.paymentAmount && !!formik.errors.paymentAmount}
+                helperText={formik.touched.paymentAmount && formik.errors.paymentAmount}
               />
             </Grid>
           </Grid>

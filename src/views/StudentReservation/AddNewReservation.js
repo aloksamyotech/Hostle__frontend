@@ -32,7 +32,6 @@ import { format } from 'date-fns';
 
 const AddNewReservation = (props) => {
   const { open, handleClose, hostelId } = props;
-  console.log('AddNewReservation props :', props);
 
   const [roomTypes, setRoomTypes] = useState([]);
   const [roomNumbers, setRoomNumbers] = useState([]);
@@ -54,6 +53,7 @@ const AddNewReservation = (props) => {
       totalRent: '',
       finalTotalRent: '',
       advanceAmount: '',
+      discount: '',
 
       foodFacility: false,
       foodFee: 0,
@@ -78,6 +78,7 @@ const AddNewReservation = (props) => {
 
     validationSchema: addReservedBedValidationSchema,
     onSubmit: async (values) => {
+      console.log('values here ............. ---->', values);
       const formData = new FormData();
 
       formData.append('roomCategory', values.roomCategory);
@@ -91,6 +92,8 @@ const AddNewReservation = (props) => {
       formData.append('totalRent', values.totalRent);
       formData.append('finalTotalRent', values.finalTotalRent);
       formData.append('advanceAmount', values.advanceAmount);
+      formData.append('discount', values.discount);
+
       formData.append('foodFee', values.foodFee);
       formData.append('libraryFee', values.libraryFee);
       formData.append('studentName', values.studentName);
@@ -153,8 +156,6 @@ const AddNewReservation = (props) => {
     }
   };
 
-  console.log('roomNumbers  : --------------------------->', roomNumbers);
-
   useEffect(() => {
     fetchRoomTypesData(hostelId);
     fetchRoomData(hostelId);
@@ -183,8 +184,6 @@ const AddNewReservation = (props) => {
       const facilityFeePerMonth = foodFee + libraryFee;
       const totalRent = months * (roomRent + facilityFeePerMonth);
 
-      console.log('calculate total rent :', totalRent);
-
       formik.setFieldValue('totalRent', totalRent);
       formik.setFieldValue('finalTotalRent', totalRent);
       setOriginalFinalRent(totalRent);
@@ -197,6 +196,19 @@ const AddNewReservation = (props) => {
     formik.values.foodFee,
     formik.values.libraryFee
   ]);
+
+  const recalculateFinalRent = (advanceAmount, discount) => {
+    const a = Number(advanceAmount) || 0;
+    const d = Number(discount) || 0;
+
+    if (a < 0 || d < 0) {
+      formik.setFieldValue('finalTotalRent', originalFinalRent);
+      return;
+    }
+
+    const newFinal = originalFinalRent - a - d;
+    formik.setFieldValue('finalTotalRent', newFinal >= 0 ? newFinal : originalFinalRent);
+  };
 
   return (
     <div>
@@ -300,41 +312,6 @@ const AddNewReservation = (props) => {
                 </Select>
                 {formik.touched.roomNumber && formik.errors.roomNumber && <FormHelperText error>{formik.errors.roomNumber}</FormHelperText>}
               </Grid>
-              {/* <Grid item xs={12} sm={6} md={6}>
-                <FormLabel component="legend">Bed Numbers</FormLabel>
-                <FormGroup row>
-                  {selectedRoomData?.beds?.length > 0 ? (
-                    selectedRoomData.beds.map((bed) => (
-                      <FormControlLabel
-                        key={bed.bedNumber}
-                        control={
-                          <Checkbox
-                            name="bedNumber"
-                            value={bed.bedNumber}
-                            checked={formik.values.bedNumber === bed.bedNumber}
-                            disabled={bed.status !== 'available'}
-                            onChange={(e) => {
-                              const value = parseInt(e.target.value, 10);
-                              if (e.target.checked) {
-                                formik.setFieldValue('bedNumber', value);
-                              } else {
-                                formik.setFieldValue('bedNumber', null);
-                              }
-                            }}
-                          />
-                        }
-                        label={`Bed ${bed.bedNumber} (${bed.status})`}
-                      />
-                    ))
-                  ) : (
-                    <>
-                      {[1, 2, 3].map((num) => (
-                        <FormControlLabel key={num} control={<Checkbox disabled />} label={`Bed ${num}`} />
-                      ))}
-                    </>
-                  )}
-                </FormGroup>
-              </Grid> */}
 
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Bed Numbers</FormLabel>
@@ -504,6 +481,24 @@ const AddNewReservation = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Advance Amount</FormLabel>
+                <TextField
+                  id="advanceAmount"
+                  name="advanceAmount"
+                  size="small"
+                  fullWidth
+                  value={formik.values.advanceAmount}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    formik.setFieldValue('advanceAmount', value);
+                    recalculateFinalRent(value, formik.values.discount);
+                  }}
+                  error={formik.touched.advanceAmount && !!formik.errors.advanceAmount}
+                  helperText={formik.touched.advanceAmount && formik.errors.advanceAmount}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Final Total Rent</FormLabel>
                 <TextField
                   id="finalTotalRent"
@@ -516,29 +511,31 @@ const AddNewReservation = (props) => {
                     formik.setFieldValue('finalTotalRent', value);
                     setOriginalFinalRent(value);
                   }}
+                  InputProps={{
+                    readOnly: true
+                  }}
                   error={formik.touched.finalTotalRent && !!formik.errors.finalTotalRent}
                   helperText={formik.touched.finalTotalRent && formik.errors.finalTotalRent}
                 />
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Advance Amount</FormLabel>
+                <FormLabel>Discount on Final Rent</FormLabel>
                 <TextField
-                  id="advanceAmount"
-                  name="advanceAmount"
-                  type="number"
+                 
+
+                  id="discount"
+                  name="discount"
                   size="small"
                   fullWidth
-                  value={formik.values.advanceAmount}
+                  value={formik.values.discount}
                   onChange={(e) => {
                     const value = e.target.value;
-                    formik.setFieldValue('advanceAmount', value);
-                    const remainingAmount = Number(originalFinalRent) - Number(value);
-                    console.log('remainingAmount :', remainingAmount);
-                    formik.setFieldValue('finalTotalRent', remainingAmount);
+                    formik.setFieldValue('discount', value);
+                    recalculateFinalRent(value, formik.values.advanceAmount);
                   }}
-                  error={formik.touched.advanceAmount && !!formik.errors.advanceAmount}
-                  helperText={formik.touched.advanceAmount && formik.errors.advanceAmount}
+                  error={formik.touched.discount && !!formik.errors.discount}
+                  helperText={formik.touched.discount && formik.errors.discount}
                 />
               </Grid>
 
