@@ -55,7 +55,7 @@ const EditReservation = (props) => {
       totalRent: rowData?.totalRent || '',
       finalTotalRent: rowData?.finalTotalRent || '',
       advanceAmount: rowData?.advanceAmount || 0,
-      discount: rowData?.discount || 0,
+      discount: rowData?.discount || 0
     },
 
     validationSchema: editReservedBedValidationSchema,
@@ -129,11 +129,17 @@ const EditReservation = (props) => {
         const totalRent = months * (roomRent + facilityFeePerMonth);
         console.log('this is totalRent :', totalRent);
         formik.setFieldValue('totalRent', totalRent);
-        formik.setFieldValue('finalTotalRent', totalRent - formik.values.advanceAmount);
+        let total = totalRent - (formik.values.advanceAmount + formik.values.discount);
+        formik.setFieldValue('finalTotalRent', total);
       } else {
-        const roomRent = rowData?.finalTotalRent || 0;
         const months = monthDiffInclusive(formik.values.startDate, formik.values.endDate);
+
+        const roomRent = rowData?.finalTotalRent / rowData?.stayMonths || 0;
+
         const totalRent = months * roomRent;
+
+        console.log('total rent :', totalRent);
+
         formik.setFieldValue('totalRent', rowData?.totalRent);
         formik.setFieldValue('finalTotalRent', totalRent);
       }
