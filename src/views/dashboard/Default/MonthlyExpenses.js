@@ -17,10 +17,10 @@ MonthlyExpenses.propTypes = {
 
 export default function MonthlyExpenses({ title, subheader, chartData, ...other }) {
   const chartLabels = chartData.map((i) => i.label);
-  console.log("chartLabels ==>",chartLabels);
+
 
   const chartSeries = chartData.map((i) => i.value);
-  console.log("chartSeries==>",chartSeries);
+
 
   const chartOptions = useChart({
     tooltip: {

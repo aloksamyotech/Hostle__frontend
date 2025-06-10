@@ -18,7 +18,7 @@ import axios from 'axios';
 
 const ChangeStatus = (props) => {
   const { open, handleClose, rowData } = props;
-  console.log('-------------- ChangeStatus rowDataId :', rowData);
+
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   const [loading, setLoading] = useState(false);

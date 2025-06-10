@@ -66,11 +66,8 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 // ===========================|| DASHBOARD DEFAULT - EARNING CARD ||=========================== //
 
-const TotalStudents = ({ isLoading,studentData}) => {
+const TotalStudents = ({ isLoading, studentData }) => {
   const theme = useTheme();
-
-  console.log("This is the studentData :::::::::::::::::: studentData :",studentData);
-  
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -97,17 +94,17 @@ const TotalStudents = ({ isLoading,studentData}) => {
                   </Grid>
 
                   <Grid item>
-                    <PeopleAltRoundedIcon fontSize="large" sx={{mr: 1, mt: 4, mb: 0.75}}/>
+                    <PeopleAltRoundedIcon fontSize="large" sx={{ mr: 1, mt: 4, mb: 0.75 }} />
                   </Grid>
                 </Grid>
               </Grid>
 
               <Grid item sx={{ mb: 1.25 }}>
                 <Typography
-                 sx={{
-                  fontSize: '1rem',
-                  fontWeight: 500,
-                  color: theme.palette.primary[200]
+                  sx={{
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    color: theme.palette.primary[200]
                   }}
                 >
                   Total Students

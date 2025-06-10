@@ -34,6 +34,7 @@ const Payment = Loadable(lazy(() => import('views/Payment')));
 const NoticeBoard = Loadable(lazy(() => import('views/NoticeBoard')));
 const WeeklyFoodMenu = Loadable(lazy(() => import('views/WeeklyFoodMenu')));
 const RoomType = Loadable(lazy(() => import('views/RoomType')));
+const InventoryReport = Loadable(lazy(() => import('views/CanteenInventory/InventoryDashboard')));
 
 const ViewBeds = Loadable(lazy(() => import('views/Room/ViewBeds')));
 import Report from 'views/Report';
@@ -165,6 +166,15 @@ const SubAdminRoutes = {
         {
           path: 'consume_inventory',
           element: <InventoryConsumption />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'inventory_report',
+          element: <InventoryReport />
         }
       ]
     },

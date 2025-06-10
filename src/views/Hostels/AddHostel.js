@@ -64,10 +64,6 @@ const AddHostel = (props) => {
         }
       });
 
-      for (let [key, value] of formData.entries()) {
-        console.log(`formData==> ${key}: ${value}`);
-      }
-
       try {
         let response;
         if (editHostelData) {

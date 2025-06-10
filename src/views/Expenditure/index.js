@@ -37,6 +37,7 @@ import moment from 'moment';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import { useNavigate } from 'react-router-dom';
+import { handleApiResponse } from 'utils/common';
 
 const Expenditure = () => {
   const navigate = useNavigate();
@@ -80,8 +81,10 @@ const Expenditure = () => {
           endDate: endDate || undefined
         }
       });
-      setAllExpenses(response.data.result);
-      setTotalCount(response.data.totalRecodes);
+      const res = await handleApiResponse(response);
+     
+      setAllExpenses(res?.data);
+      
     } catch (error) {
       console.error('Error fetching expenses data:', error);
     }

@@ -14,10 +14,11 @@ import { productValidationSchema } from 'views/Validation/validationSchema';
 import axios from 'axios';
 import { useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { handleApiResponse } from 'utils/common';
+
 
 const AddInventory = (props) => {
   const { open, handleClose, hostelId, editInventory } = props;
-  console.log('props==>', props);
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -43,12 +44,13 @@ const AddInventory = (props) => {
         if (editInventory) {
           try {
             response = await axios.put(`${REACT_APP_BACKEND_URL}/canteen_inventory/edit/${editInventory._id}`, values);
+            await handleApiResponse(response, 'UPDATE');
 
-            if (response.status === 200) {
-              toast.success('Inventory Updated Successfully !!');
-            } else {
-              toast.error('Failed to update inventory !!');
-            }
+            // if (response.status === 200) {
+            //   toast.success('Inventory Updated Successfully !!');
+            // } else {
+            //   toast.error('Failed to update inventory !!');
+            // }
           } catch (error) {
             console.log('Error:', error);
             toast.error('Something went wrong !!');
@@ -56,12 +58,13 @@ const AddInventory = (props) => {
         } else {
           try {
             response = await axios.post(`${REACT_APP_BACKEND_URL}/canteen_inventory/add/${hostelId}`, values);
+            await handleApiResponse(response);
 
-            if (response.status === 201) {
-              toast.success('Inventory Added Successfully !!');
-            } else {
-              toast.error('Failed to add inventory !!');
-            }
+            // if (response.status === 201) {
+            //   toast.success('Inventory Added Successfully !!');
+            // } else {
+            //   toast.error('Failed to add inventory !!');
+            // }
           } catch (error) {
             console.log('Error:', error);
             toast.error('Something went wrong !!');
@@ -132,7 +135,7 @@ const AddInventory = (props) => {
                   <MenuItem value="">Select Measurement</MenuItem>
                   <MenuItem value="kg">Kilogram (kg)</MenuItem>
                   <MenuItem value="liter">Liter (L)</MenuItem>
-                  <MenuItem value="gm">Gram (gm)</MenuItem>
+                  <MenuItem value="grams">Gram (gm)</MenuItem>
                 </Select>
                 {formik.touched.mesurment && formik.errors.mesurment ? (
                   <FormHelperText error>{formik.errors.mesurment}</FormHelperText>

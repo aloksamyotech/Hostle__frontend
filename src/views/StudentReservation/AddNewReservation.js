@@ -78,7 +78,6 @@ const AddNewReservation = (props) => {
 
     validationSchema: addReservedBedValidationSchema,
     onSubmit: async (values) => {
-      console.log('values here ............. ---->', values);
       const formData = new FormData();
 
       formData.append('roomCategory', values.roomCategory);
@@ -522,8 +521,6 @@ const AddNewReservation = (props) => {
               <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Discount on Final Rent</FormLabel>
                 <TextField
-                 
-
                   id="discount"
                   name="discount"
                   size="small"

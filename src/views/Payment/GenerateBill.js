@@ -34,7 +34,7 @@ import { useNavigate } from 'react-router-dom';
 
 const GenerateBill = (props) => {
   const { open, handleClose, rowData, hostelId } = props;
-  console.log('GenerateBill props :', props);
+
 
   const navigate = useNavigate();
 
@@ -54,7 +54,7 @@ const GenerateBill = (props) => {
     // validationSchema: '',
     enableReinitialize: true,
     onSubmit: async (values) => {
-      console.log('Final values :', values);
+ 
 
       try {
         navigate(`/paymentslip/view`);

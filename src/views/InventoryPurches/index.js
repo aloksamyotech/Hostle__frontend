@@ -37,6 +37,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import { useNavigate } from 'react-router';
+import { handleApiResponse } from 'utils/common';
 
 const InventoryPurches = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -73,15 +74,13 @@ const InventoryPurches = () => {
     fetchPurchaseInventory(HosId);
   }, []);
 
-  console.log('hostelId==>', hostelId);
-
   const fetchPurchaseInventory = async (hostelId) => {
     try {
-      console.log('Url =>', `${REACT_APP_BACKEND_URL}/canteen_inventory_purches/index/${hostelId}`);
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/canteen_inventory_purches/index/${hostelId}`);
-      console.log('response==>', response);
-      setPurchaseProduct(response.data.result);
-      setTotalCount(response.data.totalRecodes);
+      const res = await handleApiResponse(response);
+
+      setPurchaseProduct(res?.data);
+      // setTotalCount(response.data.totalRecodes);
     } catch (error) {
       console.error('Error fetching purchase inventory data:', error);
     }
@@ -89,17 +88,14 @@ const InventoryPurches = () => {
 
   //Handle Edit Action Here
   const handleEdit = (id) => {
-    console.log(`Edit clicked for ID: ${id}`);
     setOpenAdd(true);
 
     const product = purchaseProduct.find((product) => product._id === id);
     setEditPurchase(product);
   };
-  console.log('editPurchase==>', editPurchase);
 
   //Handle Delete Action Here
   const handleDelete = (id) => {
-    console.log(`Delete clicked for ID: ${id}`);
     setOpenDeleteDialog(true);
     setDeletePurchaseProduct(id);
   };
@@ -110,9 +106,8 @@ const InventoryPurches = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/canteen_inventory_purches/delete/${deletePurchaseProduct}`);
       let response = await axios.delete(`${REACT_APP_BACKEND_URL}/canteen_inventory_purches/delete/${deletePurchaseProduct}`);
-      console.log('delete =====> response =====>', response);
+      await handleApiResponse(response, 'DELETE');
 
       setOpenDeleteDialog(false);
       fetchPurchaseInventory(hostelId);
@@ -123,7 +118,6 @@ const InventoryPurches = () => {
 
   // Handle Pages
   const handleChangePage = (event, newPage) => {
-    console.log('New Page:', newPage);
     setPage(newPage);
   };
 
@@ -178,6 +172,26 @@ const InventoryPurches = () => {
       flex: 1,
       renderCell: (params) => {
         return moment(params.value).format('YYYY-MM-DD');
+      }
+    },
+    {
+      field: 'purchesBillPhoto',
+      headerName: 'Bill Photo',
+      width: 150,
+      renderCell: (params) => {
+        const billPhoto = params.row.purchesBillPhoto;
+        return billPhoto ? (
+          <a
+            href={`${process.env.REACT_APP_BACKEND_URL}${billPhoto}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#1976d2', textDecoration: 'none' }}
+          >
+            View Bill
+          </a>
+        ) : (
+          <span style={{ color: '#aaa' }}>No Bill</span>
+        );
       }
     },
     {

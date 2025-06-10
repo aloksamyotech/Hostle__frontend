@@ -20,7 +20,6 @@ import { HailSharp } from '@mui/icons-material';
 
 const Notices = (props) => {
   const { open, handleClose, hostelId, editNotice } = props;
-  console.log('props==>', props);
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -44,17 +43,13 @@ const Notices = (props) => {
     },
     validationSchema: noticeValidationSchema,
     onSubmit: async (values) => {
-      console.log('Form is valid ====>', values);
-
       try {
-        console.log('in try...');
         let response;
         if (editNotice) {
           try {
             response = await axios.put(`${REACT_APP_BACKEND_URL}/notice_board/edit/${editNotice._id}`, values);
 
             if (response.status === 200) {
-              console.log('Notice Edit Successfully !!');
               toast.success('Notice Edit Successfully !!');
             } else {
               console.error('Failed to edit data');
@@ -69,7 +64,6 @@ const Notices = (props) => {
             response = await axios.post(`${REACT_APP_BACKEND_URL}/notice_board/add/${hostelId}`, values);
 
             if (response.status === 201) {
-              console.log('Notice Add Successfully !!');
               toast.success('Notice Add Successfully !!');
             } else {
               console.error('Failed to save data');

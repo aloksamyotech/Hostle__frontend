@@ -25,7 +25,7 @@ import { useNavigate } from 'react-router';
 
 const AddStudent = (props) => {
   const { open, handleClose, editStudentData,adminid} = props;
-  console.log("props==>",props);
+
 
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
@@ -68,12 +68,12 @@ const AddStudent = (props) => {
     }
     fetchAllStates();
   }, []);
-  console.log("states==>",states);
+
 
   // Set State Here
   const handleStateChange = (e) => {
     const getSelectedState = e.target.value;
-    console.log('getSelectedState=>',getSelectedState);
+
     formik.handleChange(e);
     setSelectedState(getSelectedState);
   }
@@ -81,16 +81,16 @@ const AddStudent = (props) => {
   // Get Cities By Selected State
   useEffect(() => {
     if (selectedState) {
-      console.log("in second useEffect for fetching cities..",selectedState);
+     
       const fetchCities = async () => {
         const allCities = City.getCitiesOfState('IN', selectedState); 
         setCities(allCities);
-        console.log("allCities==>",allCities);
+       
       }
       fetchCities();
     }
   }, [selectedState]);
-  console.log("cities==>",cities);
+
 
 
   const formik = useFormik({
@@ -113,7 +113,7 @@ const AddStudent = (props) => {
 
     //Submit Or Add Admin Data 
       onSubmit:  async (values) => {
-      console.log('Form is valid ====>', values);
+    
       
       const formData = new FormData();
       Object.keys(values).forEach((key)=>{
@@ -124,10 +124,7 @@ const AddStudent = (props) => {
         }
       });
 
-      // Log FormData entries
-      for (let [key, value] of formData.entries()) {
-        console.log(`formData==> ${key}: ${value}`);
-      }
+     
 
       try{
         let response;
@@ -146,11 +143,10 @@ const AddStudent = (props) => {
             }
           });
         }
-        console.log("response==>",response);
-        console.log("response.data==>",response.data);
+  
 
         if (response.status === 200 || response.status === 201) {
-          console.log('Student Data Add Successfully');
+     
           handleClose();
         } else{
           console.error('Failed to save Hostel');

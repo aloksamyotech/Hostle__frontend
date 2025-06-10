@@ -57,7 +57,6 @@ const ProfileDetails = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [studentName, setStudentName] = useState('');
-  
 
   const [openPayment, setOpenPayment] = useState(false);
 
@@ -73,8 +72,6 @@ const ProfileDetails = () => {
   const pathname = location.pathname;
   const parts = pathname.split('/');
   const id = parts[parts.length - 1];
-
-  console.log('student id :', id);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -92,12 +89,12 @@ const ProfileDetails = () => {
     fetchStudentDetails();
     fetchPaymentData();
     fetchVisitorData();
-  }, [id,openPayment]);
+  }, [id, openPayment]);
 
   const fetchStudentDetails = async () => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/view/${id}`);
-      console.log('API fetch StudentDetails response=>', response);
+
       setProfileData(response.data.result);
       setStudentName(response.data.result.studentName);
     } catch (error) {
@@ -108,7 +105,7 @@ const ProfileDetails = () => {
   const fetchPaymentData = async () => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/student_payment/paymenthistory/${id}`);
-      console.log('response ----> fetchPaymentData ---> :', response);
+
       setStudentPaymentData(response.data.result);
     } catch (error) {
       console.error('Error fetching payment data:', error);
@@ -164,7 +161,6 @@ const ProfileDetails = () => {
 
   // Handle Pages
   const handleChangePage = (event, newPage) => {
-    console.log('New Page:', newPage);
     setPage(newPage);
   };
 

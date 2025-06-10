@@ -43,7 +43,7 @@ const SuperAdminDashboard = () => {
       setRoomData(responseForRoom.data.roomRecords);
 
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/hostel/list`);
-      console.log('response==>', response);
+
       setHosteldata(response.data.result);
 
       const responseForHostelBeds = await axios.get(`${REACT_APP_BACKEND_URL}/room/calculate-beds`);

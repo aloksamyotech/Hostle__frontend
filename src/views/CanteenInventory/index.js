@@ -37,6 +37,10 @@ import * as React from 'react';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import { useNavigate } from 'react-router';
+import { handleApiResponse } from 'utils/common';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import sampleFile from 'assets/sampleFile/inventorysamplesheet.csv';
+import { toast } from 'react-toastify';
 
 const CanteenInventory = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -73,21 +77,17 @@ const CanteenInventory = () => {
     }
     fetchInventory(HosId);
   }, []);
-  
 
-  //Fetching Data Here
   const fetchInventory = async (hostelId) => {
     try {
-    
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/canteen_inventory/index/${hostelId}`);
-      
-      setAllInventory(response.data.result);
-      setTotalCount(response.data.totalRecodes);
+      const res = await handleApiResponse(response);
+
+      setAllInventory(res?.data);
     } catch (error) {
       console.error('Error fetching inventory data:', error);
     }
   };
- 
 
   // Handle view action here
   const handleEdit = (id) => {
@@ -97,10 +97,8 @@ const CanteenInventory = () => {
     setEditInventory(inventory);
   };
 
-
   // Handle view action here
   const handleDelete = (id) => {
-   
     setOpenDeleteDialog(true);
     setDeleteInventoryId(id);
   };
@@ -111,10 +109,8 @@ const CanteenInventory = () => {
 
   const handleConfirmDelete = async () => {
     try {
-    
       let response = await axios.delete(`${REACT_APP_BACKEND_URL}/canteen_inventory/delete/${deleteInventoryId}`);
-    
-
+      await handleApiResponse(response, 'DELETE');
       setOpenDeleteDialog(false);
       fetchInventory(hostelId);
     } catch (error) {
@@ -124,17 +120,14 @@ const CanteenInventory = () => {
 
   // Handle Pages
   const handleChangePage = (event, newPage) => {
-   
     setPage(newPage);
   };
 
-  // Handle Rows PerPage
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  //for imported file handle
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -147,12 +140,12 @@ const CanteenInventory = () => {
       const worksheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-    
-
       try {
         const response = await axios.post(`${REACT_APP_BACKEND_URL}/canteen_inventory/importFile/${hostelId}`, jsonData);
-      
+
         if (response.status === 200) {
+          handleCloseImportModal();
+          toast.success('Inventory Updated Successfully !!');
           fetchInventory(hostelId);
         } else {
           console.error('Failed to import items');
@@ -164,7 +157,6 @@ const CanteenInventory = () => {
     reader.readAsArrayBuffer(file);
   };
 
-  //for import button
   const handleOpenImportModal = () => {
     setOpenImportModal(true);
   };
@@ -220,6 +212,7 @@ const CanteenInventory = () => {
   return (
     <>
       <AddInventory open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} editInventory={editInventory} />
+
       <Container>
         <Box
           sx={{
@@ -242,12 +235,14 @@ const CanteenInventory = () => {
             <Typography variant="h5">Canteen Inventory List</Typography>
           </Stack>
 
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Card>
-              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-                Add Inventory Item
-              </Button>
-            </Card>
+          <Stack direction="row" alignItems="center" justifyContent={'flex-end'} spacing={2}>
+            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
+              Add Inventory Item
+            </Button>
+
+            <Button variant="contained" startIcon={<CloudUploadIcon />} onClick={handleOpenImportModal}>
+              Bulk Upload
+            </Button>
           </Stack>
         </Box>
 
@@ -288,9 +283,12 @@ const CanteenInventory = () => {
       {/* -------------------- for import button ------------------ */}
 
       <Dialog open={openImportModal} onClose={handleCloseImportModal} sx={{ minWidth: '500px', padding: '20px', borderRadius: '10px' }}>
-        <DialogTitle>Import Items File Form Here</DialogTitle>
+        <DialogTitle>Import Items File From Here</DialogTitle>
         <DialogContent>
-          <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
+          <Box display="flex" flexDirection="row" alignItems="center" gap={2}>
+            <Button variant="contained" component="a" href={sampleFile} download>
+              Download Sample File
+            </Button>
             <Button variant="contained" component="label">
               Upload File
               <input type="file" accept=".xlsx, .xls" hidden onChange={handleFileUpload} />
@@ -298,8 +296,8 @@ const CanteenInventory = () => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseImportModal} color="secondary">
-            Close
+          <Button onClick={handleCloseImportModal} variant="outlined" color="error">
+            Cancel
           </Button>
         </DialogActions>
       </Dialog>

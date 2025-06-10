@@ -1,5 +1,23 @@
 import { useState } from 'react';
-import { Stack, Button, Container, Typography, Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton,Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import {
+  Stack,
+  Button,
+  Container,
+  Typography,
+  Box,
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from '@mui/material';
 import TableStyle from '../../ui-component/TableStyle';
 import Iconify from '../../ui-component/iconify';
 import AddAttendence from './AddAttendence';
@@ -9,7 +27,7 @@ const attendenceData = [
   {
     id: 1,
     hostelName: 'MahaveerSeve Dham',
-    studentName: 'John Doe', 
+    studentName: 'John Doe',
     date: '10-10-2024',
     outTime: '08:15',
     inTime: '07:30'
@@ -17,32 +35,13 @@ const attendenceData = [
 ];
 const Attendence = () => {
   const [openAdd, setOpenAdd] = useState(false);
-  
+
   const handleOpenAdd = () => setOpenAdd(true);
   const handleCloseAdd = () => setOpenAdd(false);
 
-  // const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-
-  // Handle view action here
   const handleEdit = (id) => {
     setOpenAdd(true);
-    console.log(`Edit clicked for ID: ${id}`);
   };
-
-  // const handleDelete = (id) => {
-  //   setOpenDeleteDialog(true);
-  //   console.log(`Delete clicked for ID: ${id}`);
-  // };
-
-  // const handleCloseDeleteDialog = () => {
-  //   setOpenDeleteDialog(false);
-  // };
-
-  // //for delete
-  // const handleConfirmDelete = () => {
-  //   console.log(`Deleting administrator with ID: ${deleteId}`);
-  //   setOpenDeleteDialog(false);
-  // };
 
   return (
     <>
@@ -100,7 +99,7 @@ const Attendence = () => {
       </Container>
 
       {/*-------------------- Dialog for Delete ----------------- */}
-      
+
       {/* <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
       <DialogTitle variant="h4">Delete Administrator</DialogTitle>
       <DialogContent>

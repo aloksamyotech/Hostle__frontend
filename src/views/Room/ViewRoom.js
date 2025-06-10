@@ -18,20 +18,17 @@ const ViewRoom = () => {
   const [roomDetail, setRoomDetails] = useState(null);
 
   const location = useLocation();
-  console.log('location=>', location);
+
   const pathname = location.pathname;
 
   // Split the pathname by slashes and get the last part
   const parts = pathname.split('/');
   const id = parts[parts.length - 1];
-  console.log('navigate id==>', id);
 
   useEffect(() => {
     const fetchRoomDetails = async () => {
       try {
-        console.log('URL =>', `${REACT_APP_BACKEND_URL}/room/view/${id}`);
         const response = await axios.get(`${REACT_APP_BACKEND_URL}/room/view/${id}`);
-        console.log('response==>', response);
         setRoomDetails(response.data.result);
       } catch (error) {
         console.error('Error fetching reserved student details:', error);
@@ -39,8 +36,6 @@ const ViewRoom = () => {
     };
     fetchRoomDetails();
   }, [id]);
-
-  console.log('roomDetail :', roomDetail);
 
   return (
     <>

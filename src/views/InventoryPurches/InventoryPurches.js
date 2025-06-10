@@ -16,16 +16,16 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 import { toast } from 'react-toastify';
+import { handleApiResponse } from 'utils/common';
 
 const PurchaseInventory = (props) => {
   const { open, handleClose, hostelId, editPurchase } = props;
-  console.log('props==>', props);
 
   const [allProductList, setProductList] = useState([]);
+  const [existingImgFile, setExistingImgFile] = useState(null);
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
-  //When Found editPurchase Data
   useEffect(() => {
     if (open && editPurchase) {
       const formattedDate = moment(editPurchase.date).format('YYYY-MM-DD');
@@ -38,62 +38,81 @@ const PurchaseInventory = (props) => {
     }
   }, [open, editPurchase]);
 
-  //Get All Product Which Adeed
   useEffect(() => {
     if (open) {
-      axios
-        .get(`${REACT_APP_BACKEND_URL}/canteen_inventory/index/${hostelId}`)
-        .then((response) => {
-          console.log('response for Product ==>', response);
-
-          const ProductNames = response.data.result.map((product) => product['productName']);
-          console.log('==>', ProductNames);
+      (async () => {
+        try {
+          const response = await axios.get(`${REACT_APP_BACKEND_URL}/canteen_inventory/index/${hostelId}`);
+          const res = await handleApiResponse(response);
+          const ProductNames = res?.data.map((product) => product['productName']);
           setProductList(ProductNames);
-        })
-        .catch((error) => {
+        } catch (error) {
           console.log('Product List is not Found!!', error);
-        });
+        }
+      })();
     }
   }, [open]);
-  console.log('allProductList==>', allProductList);
 
   const formik = useFormik({
     initialValues: {
       productName: '',
       quantity: '',
       price: '',
-      date: ''
+      date: '',
+      purchesBillPhoto: null
     },
     validationSchema: productPurchesValidationSchema,
-    onSubmit: async (values) => {
-      console.log('Form is valid ====>', values);
+    // onSubmit: async (values) => {
+    //   try {
+    //     let response;
+    //     if (editPurchase) {
+    //       try {
+    //         response = await axios.put(`${REACT_APP_BACKEND_URL}/canteen_inventory_purches/edit/${editPurchase._id}`, values);
+    //         await handleApiResponse(response, 'UPDATE');
+    //       } catch (error) {
+    //         console.log('Error:', error);
+    //         toast.error('Something went wrong !!');
+    //       }
+    //     } else {
+    //       try {
+    //         response = await axios.post(`${REACT_APP_BACKEND_URL}/canteen_inventory_purches/add/${hostelId}`, values);
+    //         await handleApiResponse(response);
+    //       } catch (error) {
+    //         console.log('Error:', error);
+    //         toast.error('Something went wrong !!');
+    //       }
+    //     }
 
+    //     handleClose();
+    //     formik.resetForm();
+    //   } catch (error) {
+    //     console.log('Error:', error);
+    //     toast.error('Something went wrong !!');
+    //   }
+    // }
+
+    onSubmit: async (values) => {
       try {
+        const formData = new FormData();
+        formData.append('productName', values.productName);
+        formData.append('quantity', values.quantity);
+        formData.append('price', values.price);
+        formData.append('date', values.date);
+        if (values.purchesBillPhoto) {
+          formData.append('purchesBillPhoto', values.purchesBillPhoto);
+        }
+
         let response;
         if (editPurchase) {
-          try {
-            response = await axios.put(`${REACT_APP_BACKEND_URL}/canteen_inventory_purches/edit/${editPurchase._id}`, values);
-            if (response.status === 200) {
-              toast.success('Inventory Purchase Updated Successfully !!');
-            } else {
-              toast.error('Failed to update Inventory Purchase !!');
-            }
-          } catch (error) {
-            console.log('Error:', error);
-            toast.error('Something went wrong !!');
-          }
+          response = await axios.put(`${REACT_APP_BACKEND_URL}/canteen_inventory_purches/edit/${editPurchase._id}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          await handleApiResponse(response, 'UPDATE');
         } else {
-          try {
-            response = await axios.post(`${REACT_APP_BACKEND_URL}/canteen_inventory_purches/add/${hostelId}`, values);
-            if (response.status === 201) {
-              toast.success('Inventory Purchase Added Successfully !!');
-            } else {
-              toast.error('Failed to add Inventory Purchase !!');
-            }
-          } catch (error) {
-            console.log('Error:', error);
-            toast.error('Something went wrong !!');
-          }
+          response = await axios.post(`${REACT_APP_BACKEND_URL}/canteen_inventory_purches/add/${hostelId}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+          await handleApiResponse(response);
         }
 
         handleClose();
@@ -105,12 +124,19 @@ const PurchaseInventory = (props) => {
     }
   });
 
-  //For Reset Feilds When Add New
   useEffect(() => {
     if (open && !editPurchase) {
       formik.resetForm();
     }
   }, [open]);
+
+  useEffect(() => {
+    if (open && editPurchase) {
+      const fullPath = editPurchase.purchesBillPhoto || null;
+      const fileName = fullPath ? fullPath.replace('/images/', '') : null;
+      setExistingImgFile(fileName);
+    }
+  }, [open, editPurchase]);
 
   return (
     <div>
@@ -196,6 +222,25 @@ const PurchaseInventory = (props) => {
                   error={formik.touched.date && !!formik.errors.date}
                   helperText={formik.touched.date && formik.errors.date}
                 />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Attach Bill Photo / Payment Screenshot</FormLabel>
+
+                <input
+                  type="file"
+                  name="purchesBillPhoto"
+                  onChange={(event) => {
+                    formik.setFieldValue('purchesBillPhoto', event.currentTarget.files[0]);
+                  }}
+                />
+                {existingImgFile && !formik.values.purchesBillPhoto && <Typography>Current file: {existingImgFile}</Typography>}
+                {formik.values.purchesBillPhoto && formik.values.purchesBillPhoto.name && (
+                  <Typography>Selected file: {formik.values.purchesBillPhoto.name}</Typography>
+                )}
+                {formik.touched.purchesBillPhoto && formik.errors.purchesBillPhoto && (
+                  <FormHelperText error>{formik.errors.purchesBillPhoto}</FormHelperText>
+                )}
               </Grid>
             </Grid>
           </form>

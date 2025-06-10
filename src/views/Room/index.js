@@ -39,6 +39,7 @@ import { useTheme } from '@mui/material/styles';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import { useNavigate } from 'react-router-dom';
+import { handleApiResponse } from 'utils/common';
 
 const Room = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -102,8 +103,9 @@ const Room = () => {
           Authorization: `Bearer ${Cookies.get('Admin_Token')}`
         }
       });
-      setRoomData(response.data.result);
-      setTotalCount(response.data.totalRecodes);
+
+      const res = await handleApiResponse(response);
+      setRoomData(res?.data);
     } catch (error) {
       console.error('Error fetching room data:', error);
     }
@@ -128,12 +130,13 @@ const Room = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`${REACT_APP_BACKEND_URL}/room/deleteData/${deleteStudentId}`, {
+      const response = await axios.delete(`${REACT_APP_BACKEND_URL}/room/deleteData/${deleteStudentId}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get('Admin_Token')}`
         }
       });
 
+      await handleApiResponse(response, 'DELETE');
       setOpenDeleteDialog(false);
       fetchRoomsData(hostelId);
     } catch (error) {
@@ -153,7 +156,6 @@ const Room = () => {
   };
 
   const handleClickForBeds = (id) => {
-    console.log('on click handleClickForBeds :', id);
     navigate(`/dashboard/room/view_beds/${id}`);
   };
 

@@ -9,7 +9,6 @@ import Cookies from 'js-cookie';
 // ==============================|| SIDEBAR MENU LIST ||============================== //
 const MenuList = () => {
   const user = Cookies.get('Role');
-  console.log("user==>",user);
 
   const subAdminItems = menuItem.subAdmin.map((item) => {
     switch (item.type) {
@@ -39,12 +38,12 @@ const MenuList = () => {
     }
   });
 
-  
-
-  return<>
-  {user === 'Customer' && subAdminItems}
-  {user === 'SuperAdmin' && superAdminItems}
-  </>;
+  return (
+    <>
+      {user === 'Customer' && subAdminItems}
+      {user === 'SuperAdmin' && superAdminItems}
+    </>
+  );
 };
 
 export default MenuList;

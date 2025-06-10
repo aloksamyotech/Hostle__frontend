@@ -39,7 +39,7 @@ AllComplaints.propTypes = {
 };
 
 export default function AllComplaints({ title, subheader, chartColors, chartData, ...other }) {
-  console.log("chat",chartData);
+
   const theme = useTheme();
 
   const chartLabels = chartData.map((i) => i.label);

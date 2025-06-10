@@ -18,12 +18,12 @@ import MainLayout from 'layout/MainLayout';
 
 const AppRoutes = ({ role }) => {
   let routes;
-  console.log('role in app.js =>', role);
+ 
 
   if (role === 'Customer') {
     // routes = SubAdminRoutes.children;
     routes = [...SubAdminRoutes.children, ...BillRoute.children];
-    console.log('this is customer ==>', routes);
+  
   } else {
     routes = [{ path: '*', element: <Login /> }];
   }
@@ -60,7 +60,7 @@ const App = () => {
     checkToken();
   }, [token, role]);
 
-  console.log('token found in app.js =>', token, 'role ==>', role);
+ 
 
   return (
     <StyledEngineProvider injectFirst>

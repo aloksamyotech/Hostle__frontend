@@ -19,13 +19,14 @@ import axios from 'axios';
 import { useState } from 'react';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { toast } from 'react-toastify';
+import { handleApiResponse } from 'utils/common';
 
 const AddRoom = (props) => {
-  console.log('AddRoom props========>', props);
+
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const { open, handleClose, hostelId, rowData } = props;
 
-  console.log('edit rowData :', rowData);
+
 
   const [roomType, setRoomType] = useState([]);
   const [roomPhotos, setRoomPhotos] = useState([]);
@@ -43,7 +44,7 @@ const AddRoom = (props) => {
     validationSchema: rowData ? roomEditValidationSchema(rowData?.occupiedBeds) : roomValidationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
-      console.log('values :::::', values);
+     
       try {
         const formData = new FormData();
         formData.append('roomTypeId', values.roomTypeId);
@@ -66,14 +67,11 @@ const AddRoom = (props) => {
               }
             });
 
-            if (response.status === 200) {
-              toast.success('Room Details Updated Successfully !!');
-            } else {
-              toast.error('Failed to update room details !!');
-            }
+            const res = await handleApiResponse(response, 'UPDATE');
+           
           } catch (error) {
             console.log('Error:', error);
-            toast.error('Something went wrong !!');
+            // toast.error('Something went wrong !!');
           }
         } else {
           try {
@@ -82,12 +80,7 @@ const AddRoom = (props) => {
                 'Content-Type': 'multipart/form-data'
               }
             });
-
-            if (response.status === 201) {
-              toast.success('Room Details Add Successfully !!');
-            } else {
-              toast.error('Failed to add room details !!');
-            }
+            const res = await handleApiResponse(response);
           } catch (error) {
             console.log('Error:', error);
             toast.error('Something went wrong !!');
@@ -120,7 +113,8 @@ const AddRoom = (props) => {
   const fetchRoomTypesData = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/roomTypes/getall/${hostelId}`);
-      setRoomType(response?.data?.result);
+      const res = await handleApiResponse(response);
+      setRoomType(res?.data);
     } catch (error) {
       console.error('Error fetching Room Type Data:', error);
     }
@@ -193,7 +187,7 @@ const AddRoom = (props) => {
                   error={formik.touched.roomTypeId && !!formik.errors.roomTypeId}
                 >
                   <MenuItem value="">Select Room Type</MenuItem>
-                  {roomType.map((type) => (
+                  {roomType?.map((type) => (
                     <MenuItem key={type._id} value={type._id}>
                       {type.roomType} | {type.roomCategory}
                     </MenuItem>

@@ -59,8 +59,6 @@ const EditStudent = (props) => {
     // validationSchema: addReservedBedValidationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
-      console.log('this is student data ------------------>', values);
-
       const formData = new FormData();
       formData.append('studentName', values.studentName);
       formData.append('studentContact', values.studentContact);

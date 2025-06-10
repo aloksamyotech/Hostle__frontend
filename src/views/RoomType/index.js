@@ -36,6 +36,7 @@ import * as React from 'react';
 import AddRoomType from './AddRoomType';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
+import { handleApiResponse } from 'utils/common';
 
 const RoomType = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -83,7 +84,8 @@ const RoomType = () => {
   const fetchRoomTypesData = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/roomTypes/getall/${hostelId}`);
-      setRoomData(response.data.result);
+      const res = await handleApiResponse(response);
+      setRoomData(res?.data);
     } catch (error) {
       console.error('Error fetching room data:', error);
     }
@@ -107,7 +109,8 @@ const RoomType = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`${REACT_APP_BACKEND_URL}/roomTypes/delete/${rowData._id}`);
+      const response = await axios.delete(`${REACT_APP_BACKEND_URL}/roomTypes/delete/${rowData._id}`);
+      await handleApiResponse(response, 'DELETE');
       setOpenDeleteDialog(false);
       fetchRoomTypesData(hostelId);
       handleClose();
@@ -197,7 +200,7 @@ const RoomType = () => {
 
           <Stack direction="row" alignItems="center" spacing={2}>
             <Card>
-              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}  onClick={handleOpenAdd}>
+              <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
                 Add Room Type
               </Button>
             </Card>

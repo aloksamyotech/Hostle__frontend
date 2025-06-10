@@ -37,7 +37,7 @@ import axios from 'axios';
 const ChangePassword = (props) => {
   const { open, handleClose } = props;
   const user = JSON.parse(Cookies.get('user'));
-  console.log('chnage password ... ==>>', user);
+
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
   const [loading, setLoading] = useState(false);
@@ -63,11 +63,9 @@ const ChangePassword = (props) => {
     enableReinitialize: true,
     onSubmit: async (values) => {
       setLoading(true);
-      console.log('values of chnage password .... :::', values);
 
       try {
         const response = await axios.post(`${REACT_APP_BACKEND_URL}/hostel/change_password`, values);
-        console.log('change password response ===>', response);
 
         if (response.status === 200) {
           toast.success('Password updated successfully');

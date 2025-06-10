@@ -16,10 +16,10 @@ import axios from 'axios';
 import { productConsumeValidationSchema } from 'views/Validation/validationSchema';
 import moment from 'moment';
 import { ToastContainer, toast } from 'react-toastify';
+import { handleApiResponse } from 'utils/common';
 
 const ConsumptionInventory = (props) => {
   const { open, handleClose, hostelId, editConsumeProduct } = props;
-  console.log('props==>', props);
 
   const [allPurchaseProducts, setAllPurchaseProducts] = useState([]);
 
@@ -37,22 +37,22 @@ const ConsumptionInventory = (props) => {
     }
   }, [open, editConsumeProduct]);
 
-  //Get All Purchased Product Which Added
   useEffect(() => {
-    if (open) {
-      axios
-        .get(`${REACT_APP_BACKEND_URL}/canteen_inventory_purches/index/${hostelId}`)
-        .then((response) => {
-          console.log('Purchase Products ==>', response);
+    const fetchPurchaseProducts = async () => {
+      if (open) {
+        try {
+          const response = await axios.get(`${REACT_APP_BACKEND_URL}/canteen_inventory_purches/index/${hostelId}`);
+          const res = await handleApiResponse(response);
 
-          const ProductNames = response.data.result.map((product) => product['productName']);
-          console.log('==>', ProductNames);
+          const ProductNames = res?.data?.map((product) => product['productName']);
           setAllPurchaseProducts(ProductNames);
-        })
-        .catch((error) => {
+        } catch (error) {
           console.log('Product List is not Found!!', error);
-        });
-    }
+        }
+      }
+    };
+
+    fetchPurchaseProducts();
   }, [open]);
 
   const formik = useFormik({
@@ -63,24 +63,12 @@ const ConsumptionInventory = (props) => {
     },
     validationSchema: productConsumeValidationSchema,
     onSubmit: async (values) => {
-      console.log('Form is valid ====>', values);
-
       try {
         let response;
         if (editConsumeProduct) {
           try {
             response = await axios.put(`${REACT_APP_BACKEND_URL}/canteen_inventory_consume/edit/${editConsumeProduct._id}`, values);
-
-            if (response.status === 200) {
-              toast.success('Inventory Consume Updated Successfully !!');
-            } else {
-              if (response.status === 205) {
-                toast.error('Insufficient Consume Quantity');
-                console.log('Consume quantity cannot be greater than remaining or purchase quantity.');
-              } else {
-                toast.error('Failed to update Inventory Consume !!');
-              }
-            }
+            await handleApiResponse(response, 'UPDATE');
           } catch (error) {
             console.log('Found Error', error);
             toast.error('Error in Edit Consume Product');
@@ -88,17 +76,7 @@ const ConsumptionInventory = (props) => {
         } else {
           try {
             response = await axios.post(`${REACT_APP_BACKEND_URL}/canteen_inventory_consume/add/${hostelId}`, values);
-            console.log('response ====>', response);
-            if (response.status === 201) {
-              toast.success('Inventory Consume Added Successfully !!');
-            } else {
-              if (response.status === 205) {
-                toast.error('Insufficient Consume Quantity');
-                console.log('Consume quantity cannot be greater than remaining or purchase quantity.');
-              } else {
-                toast.error('Failed to Add Inventory Consume !!');
-              }
-            }
+            await handleApiResponse(response);
           } catch (error) {
             console.log('Found Error', error);
             toast.error('Error in Add Consume Product');

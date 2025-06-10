@@ -71,9 +71,8 @@ const FirebaseLogin = ({ ...others }) => {
         onSubmit={async (values, { setErrors, setStatus }) => {
           try {
             setIsSubmitting(true);
-            console.log('login values :', values);
+
             const response = await axios.post(`${REACT_APP_BACKEND_URL}/administrator/login`, values);
-            console.log('this is login response :: ========>', response);
 
             if (response?.data?.token) {
               Cookies.set('Token', response?.data?.token, { expires: 7 });

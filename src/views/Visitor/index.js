@@ -28,6 +28,7 @@ import * as React from 'react';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import { useNavigate } from 'react-router-dom';
+import { handleApiResponse } from 'utils/common';
 
 const Visitors = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -59,29 +60,28 @@ const Visitors = () => {
     }
     fetchVisitorData(HosId);
   }, []);
-  console.log('hostelId==>', hostelId);
 
   //Fetch Visitor's Data
   const fetchVisitorData = async (hostelId) => {
     try {
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/visitor/index/${hostelId}`);
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/visitor/index/${hostelId}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get('Admin_Token')}`
         }
       });
-      console.log('response===>', response);
-      setAllVisitors(response.data.result);
-      setTotalCount(response.data.totalRecodes);
+
+      const res = await handleApiResponse(response);
+      setAllVisitors(res?.data);
+
+      // setAllVisitors(response.data.result);
+      // setTotalCount(response.data.totalRecodes);
     } catch (error) {
       console.error('Error fetching visitors data:', error);
     }
   };
-  console.log('allVisitors ==================>', allVisitors);
 
   // Handle Pages
   const handleChangePage = (event, newPage) => {
-    console.log('New Page:', newPage);
     setPage(newPage);
   };
 

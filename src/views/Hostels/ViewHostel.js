@@ -38,7 +38,7 @@ const ViewHostel = () => {
     const fetchStudents = async () => {
       try {
         const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/getAllReservedStudents/${id}`);
-        console.log('this is in tab  student response -->', response);
+
         setStudents(response?.data?.data || []);
       } catch (error) {
         console.error('Error fetching students:', error);
@@ -172,7 +172,7 @@ const ViewHostel = () => {
       >
         <Stack direction="row" alignItems="center">
           <IconButton onClick={() => navigate('/superadmindashboard/default')}>
-            <HomeIcon color='primary'/>
+            <HomeIcon color="primary" />
           </IconButton>
           <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
           <IconButton onClick={() => navigate(`/superadmindashboard/hostel`)}>

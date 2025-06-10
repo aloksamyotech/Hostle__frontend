@@ -71,14 +71,12 @@ const WeeklyFoodMenu = () => {
     }
     fetchFoodMenuData(HosId);
   }, []);
-  console.log('hostelId==>', hostelId);
 
   //Fetch FoodMenu Data
   const fetchFoodMenuData = async (hostelId) => {
     try {
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/weeklyfoodmenu/index/${hostelId}`);
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/weeklyfoodmenu/index/${hostelId}`);
-      console.log('response===>', response);
+
       setAllFoodItem(response.data.result);
       setTotalCount(response.data.totalRecodes);
     } catch (error) {
@@ -88,16 +86,13 @@ const WeeklyFoodMenu = () => {
 
   //Handle Edit Action Here
   const handleEdit = (id) => {
-    console.log(`Edit clicked for ID: ${id}`);
     setOpenAdd(true);
     const foodmenu = allFoodItem.find((foodmenu) => foodmenu._id === id);
     setEditFoodItem(foodmenu);
   };
-  console.log('editFoodItem==>', editFoodItem);
 
   //Handle Delete Action Here
   const handleDelete = (id) => {
-    console.log(`Delete clicked for ID: ${id}`);
     setOpenDeleteDialog(true);
     setDeleteFoodId(id);
   };
@@ -108,9 +103,8 @@ const WeeklyFoodMenu = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/weeklyfoodmenu/delete/${deleteFoodId}`);
       let response = await axios.delete(`${REACT_APP_BACKEND_URL}/weeklyfoodmenu/delete/${deleteFoodId}`);
-      console.log('delete =====> response =====>', response);
+
       setOpenDeleteDialog(false);
       fetchFoodMenuData(hostelId);
     } catch (error) {
@@ -120,7 +114,6 @@ const WeeklyFoodMenu = () => {
 
   // Handle Pages
   const handleChangePage = (event, newPage) => {
-    console.log('New Page:', newPage);
     setPage(newPage);
   };
 

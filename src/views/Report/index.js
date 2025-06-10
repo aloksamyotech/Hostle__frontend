@@ -103,7 +103,6 @@ const Report = () => {
   const fetchPaymentData = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/student_payment/list/${hostelId}`);
-      console.log('this is payment report data : ----------------------------------->', response);
       setStudentPaymentData(response.data.result);
     } catch (error) {
       console.error('Error fetching payment data:', error);

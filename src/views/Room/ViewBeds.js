@@ -43,8 +43,6 @@ const ViewBeds = () => {
     }
   };
 
-  console.log('this is a one room data : ', roomData);
-
   const totalBeds = roomData?.noOfBeds || 0;
 
   const handleBack = () => {
@@ -58,8 +56,6 @@ const ViewBeds = () => {
   const handleBookBedClose = () => {
     setOpen(false);
   };
-
-  console.log('bedNo : -------->', bedNo);
 
   return (
     <>
@@ -100,7 +96,7 @@ const ViewBeds = () => {
               <Grid container spacing={2} sx={{ marginTop: '10px' }}>
                 {roomData?.beds?.map((bed, index) => {
                   const isOccupied = bed.status === 'occupied';
-                  console.log('isOccupied :', isOccupied);
+
                   return (
                     <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
                       <Paper

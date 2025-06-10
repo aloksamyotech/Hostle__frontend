@@ -18,7 +18,6 @@ import { toast } from 'react-toastify';
 
 const FoodMenu = (props) => {
   const { open, handleClose, hostelId, editFoodItem } = props;
-  console.log('props===>', props);
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -41,15 +40,12 @@ const FoodMenu = (props) => {
     },
     validationSchema: weeklyFoodValidationSchema,
     onSubmit: async (values) => {
-      console.log('Form is valid ====>', values);
-
       try {
         let response;
         if (editFoodItem) {
           try {
             response = await axios.put(`${REACT_APP_BACKEND_URL}/weeklyfoodmenu/edit/${editFoodItem._id}`, values);
             if (response.status === 200) {
-              console.log('Food Menu Edit Successfully !!');
               toast.success('Food Menu Edit Successfully !!');
             } else {
               console.error('Failed to edit data');
@@ -64,7 +60,6 @@ const FoodMenu = (props) => {
             response = await axios.post(`${REACT_APP_BACKEND_URL}/weeklyfoodmenu/add/${hostelId}`, values);
 
             if (response.status === 201) {
-              console.log('Food Menu Added Successfully !!');
               toast.success('Food Menu Added Successfully !!');
             } else {
               console.error('Failed to add foodmenu');
@@ -78,7 +73,6 @@ const FoodMenu = (props) => {
         handleClose();
         formik.resetForm();
       } catch (error) {
-        console.log('Found Error =>', error);
         toast.error('something went wrong !!');
       }
     }

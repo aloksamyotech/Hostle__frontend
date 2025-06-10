@@ -1,5 +1,24 @@
 import { useState } from 'react';
-import { Stack, Button, Container, Typography, Box, Card, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TablePagination } from '@mui/material';
+import {
+  Stack,
+  Button,
+  Container,
+  Typography,
+  Box,
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TablePagination
+} from '@mui/material';
 import Iconify from '../../ui-component/iconify';
 import TableStyle from '../../ui-component/TableStyle';
 import AddAdministrator from './AddAdministrator.js';
@@ -8,9 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect } from 'react';
 
-
 const Administrator = () => {
-
   const navigate = useNavigate();
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -20,82 +37,77 @@ const Administrator = () => {
   const [editAdmin, setEditAdmin] = useState(null);
   const [deleteAdminId, setDeleteAdminId] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
-  const [page, setPage] = useState(0); 
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-    useEffect(()=>{
-      fetchAdminData();
-    },[openAdd]);
+  useEffect(() => {
+    fetchAdminData();
+  }, [openAdd]);
 
-    //Get All Admin's Here
-    const fetchAdminData = async () => {
-      try{
-        const response = await axios.get(`${REACT_APP_BACKEND_URL}/administrator/list`);
-        console.log("response==>",response);
-        console.log("response.data.result==>",response.data.result);
-        console.log("response.data.totalRecodes==>",response.data.totalRecodes);
-        setAdminData(response.data.result);
-        setTotalCount(response.data.totalRecodes);
-      }catch(error){
-        console.error("Error fetching admin data:", error);
-      }
+  //Get All Admin's Here
+  const fetchAdminData = async () => {
+    try {
+      const response = await axios.get(`${REACT_APP_BACKEND_URL}/administrator/list`);
+      
+      setAdminData(response.data.result);
+      setTotalCount(response.data.totalRecodes);
+    } catch (error) {
+      console.error('Error fetching admin data:', error);
     }
+  };
 
-    //Nevigate On View Page
-    const handleNavigate = (id) => {
-      navigate(`/dashboard/administrator/view/${id}`);
-    };
+  //Nevigate On View Page
+  const handleNavigate = (id) => {
+    navigate(`/dashboard/administrator/view/${id}`);
+  };
 
-    const handleOpenAdd = () => {
-      setOpenAdd(true);
-      setEditAdmin(null);
-    };
+  const handleOpenAdd = () => {
+    setOpenAdd(true);
+    setEditAdmin(null);
+  };
 
-    const handleCloseAdd = () => setOpenAdd(false);
+  const handleCloseAdd = () => setOpenAdd(false);
 
-    // Handle Edit Action Here
-    const handleEdit = (id) => {
-      console.log(`Edit clicked for ID: ${id}`);
-      const admin = adminData.find(admin => admin._id === id);
-      console.log("set admin for edit=>",admin);
-      setOpenAdd(true);
-      setEditAdmin(admin);
-    };
-    console.log("editAdmin=>",editAdmin);
+  // Handle Edit Action Here
+  const handleEdit = (id) => {
+    const admin = adminData.find((admin) => admin._id === id);
 
-    // Handle Delete Action Here
-    const handleDelete = (id) => {
-      setOpenDeleteDialog(true);
-      console.log(`Delete clicked for ID: ${id}`);
-      setDeleteAdminId(id);
-    };
+    setOpenAdd(true);
+    setEditAdmin(admin);
+  };
 
-    const handleCloseDeleteDialog = () => {
+  // Handle Delete Action Here
+  const handleDelete = (id) => {
+    setOpenDeleteDialog(true);
+
+    setDeleteAdminId(id);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      let response = await axios.delete(`${REACT_APP_BACKEND_URL}/administrator/delete/${deleteAdminId}`);
+
       setOpenDeleteDialog(false);
-    };
+      fetchAdminData();
+    } catch (error) {
+      console.error('Error deleting admin:', error);
+    }
+  };
 
-    const handleConfirmDelete = async () => {
-      try {
-        let response = await axios.delete(`${REACT_APP_BACKEND_URL}/administrator/delete/${deleteAdminId}`);
-        console.log("response=>",response);
-        setOpenDeleteDialog(false);
-        fetchAdminData();
-      } catch (error) {
-        console.error("Error deleting admin:", error);
-      }
-    };
+  // Handle Pages
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
-    // Handle Pages
-    const handleChangePage = (event, newPage) => {
-      console.log("New Page:", newPage);
-      setPage(newPage); 
-    };
-
-    // Handle Rows PerPage
-    const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0); 
-    };
+  // Handle Rows PerPage
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <>
@@ -130,7 +142,7 @@ const Administrator = () => {
                         <TableCell>{row.hostelname}</TableCell>
                         <TableCell
                           style={{ cursor: 'pointer', textDecoration: 'underline', color: 'blue' }}
-                          onClick={() => handleNavigate(row._id)} 
+                          onClick={() => handleNavigate(row._id)}
                         >
                           {row.firstname} {row.lastname}
                         </TableCell>
@@ -138,15 +150,15 @@ const Administrator = () => {
                         <TableCell>{row.phonenumber}</TableCell>
                         <TableCell>{row.city}</TableCell>
                         <TableCell>
-                          <Stack direction="row" >
-                            <IconButton onClick={() => handleEdit(row._id)} aria-label="edit" style={{ color: 'green' }} >
+                          <Stack direction="row">
+                            <IconButton onClick={() => handleEdit(row._id)} aria-label="edit" style={{ color: 'green' }}>
                               <EditOutlined />
                             </IconButton>
                             <IconButton onClick={() => handleDelete(row._id)} aria-label="delete" style={{ color: 'red' }}>
                               <DeleteOutline />
                             </IconButton>
                           </Stack>
-                      </TableCell>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -166,22 +178,20 @@ const Administrator = () => {
       </Container>
 
       {/*-------------------- Dialog for Delete ----------------- */}
-    
+
       <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-      <DialogTitle variant="h4">Delete Administrator</DialogTitle>
-      <DialogContent>
-        <Typography variant="body2">
-          Are you sure you want to delete this administrator?
-        </Typography>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseDeleteDialog} variant="contained" color="primary">
-          Cancel
-        </Button>
-        <Button onClick={handleConfirmDelete} variant="contained" color="error">
-          Delete
-        </Button>
-      </DialogActions>
+        <DialogTitle variant="h4">Delete Administrator</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2">Are you sure you want to delete this administrator?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} variant="contained" color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} variant="contained" color="error">
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </>
   );

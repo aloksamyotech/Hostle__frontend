@@ -15,6 +15,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
 import { toast } from 'react-toastify';
+import { handleApiResponse } from 'utils/common';
 
 const AllExpenses = (props) => {
   const { open, handleClose, hostelId, editExpense } = props;
@@ -31,7 +32,7 @@ const AllExpenses = (props) => {
     },
     validationSchema: editExpense ? editExpenseValidationSchema : addExpenseValidationSchema,
     onSubmit: async (values) => {
-      console.log('Form is valid ====>', values);
+    
 
       const formData = new FormData();
       Object.keys(values).forEach((key) => {
@@ -52,13 +53,7 @@ const AllExpenses = (props) => {
               }
             });
 
-            if (response.status === 200) {
-              console.log("Expenditure's Edit Successfully !!");
-              toast.success("Expenditure's Edit Successfully !!");
-            } else {
-              console.error('Failed to edit data');
-              toast.error('Failed to edit data');
-            }
+            await handleApiResponse(response, 'UPDATE');
           } catch (error) {
             console.log('Error in edit Expense', error);
             toast.error('Error in edit Expense');
@@ -70,13 +65,7 @@ const AllExpenses = (props) => {
                 'Content-Type': 'multipart/form-data'
               }
             });
-            if (response.status === 201) {
-              console.log("Expenditure's Add Successfully !!");
-              toast.success("Expenditure's Add Successfully !!");
-            } else {
-              console.error('Failed to save data');
-              toast.error('Failed to save data');
-            }
+            await handleApiResponse(response);
           } catch (error) {
             console.log('Error in add Expense', error);
             toast.error('Error in add Expense');

@@ -35,6 +35,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import { useNavigate } from 'react-router-dom';
+import { handleApiResponse } from 'utils/common';
 
 const InventoryConsumption = () => {
   const [openAdd, setOpenAdd] = useState(false);
@@ -70,14 +71,15 @@ const InventoryConsumption = () => {
     }
     fetchConsumptionProducts(HosId);
   }, []);
-  
 
   const fetchConsumptionProducts = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/canteen_inventory_consume/index/${hostelId}`);
+      const res = await handleApiResponse(response);
      
-      setConsumeProducts(response.data.result);
-      setTotalCount(response.data.totalRecodes);
+      
+      setConsumeProducts(res?.data);
+      // setTotalCount(response.data.totalRecodes);
     } catch (error) {
       console.error('Error fetching consume inventory data:', error);
     }
@@ -85,7 +87,6 @@ const InventoryConsumption = () => {
 
   //Handle Edit Action Here
   const handleEdit = (id) => {
-  
     setOpenAdd(true);
 
     const product = allConsumeProducts.find((product) => product._id === id);
@@ -94,7 +95,6 @@ const InventoryConsumption = () => {
 
   //Handle Delete Action Here
   const handleDelete = (id) => {
-    
     setOpenDeleteDialog(true);
     setDeleteConsumeProduct(id);
   };
@@ -105,9 +105,8 @@ const InventoryConsumption = () => {
 
   const handleConfirmDelete = async () => {
     try {
-    
       let response = await axios.delete(`${REACT_APP_BACKEND_URL}/canteen_inventory_consume/delete/${deleteConsumeProduct}`);
-     
+      await handleApiResponse(response, 'DELETE');
       setOpenDeleteDialog(false);
       fetchConsumptionProducts(hostelId);
     } catch (error) {

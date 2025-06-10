@@ -140,6 +140,14 @@ const subdashboard = {
           url: '/dashboard/consume_inventory',
           icon: icons.IconMenu,
           breadcrumbs: false
+        },
+        {
+          id: '104',
+          title: 'Inventory Report',
+          type: 'item',
+          url: '/dashboard/inventory_report',
+          icon: icons.IconMenu,
+          breadcrumbs: false
         }
       ]
     },

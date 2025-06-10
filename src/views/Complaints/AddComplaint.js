@@ -17,6 +17,7 @@ import { useState, useEffect } from 'react';
 import moment from 'moment';
 import Cookies from 'js-cookie';
 import { ToastContainer, toast } from 'react-toastify';
+import { handleApiResponse } from 'utils/common';
 
 const AddComplaint = (props) => {
   const { open, handleClose, hostelId, editComplaint } = props;
@@ -27,6 +28,7 @@ const AddComplaint = (props) => {
   const fetchStudents = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
+
       const activeStudents = response.data.result.filter((item) => item.status === 'active');
       setStudentList(activeStudents);
     } catch (error) {
@@ -57,11 +59,12 @@ const AddComplaint = (props) => {
                 Authorization: `Bearer ${Cookies.get('Admin_Token')}`
               }
             });
-            if (response.status === 200) {
-              toast.success('Complaint Updated Successfully !!');
-            } else {
-              toast.error('Failed to update complaint !!');
-            }
+            await handleApiResponse(response, 'UPDATE');
+            // if (response.status === 200) {
+            //   toast.success('Complaint Updated Successfully !!');
+            // } else {
+            //   toast.error('Failed to update complaint !!');
+            // }
           } catch (error) {
             console.log('Error:', error);
             toast.error('Something went wrong !!');
@@ -74,11 +77,13 @@ const AddComplaint = (props) => {
               }
             });
 
-            if (response.status === 201) {
-              toast.success('Complaint Added Successfully !!');
-            } else {
-              toast.error('Failed to add complaint !!');
-            }
+            await handleApiResponse(response);
+
+            // if (response.status === 201) {
+            //   toast.success('Complaint Added Successfully !!');
+            // } else {
+            //   toast.error('Failed to add complaint !!');
+            // }
           } catch (error) {
             console.log('Error:', error);
             toast.error('Something went wrong !!');

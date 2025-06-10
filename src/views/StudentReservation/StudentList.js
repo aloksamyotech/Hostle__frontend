@@ -11,8 +11,7 @@ import AddNewReservation from './AddNewReservation';
 
 const StudentList = (props) => {
   const {studentData, totalCount, fetchReserveStudentData, hostelId  } = props;
-  console.log("props=====>",props);
-  console.log("in studentList =>", studentData, "==>",totalCount);
+
 
   const [page, setPage] = useState(0); 
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -34,7 +33,7 @@ const StudentList = (props) => {
 
     // Handle Pages
     const handleChangePage = (event, newPage) => {
-      console.log("New Page:", newPage);
+ 
       setPage(newPage); 
     };
 
@@ -46,24 +45,24 @@ const StudentList = (props) => {
 
     // Navigate On View Page
     const handleNavigate = (id) => {
-      console.log("_id==>",id);
-      // navigate(`/dashboard/student_reservation/view/${id}`);
+   
+      
       navigate(`/dashboard/student_reservation/view_profile/${id}`);
     };
 
     const handleEdit = (id) =>{
-      console.log("Id in Edit =>",id);
+   
       setOpenAdd(true);
 
       let student = studentData.find(student => student._id === id);
-      console.log("student =>", student);
+    
       setEditStudent(student);
       // setHostelId(hostelId);
     } 
 
     // Handle Delete Action Here
     const handleDelete = (id) => {
-      console.log(`Delete clicked for ID: ${id}`);
+   
       setOpenDeleteDialog(true);
       setDeleteStudentId(id)
     };
@@ -74,9 +73,9 @@ const StudentList = (props) => {
 
   const handleConfirmDelete = async () => {
     try {
-      console.log("URL =>",`${REACT_APP_BACKEND_URL}/sudent_reservation/deleteData/${deleteStudentId}`);
+    
       let response = await axios.delete(`${REACT_APP_BACKEND_URL}/sudent_reservation/deleteData/${deleteStudentId}`);
-      console.log("response for delete =====>",response);
+  
       setOpenDeleteDialog(false);
       fetchReserveStudentData(hostelid);
     } catch (error) {

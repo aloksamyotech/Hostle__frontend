@@ -44,7 +44,7 @@ const AddPayment = (props) => {
   const parts = pathname.split('/');
   const id = parts[parts.length - 1];
 
-  console.log('id student payment payment -------->', id);
+
 
   const fetchStudents = async (hostelId) => {
     try {

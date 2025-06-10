@@ -71,8 +71,6 @@ const PaymentList = () => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/student_payment/list/${hostelId}`);
       setStudentPaymentData(response.data.result);
-      console.log("this is setStudentPaymentData :::", response.data.result);
-      
     } catch (error) {
       console.error('Error fetching payment data:', error);
     }
@@ -246,10 +244,10 @@ const PaymentList = () => {
             variant="contained"
             onClick={(event) => handleOpenGenerateBill(event, params.row)}
             sx={{
-              backgroundColor: '#4CAF50', 
+              backgroundColor: '#4CAF50',
               color: '#fff',
               '&:hover': {
-                backgroundColor: '#45A049' 
+                backgroundColor: '#45A049'
               }
             }}
           >

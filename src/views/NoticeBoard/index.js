@@ -70,14 +70,14 @@ const NoticeBoard = () => {
     }
     fetchNotices(HosId);
   }, []);
-  console.log('hostelId=>', hostelId);
+
 
   //Fetching Data Here
   const fetchNotices = async (hostelId) => {
     try {
-      console.log('URL=>', `${REACT_APP_BACKEND_URL}/notice_board/index/${hostelId}`);
+   
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/notice_board/index/${hostelId}`);
-      console.log('response', response);
+      
       setAllNotices(response.data.result);
       setTotalCount(response.data.totalRecodes);
     } catch (error) {
@@ -87,7 +87,7 @@ const NoticeBoard = () => {
 
   //Handle Edit Action Here
   const handleEdit = (id) => {
-    console.log(`Edit clicked for ID: ${id}`);
+
     setOpenAdd(true);
     const notice = allNotice.find((notice) => notice._id === id);
     setEditNotice(notice);
@@ -95,7 +95,7 @@ const NoticeBoard = () => {
 
   //Handle Delete Action Here
   const handleDelete = (id) => {
-    console.log(`Delete clicked for ID: ${id}`);
+
     setOpenDeleteDialog(true);
     setDeleteNotice(id);
   };
@@ -106,9 +106,8 @@ const NoticeBoard = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/notice_board/delete/${deleteNoticeId}`);
       let response = await axios.delete(`${REACT_APP_BACKEND_URL}/notice_board/delete/${deleteNoticeId}`);
-      console.log('delete =====> response =====>', response);
+
       setOpenDeleteDialog(false);
       fetchNotices(hostelId);
     } catch (error) {
@@ -118,7 +117,6 @@ const NoticeBoard = () => {
 
   // Handle Pages
   const handleChangePage = (event, newPage) => {
-    console.log('New Page:', newPage);
     setPage(newPage);
   };
 

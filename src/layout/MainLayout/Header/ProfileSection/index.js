@@ -95,8 +95,6 @@ const ProfileSection = () => {
     fetchAdminData(HosId);
   }, [hostelId]);
 
-  console.log('profile login id =>', hostelId);
-
   const anchorRef = useRef(null);
 
   const handleLogout = async () => {
@@ -143,9 +141,8 @@ const ProfileSection = () => {
 
   const fetchAdminData = async (hostelId) => {
     try {
-      console.log('URL====>', `${REACT_APP_BACKEND_URL}/hostel/view/${hostelId}`);
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/hostel/view/${hostelId}`);
-      console.log('login response===>', response);
+
       setAdminData(response.data.result);
     } catch (error) {
       console.error('Error fetching enpenses data:', error);

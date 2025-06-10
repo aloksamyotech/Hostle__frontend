@@ -41,12 +41,10 @@ const Paymentslip = () => {
   const parts = pathname.split('/');
   const id = parts[parts.length - 1];
 
-  console.log('payment id navigate ::', id);
-
   const fetchPaymentDetails = async () => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/student_payment/paymentDataById/${id}`);
-      console.log('---------- Payment details : ------>', response);
+
       setPaymentData(response.data.payment);
       setRoomDetails(response.data.assignBed);
       setHostelDetails(response.data.hostelData);
@@ -74,7 +72,6 @@ const Paymentslip = () => {
         canvas.width = img.width;
         canvas.height = img.height;
         const ctx = canvas.getContext('2d');
-        console.log('ctx :', ctx);
 
         ctx.drawImage(img, 0, 0);
         resolve(canvas.toDataURL('image/png'));
@@ -174,8 +171,8 @@ const Paymentslip = () => {
       body: tableBody,
       theme: 'grid',
       headStyles: {
-        fillColor: [0, 0, 0], 
-        textColor: 255 
+        fillColor: [0, 0, 0],
+        textColor: 255
       },
       styles: {
         fontSize: 11,

@@ -46,24 +46,19 @@ const Dashboard = () => {
   //Fetch Dashboard Data----------------
   async function fetchDashboardData(hostelId) {
     try {
-      console.log('URL=>', `${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
       const resForStudent = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
-      console.log('hyyyyyyyyyyyyyy response for resForStudent ========>', resForStudent);
+
       setStudentCount(resForStudent.data.total_recodes);
 
-      console.log('URL=>', `${REACT_APP_BACKEND_URL}/room/index/${hostelId}`);
       const resForTotalRooms = await axios.get(`${REACT_APP_BACKEND_URL}/room/index/${hostelId}`);
-      console.log('response for resForTotalRooms -------========>', resForTotalRooms);
+
       setTotalRooms(resForTotalRooms.data.totalRecodes);
       setAvaRoomsCount(resForTotalRooms.data.availableRoomCount);
       setAvaBedsCount(resForTotalRooms.data.totalAvailableBeds);
 
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/expense/allexpenses/${hostelId}`);
       const responseForExpense = await axios.get(`${REACT_APP_BACKEND_URL}/expense/allexpenses/${hostelId}`);
-      console.log('response For Expense =======>', responseForExpense);
 
       const expensesData = responseForExpense.data.monthlyExpenses;
-      console.log('expensesData==>', expensesData);
 
       // Transform the data to the required format for the chart
       const transformedData = Object.keys(expensesData).map((month) => ({
@@ -71,14 +66,10 @@ const Dashboard = () => {
         value: expensesData[month]
       }));
       setMonthlyExpenses(transformedData);
-      console.log('transformedData==>', transformedData);
 
-      console.log('URL =>', `${REACT_APP_BACKEND_URL}/student_complaint/allComplaints/${hostelId}`);
       const resForAllComplaints = await axios.get(`${REACT_APP_BACKEND_URL}/student_complaint/allComplaints/${hostelId}`);
-      console.log('response for resForAllComplaints =======>', resForAllComplaints);
 
       const complaintData = resForAllComplaints.data.totalComplaints;
-      console.log('complaintData==>', complaintData);
 
       const transformedComplaintsData = Object.keys(complaintData).map((complaint) => ({
         label: complaint,
@@ -86,7 +77,6 @@ const Dashboard = () => {
       }));
 
       setAllComplaints(transformedComplaintsData);
-      console.log('transformedComplaintsData==>', transformedComplaintsData);
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
@@ -165,26 +155,9 @@ const Dashboard = () => {
         </Grid>
       </Grid>
 
-      {/* <Grid item xs={12}>
-        <Grid container spacing={gridSpacing}>
-          <Grid item xs={12} md={6} lg={6}>
-            <MonthlyExpenses title="Monthly Expense's" subheader="All Monthly Expenditures" chartData={monthlyExpenses} />
-          </Grid>
-          <Grid item xs={12} md={4} lg={6}>
-            <AllComplaints
-              title="Current Complaint's Status"
-              chartData={allComplaints}
-              chartColors={[theme.palette.primary.main, theme.palette.info.main, theme.palette.warning.main, theme.palette.error.main]}
-            />
-          </Grid>
-        </Grid>
-      </Grid> */}
-
       <Grid item xs={12}>
         <PendingFeeStudent />
       </Grid>
-
-     
     </Grid>
   );
 };

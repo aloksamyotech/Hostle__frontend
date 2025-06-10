@@ -14,10 +14,10 @@ import { useState, useEffect } from 'react';
 import ClearIcon from '@mui/icons-material/Clear';
 import { visitorValidationSchema } from 'views/Validation/validationSchema';
 import { toast } from 'react-toastify';
+import { handleApiResponse } from 'utils/common';
 
 const AddVisotor = (props) => {
   const { open, handleClose, hostelId } = props;
-  console.log('props===>', props);
 
   const [studentList, setStudentList] = useState([]);
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -25,6 +25,7 @@ const AddVisotor = (props) => {
   const fetchStudents = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
+
       const activeStudents = response.data.result.filter((item) => item.status === 'active');
       setStudentList(activeStudents);
     } catch (error) {
@@ -46,17 +47,16 @@ const AddVisotor = (props) => {
     },
     validationSchema: visitorValidationSchema,
     onSubmit: async (values) => {
-      console.log('Form values:==>', values);
-
       try {
         let response;
         response = await axios.post(`${REACT_APP_BACKEND_URL}/visitor/add/${hostelId}`, values);
+        await handleApiResponse(response);
 
-        if (response.status === 201) {
-          toast.success('visitor addes successfully!!');
-        } else {
-          toast.success('something went wront while added visitor');
-        }
+        // if (response.status === 201) {
+        //   toast.success('visitor addes successfully!!');
+        // } else {
+        //   toast.success('something went wront while added visitor');
+        // }
 
         handleClose();
         formik.resetForm();
@@ -142,7 +142,7 @@ const AddVisotor = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Visit Duration</FormLabel>
+                <FormLabel>Visit Duration (In Hours)</FormLabel>
                 <TextField
                   id="visitorduration"
                   name="visitorduration"

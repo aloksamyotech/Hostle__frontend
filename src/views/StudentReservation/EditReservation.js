@@ -32,8 +32,7 @@ import moment from 'moment';
 
 const EditReservation = (props) => {
   const { open, handleClose, rowData, hostelId } = props;
-  // console.log('EditReservation props :', props);
-  console.log('EditReservation rowData :', rowData);
+
 
   const [roomTypes, setRoomTypes] = useState([]);
   const [roomNumbers, setRoomNumbers] = useState([]);
@@ -61,11 +60,11 @@ const EditReservation = (props) => {
     validationSchema: editReservedBedValidationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
-      console.log('values ::::::::::: ===>', values);
+   
 
       try {
         const response = await axios.put(`${REACT_APP_BACKEND_URL}/sudent_reservation/update/${rowData?._id}/${hostelId}`, values);
-        console.log('------ edit response --------->', response);
+    
 
         if (response.status === 200) {
           toast.success('Bed details updated successfully !!');
@@ -127,7 +126,7 @@ const EditReservation = (props) => {
 
         const facilityFeePerMonth = foodFee + libraryFee;
         const totalRent = months * (roomRent + facilityFeePerMonth);
-        console.log('this is totalRent :', totalRent);
+     
         formik.setFieldValue('totalRent', totalRent);
         let total = totalRent - (formik.values.advanceAmount + formik.values.discount);
         formik.setFieldValue('finalTotalRent', total);
@@ -138,7 +137,7 @@ const EditReservation = (props) => {
 
         const totalRent = months * roomRent;
 
-        console.log('total rent :', totalRent);
+   
 
         formik.setFieldValue('totalRent', rowData?.totalRent);
         formik.setFieldValue('finalTotalRent', totalRent);

@@ -20,6 +20,7 @@ import Cookies from 'js-cookie';
 import { ToastContainer, toast } from 'react-toastify';
 import { roomTypeValidationSchema } from 'views/Validation/validationSchema';
 import { reset } from 'numeral';
+import { handleApiResponse } from 'utils/common';
 
 const AddRoomType = (props) => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -34,29 +35,19 @@ const AddRoomType = (props) => {
     enableReinitialize: true,
 
     onSubmit: async (values) => {
-      console.log('Form values ======>', values);
       try {
         let response;
         if (rowData) {
           try {
             response = await axios.put(`${REACT_APP_BACKEND_URL}/roomTypes/update/${rowData._id}`, values);
-            if (response.status === 200) {
-              toast.success('Room-Types Details Updated Successfully !!');
-            } else {
-              toast.error('Failed to update room type !!');
-            }
+            const res = await handleApiResponse(response, 'UPDATE');
           } catch (error) {
             console.log('Error:', error);
-            toast.error('Something went wrong !!');
           }
         } else {
           try {
             response = await axios.post(`${REACT_APP_BACKEND_URL}/roomTypes/add/${hostelId}`, values);
-            if (response.status === 201) {
-              toast.success('Room-Types Details Added Successfully !!');
-            } else {
-              toast.error('Failed to add room type !!');
-            }
+            const res = await handleApiResponse(response);
           } catch (error) {
             console.log('Error:', error);
             toast.error('Something went wrong !!');

@@ -35,8 +35,6 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 
 const UserProfile = (props) => {
-  console.log('this is UserProfile props :', props);
-
   const { open, handleClose } = props;
   const [hostelId, setHostelId] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -49,7 +47,7 @@ const UserProfile = (props) => {
   const fetchProfileData = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/hostel/view/${hostelId}`);
-      console.log('response for hostel profile data ========>', response);
+
       setUserData(response.data.result);
     } catch (error) {
       console.error('Error fetching hostel profile data:', error);
@@ -100,8 +98,6 @@ const UserProfile = (props) => {
     validationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
-      console.log('values :', values);
-
       try {
         const formData = new FormData();
         formData.append('hostelName', values.hostelName);
@@ -116,7 +112,6 @@ const UserProfile = (props) => {
         formData.append('aadharphoto', values.aadharphoto);
 
         const response = await axios.put(`${REACT_APP_BACKEND_URL}/hostel/edit/${userData._id}`, formData);
-        console.log(' profile update response ===>', response);
 
         if (response.status === 200) {
           toast.success('Profile updated successfully');
@@ -140,6 +135,36 @@ const UserProfile = (props) => {
       }
     }
   }, [open, userData]);
+
+  const handleImageChange = (event) => {
+    const file = event.currentTarget.files[0];
+    if (!file) return;
+
+    const img = new Image();
+    
+
+    const objectUrl = URL.createObjectURL(file);
+    img.src = objectUrl;
+
+    img.onload = () => {
+      const { width, height } = img;
+     
+
+      if (width <= 1000 && height <= 239) {
+        formik.setFieldValue('hostelphoto', file);
+        setHostelPhotoPreview(objectUrl);
+      } else {
+        toast.error('Image must be max 1000px width and 239px height');
+        event.target.value = null; 
+        setHostelPhotoPreview(null);
+      }
+    };
+
+    img.onerror = () => {
+      toast.error('Invalid image file.');
+      URL.revokeObjectURL(objectUrl);
+    };
+  };
 
   return (
     <div>
@@ -267,7 +292,7 @@ const UserProfile = (props) => {
                   />
                 </Grid>
 
-                <Grid item xs={12}>
+                {/* <Grid item xs={12}>
                   <FormLabel>Hostel Photo</FormLabel>
                   <TextField
                     id="hostelphoto"
@@ -280,6 +305,22 @@ const UserProfile = (props) => {
                       formik.setFieldValue('hostelphoto', file);
                       setHostelPhotoPreview(URL.createObjectURL(file));
                     }}
+                  />
+                  {hostelPhotoPreview && (
+                    <img src={hostelPhotoPreview} alt="Hostel Preview" style={{ marginTop: 8, maxHeight: 80, display: 'block' }} />
+                  )}
+                </Grid> */}
+
+                <Grid item xs={12}>
+                  <FormLabel>Hostel Photo</FormLabel>
+                  <TextField
+                    id="hostelphoto"
+                    name="hostelphoto"
+                    type="file"
+                    size="small"
+                    fullWidth
+                    inputProps={{ accept: 'image/*' }}
+                    onChange={handleImageChange}
                   />
                   {hostelPhotoPreview && (
                     <img src={hostelPhotoPreview} alt="Hostel Preview" style={{ marginTop: 8, maxHeight: 80, display: 'block' }} />

@@ -156,7 +156,7 @@ const ReservedBeds = (props) => {
       const facilityFeePerMonth = foodFee + libraryFee;
       const totalRent = months * (roomRent + facilityFeePerMonth);
 
-      console.log('calculate total rent :', totalRent);
+  
 
       formik.setFieldValue('totalRent', totalRent);
       formik.setFieldValue('finalTotalRent', totalRent);

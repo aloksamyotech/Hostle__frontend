@@ -38,7 +38,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
 import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
-
+import { handleApiResponse } from 'utils/common';
 
 const ResidentComplaints = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -74,35 +74,28 @@ const ResidentComplaints = () => {
     }
     fetchAllComplaint(HosId);
   }, []);
- 
 
   // Fetch All Complaints Here
   const fetchAllComplaint = async (hostelId) => {
     try {
-      
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/student_complaint/index/${hostelId}`, {});
-     
-      setAllComplaints(response.data.result);
-      setTotalCount(response.data.totalRecodes);
+      const res = await handleApiResponse(response);
+      setAllComplaints(res?.data);
     } catch (error) {
       console.error('Error fetching student data:', error);
     }
   };
-  
 
   // Handle Edit Action Here
   const handleEdit = (id) => {
-  
     setOpenAdd(true);
     let complaint = allComplaints.find((complaint) => complaint._id === id);
-  
+
     setEditComplaint(complaint);
   };
-  
 
   // Handle Delete Action Here
   const handleDelete = (id) => {
-   
     setOpenDeleteDialog(true);
     setDeleteStudentId(id);
   };
@@ -113,14 +106,12 @@ const ResidentComplaints = () => {
 
   const handleConfirmDelete = async () => {
     try {
-    
       let response = await axios.delete(`${REACT_APP_BACKEND_URL}/student_complaint/deleteData/${deleteStudentId}`, {
         headers: {
           Authorization: `Bearer ${Cookies.get('Admin_Token')}`
         }
       });
-    
-
+      await handleApiResponse(response, 'DELETE');
       setOpenDeleteDialog(false);
       fetchAllComplaint(hostelId);
     } catch (error) {
