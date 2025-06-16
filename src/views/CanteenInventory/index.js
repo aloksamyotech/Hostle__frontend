@@ -69,7 +69,6 @@ const CanteenInventory = () => {
     fetchInventory(hostelId);
   };
 
-  //Get Admin Obj Id Which is Seted In Cookies
   useEffect(() => {
     const HosId = Cookies.get('_Id');
     if (HosId) {
@@ -89,7 +88,6 @@ const CanteenInventory = () => {
     }
   };
 
-  // Handle view action here
   const handleEdit = (id) => {
     setOpenAdd(true);
     let inventory = allInventory.find((inventory) => inventory._id === id);
@@ -97,7 +95,6 @@ const CanteenInventory = () => {
     setEditInventory(inventory);
   };
 
-  // Handle view action here
   const handleDelete = (id) => {
     setOpenDeleteDialog(true);
     setDeleteInventoryId(id);
@@ -118,7 +115,6 @@ const CanteenInventory = () => {
     }
   };
 
-  // Handle Pages
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -145,7 +141,7 @@ const CanteenInventory = () => {
 
         if (response.status === 200) {
           handleCloseImportModal();
-          toast.success('Inventory Updated Successfully !!');
+          toast.success(response.status.message.message);
           fetchInventory(hostelId);
         } else {
           console.error('Failed to import items');

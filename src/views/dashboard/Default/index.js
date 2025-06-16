@@ -52,9 +52,9 @@ const Dashboard = () => {
 
       const resForTotalRooms = await axios.get(`${REACT_APP_BACKEND_URL}/room/index/${hostelId}`);
 
-      setTotalRooms(resForTotalRooms.data.totalRecodes);
-      setAvaRoomsCount(resForTotalRooms.data.availableRoomCount);
-      setAvaBedsCount(resForTotalRooms.data.totalAvailableBeds);
+      setTotalRooms(resForTotalRooms?.data?.additionaData?.total_records);
+      setAvaRoomsCount(resForTotalRooms?.data?.additionaData?.availableRoomCount);
+      setAvaBedsCount(resForTotalRooms?.data?.additionaData?.totalAvailableBeds);
 
       const responseForExpense = await axios.get(`${REACT_APP_BACKEND_URL}/expense/allexpenses/${hostelId}`);
 

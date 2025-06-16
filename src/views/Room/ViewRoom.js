@@ -29,7 +29,8 @@ const ViewRoom = () => {
     const fetchRoomDetails = async () => {
       try {
         const response = await axios.get(`${REACT_APP_BACKEND_URL}/room/view/${id}`);
-        setRoomDetails(response.data.result);
+
+        setRoomDetails(response.data.data);
       } catch (error) {
         console.error('Error fetching reserved student details:', error);
       }

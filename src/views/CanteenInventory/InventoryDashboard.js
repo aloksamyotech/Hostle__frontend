@@ -16,14 +16,6 @@ const inventoryData = [
   { productName: 'Spices', purchased: 80, consumed: 50, remaining: 30 }
 ];
 
-// useEffect(() => {
-//   const fetchReportsData = async () => {
-//     const response = await axios.get(`${REACT_APP_BACKEND_URL}/canteen_inventory/inventoryReport`);
-//     console.log('Response from API:', response.data);
-//   };
-//   fetchReportsData();
-// }, []);
-
 export default function InventoryDashboard() {
   const theme = useTheme();
   const [tab, setTab] = useState(0);
@@ -35,15 +27,16 @@ export default function InventoryDashboard() {
   useEffect(() => {
     const fetchReportsData = async () => {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/canteen_inventory/inventoryReport`);
-      console.log('Response from API:', response.data.inventoryData);
+
       setReportData(response?.data?.inventoryData);
     };
     fetchReportsData();
   }, []);
 
+
   return (
     <Box sx={{ p: 2 }}>
-      <Typography variant="h5" sx={{ mb: 2 }}>
+      <Typography variant="h4" sx={{ mb: 2 }}>
         Canteen Inventory Dashboard
       </Typography>
 
@@ -54,7 +47,7 @@ export default function InventoryDashboard() {
       {tab === 0 && (
         <Card sx={{ mt: 3 }}>
           <CardContent>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h5" gutterBottom>
               All Products Inventory
             </Typography>
 

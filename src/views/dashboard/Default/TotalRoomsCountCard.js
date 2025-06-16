@@ -63,8 +63,9 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 
 // ===========================|| DASHBOARD DEFAULT - EARNING CARD ||=========================== //
 
-const TotalRoomsCountCard = ({ isLoading,totalRoomsCount }) => {
+const TotalRoomsCountCard = ({ isLoading, totalRoomsCount }) => {
   const theme = useTheme();
+ 
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -84,7 +85,6 @@ const TotalRoomsCountCard = ({ isLoading,totalRoomsCount }) => {
         <CardWrapper border={false} content={false}>
           <Box sx={{ p: 2.25 }}>
             <Grid container direction="column">
-
               {/* <Grid item>
                 <Grid container justifyContent="space-between">
                   <Grid item>
@@ -158,17 +158,17 @@ const TotalRoomsCountCard = ({ isLoading,totalRoomsCount }) => {
                   </Grid>
 
                   <Grid item>
-                    <DoorBackRoundedIcon fontSize="large" sx={{mr: 1, mt: 4, mb: 0.75}}/>
+                    <DoorBackRoundedIcon fontSize="large" sx={{ mr: 1, mt: 4, mb: 0.75 }} />
                   </Grid>
                 </Grid>
               </Grid>
 
               <Grid item sx={{ mb: 1.25 }}>
                 <Typography
-                 sx={{
-                  fontSize: '1rem',
-                  fontWeight: 500,
-                  color: theme.palette.primary[200]
+                  sx={{
+                    fontSize: '1rem',
+                    fontWeight: 500,
+                    color: theme.palette.primary[200]
                   }}
                 >
                   Total Rooms

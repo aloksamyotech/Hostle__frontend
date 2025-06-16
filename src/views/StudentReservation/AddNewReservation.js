@@ -140,7 +140,8 @@ const AddNewReservation = (props) => {
   const fetchRoomTypesData = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/roomTypes/getall/${hostelId}`);
-      setRoomTypes(response.data.result);
+
+      setRoomTypes(response.data.data);
     } catch (error) {
       console.error('Error fetching Room Type Data:', error);
     }
@@ -149,7 +150,8 @@ const AddNewReservation = (props) => {
   const fetchRoomData = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/room/index/${hostelId}`);
-      setRoomNumbers(response.data.result);
+
+      setRoomNumbers(response.data.data);
     } catch (error) {
       console.error('Error fetching Room Type Data:', error);
     }
