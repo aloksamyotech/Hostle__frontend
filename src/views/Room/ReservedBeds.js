@@ -38,6 +38,7 @@ const ReservedBeds = (props) => {
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const [originalFinalRent, setOriginalFinalRent] = useState();
+  const [typingTimeout, setTypingTimeout] = useState(0);
 
   const formik = useFormik({
     initialValues: {
@@ -71,7 +72,8 @@ const ReservedBeds = (props) => {
       courseOccupation: '',
       address: '',
       studentPhoto: '',
-      aadharPhoto: ''
+      aadharPhoto: '',
+      studentId: ''
     },
 
     validationSchema: addReservedBedValidationSchema,
@@ -103,6 +105,7 @@ const ReservedBeds = (props) => {
       formData.append('mailId', values.mailId);
       formData.append('courseOccupation', values.courseOccupation);
       formData.append('address', values.address);
+      formData.append('studentId', values.studentId);
 
       if (values.studentPhoto) {
         formData.append('studentPhoto', values.studentPhoto);
@@ -156,8 +159,6 @@ const ReservedBeds = (props) => {
       const facilityFeePerMonth = foodFee + libraryFee;
       const totalRent = months * (roomRent + facilityFeePerMonth);
 
-  
-
       formik.setFieldValue('totalRent', totalRent);
       formik.setFieldValue('finalTotalRent', totalRent);
       setOriginalFinalRent(totalRent);
@@ -193,6 +194,83 @@ const ReservedBeds = (props) => {
     formik.setFieldValue('finalTotalRent', newFinal >= 0 ? newFinal : originalFinalRent);
   };
 
+  const handleStudentContactChange = (e) => {
+    const value = e.target.value;
+
+    formik.setFieldValue('studentContact', value);
+    if (typingTimeout) clearTimeout(typingTimeout);
+    const timeout = setTimeout(() => {
+      // if (value.length === 10) {
+      //   fetchStudentData(value);
+      // }
+      fetchStudentData(value);
+    }, 500);
+
+    setTypingTimeout(timeout);
+  };
+
+  const fetchStudentData = async (contactNumber) => {
+    try {
+      const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/getStudentByContact/${contactNumber}`);
+
+      if (!response?.data?.data) {
+        // Reset only the student-related fields if student not found
+        formik.setValues({
+          ...formik.values,
+          studentContact: contactNumber, // keep the typed value
+          studentName: '',
+          fatherName: '',
+          fatherContact: '',
+          dob: '',
+          gender: '',
+          mailId: '',
+          courseOccupation: '',
+          address: '',
+          guardianName: '',
+          guardianContactNo: '',
+          guardiansAddress: '',
+          studentId: ''
+        });
+      } else {
+        const student = response.data.data;
+
+        // Populate form fields with student data
+        formik.setFieldValue('studentName', student.studentName);
+        formik.setFieldValue('fatherName', student.fatherName);
+        formik.setFieldValue('fatherContact', student.fatherContact);
+        formik.setFieldValue('dob', new Date(student.dob).toISOString().split('T')[0]);
+        formik.setFieldValue('gender', student.gender);
+        formik.setFieldValue('mailId', student.mailId);
+        formik.setFieldValue('courseOccupation', student.courseOccupation);
+        formik.setFieldValue('address', student.address);
+        formik.setFieldValue('guardianName', student.guardianName);
+        formik.setFieldValue('guardianContactNo', student.guardianContactNo);
+        formik.setFieldValue('guardiansAddress', student.guardiansAddress);
+        formik.setFieldValue('studentId', student._id);
+      }
+    } catch (error) {
+      console.error('Student not found or API error', error);
+
+      // Optional: Also reset student fields on error
+      formik.setValues({
+        ...formik.values,
+        studentContact: contactNumber,
+        studentName: '',
+        fatherName: '',
+        fatherContact: '',
+        dob: '',
+        gender: '',
+        mailId: '',
+        courseOccupation: '',
+        address: '',
+        guardianName: '',
+        guardianContactNo: '',
+        guardiansAddress: '',
+        studentId: ''
+      });
+    }
+  };
+
   return (
     <div>
       <Dialog open={open} onClose={handleClose} aria-labelledby="scroll-dialog-title" aria-describedby="scroll-dialog-description">
@@ -205,7 +283,13 @@ const ReservedBeds = (props) => {
         >
           <Typography variant="h6">Assign Bed to the Student</Typography>
           <Typography>
-            <ClearIcon onClick={handleClose} style={{ cursor: 'pointer' }} />
+            <ClearIcon
+              onClick={() => {
+                formik.resetForm();
+                handleClose();
+              }}
+              style={{ cursor: 'pointer' }}
+            />
           </Typography>
         </DialogTitle>
 
@@ -327,6 +411,9 @@ const ReservedBeds = (props) => {
                   name="stayMonths"
                   size="small"
                   fullWidth
+                  InputProps={{
+                    readOnly: true
+                  }}
                   value={formik.values.stayMonths}
                   onChange={formik.handleChange}
                   error={formik.touched.stayMonths && !!formik.errors.stayMonths}
@@ -477,6 +564,21 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
+                <FormLabel>Student Contact No.</FormLabel>
+                <TextField
+                  id="studentContact"
+                  name="studentContact"
+                  size="small"
+                  fullWidth
+                  value={formik.values.studentContact}
+                  // onChange={formik.handleChange}
+                  onChange={handleStudentContactChange}
+                  error={formik.touched.studentContact && !!formik.errors.studentContact}
+                  helperText={formik.touched.studentContact && formik.errors.studentContact}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={6}>
                 <FormLabel>Student Name</FormLabel>
                 <TextField
                   id="studentName"
@@ -487,20 +589,6 @@ const ReservedBeds = (props) => {
                   onChange={formik.handleChange}
                   error={formik.touched.studentName && !!formik.errors.studentName}
                   helperText={formik.touched.studentName && formik.errors.studentName}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Student Contact No.</FormLabel>
-                <TextField
-                  id="studentContact"
-                  name="studentContact"
-                  size="small"
-                  fullWidth
-                  value={formik.values.studentContact}
-                  onChange={formik.handleChange}
-                  error={formik.touched.studentContact && !!formik.errors.studentContact}
-                  helperText={formik.touched.studentContact && formik.errors.studentContact}
                 />
               </Grid>
 
@@ -568,7 +656,7 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Main ID</FormLabel>
+                <FormLabel>Email Id</FormLabel>
                 <TextField
                   id="mailId"
                   name="mailId"
@@ -713,7 +801,14 @@ const ReservedBeds = (props) => {
           <Button onClick={formik.handleSubmit} variant="contained" color="primary" type="submit">
             Save
           </Button>
-          <Button onClick={handleClose} variant="outlined" color="error">
+          <Button
+            onClick={() => {
+              formik.resetForm();
+              handleClose();
+            }}
+            variant="outlined"
+            color="error"
+          >
             Cancel
           </Button>
         </DialogActions>

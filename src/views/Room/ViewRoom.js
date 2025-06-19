@@ -118,11 +118,13 @@ const ViewRoom = () => {
               </Typography>
               <ImageList cols={3} rowHeight={164} gap={8}>
                 {roomDetail?.roomphoto?.length > 0 ? (
-                  roomDetail.roomphoto.map((image, index) => (
-                    <ImageListItem key={index}>
-                      <img src={`${REACT_APP_BACKEND_URL}${image}`} alt={`Room ${index + 1}`} style={{ width: '100%', height: 'auto' }} />
-                    </ImageListItem>
-                  ))
+                  roomDetail.roomphoto.map((image, index) => {
+                    return (
+                      <ImageListItem key={index}>
+                        <img src={`${REACT_APP_BACKEND_URL}${image}`} alt={`Room ${index + 1}`} style={{ width: '100%', height: 'auto' }} />
+                      </ImageListItem>
+                    );
+                  })
                 ) : (
                   <Typography>No images available</Typography>
                 )}

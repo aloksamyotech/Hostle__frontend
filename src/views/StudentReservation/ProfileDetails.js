@@ -306,9 +306,6 @@ const ProfileDetails = () => {
               <Tab label="Payment History" />
               <Tab label="Visitor History" />
             </Tabs>
-            <Button variant="contained" sx={{ marginLeft: 'auto' }} onClick={handleOpenPayment}>
-              Add Payment
-            </Button>
           </Box>
         </Box>
 

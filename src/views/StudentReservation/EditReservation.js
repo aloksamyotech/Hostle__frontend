@@ -33,7 +33,6 @@ import moment from 'moment';
 const EditReservation = (props) => {
   const { open, handleClose, rowData, hostelId } = props;
 
-
   const [roomTypes, setRoomTypes] = useState([]);
   const [roomNumbers, setRoomNumbers] = useState([]);
   const [selectedRoomData, setSelectedRoomData] = useState(null);
@@ -60,11 +59,8 @@ const EditReservation = (props) => {
     validationSchema: editReservedBedValidationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
-   
-
       try {
         const response = await axios.put(`${REACT_APP_BACKEND_URL}/sudent_reservation/update/${rowData?._id}/${hostelId}`, values);
-    
 
         if (response.status === 200) {
           toast.success('Bed details updated successfully !!');
@@ -84,7 +80,8 @@ const EditReservation = (props) => {
   const fetchRoomTypesData = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/roomTypes/getall/${hostelId}`);
-      setRoomTypes(response.data.result);
+
+      setRoomTypes(response.data.data);
     } catch (error) {
       console.error('Error fetching Room Type Data:', error);
     }
@@ -93,7 +90,8 @@ const EditReservation = (props) => {
   const fetchRoomData = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/room/index/${hostelId}`);
-      setRoomNumbers(response?.data?.result);
+
+      setRoomNumbers(response?.data?.data);
     } catch (error) {
       console.error('Error fetching Room Type Data:', error);
     }
@@ -105,8 +103,9 @@ const EditReservation = (props) => {
   }, [formik.values.roomCategory, formik.values.roomType]);
 
   useEffect(() => {
-    if (rowData?.roomNumber && roomNumbers.length) {
+    if (rowData?.roomNumber && roomNumbers?.length) {
       const room = roomNumbers.find((room) => room.roomNumber.toString() === rowData.roomNumber.toString());
+
       if (room) {
         setSelectedRoomData(room);
       }
@@ -117,6 +116,7 @@ const EditReservation = (props) => {
     const { startDate, endDate } = formik.values;
     if (startDate && endDate && selectedRoomData) {
       const months = monthDiffInclusive(startDate, endDate);
+
       formik.setFieldValue('stayMonths', months);
 
       if (selectedRoomData.roomNumber !== rowData?.roomNumber) {
@@ -126,7 +126,7 @@ const EditReservation = (props) => {
 
         const facilityFeePerMonth = foodFee + libraryFee;
         const totalRent = months * (roomRent + facilityFeePerMonth);
-     
+
         formik.setFieldValue('totalRent', totalRent);
         let total = totalRent - (formik.values.advanceAmount + formik.values.discount);
         formik.setFieldValue('finalTotalRent', total);
@@ -136,8 +136,6 @@ const EditReservation = (props) => {
         const roomRent = rowData?.finalTotalRent / rowData?.stayMonths || 0;
 
         const totalRent = months * roomRent;
-
-   
 
         formik.setFieldValue('totalRent', rowData?.totalRent);
         formik.setFieldValue('finalTotalRent', totalRent);

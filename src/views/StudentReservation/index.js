@@ -46,6 +46,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import ArrowBackIosNewRoundedIcon from '@mui/icons-material/ArrowBackIosNewRounded';
 import ChangeStatus from './ChangePassword';
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
+import AddPayment from 'views/Payment/AddPayment';
 
 const StudentReservation = () => {
   const [page, setPage] = useState(0);
@@ -63,9 +64,19 @@ const StudentReservation = () => {
   const [studentData, setStudentsData] = useState([]);
   const [openEdit, setOpenEdit] = useState(false);
   const [openChangePassword, setChangePassword] = useState(false);
+  const [openPayment, setOpenPayment] = useState(false);
 
   const navigate = useNavigate();
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
+  const handleOpenPayment = (row) => {
+    setRowData(row);
+    setOpenPayment(true);
+  };
+
+  const handleClosePayment = () => {
+    setOpenPayment(false);
+  };
 
   useEffect(() => {
     const Hos_Id = Cookies.get('_Id');
@@ -78,6 +89,7 @@ const StudentReservation = () => {
   const fetchStudents = async (hostelId) => {
     try {
       const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/getAllReservedStudents/${hostelId}`);
+
       setStudentsData(response?.data?.data);
     } catch (error) {
       console.error('Error fetching room data:', error);
@@ -182,7 +194,7 @@ const StudentReservation = () => {
       cellClassName: 'name-column--cell name-column--cell--capitalize',
       renderCell: (params) => {
         return (
-          <Box onClick={() => handleNavigate(params.row.studentId._id)} sx={{ cursor: 'pointer' }}>
+          <Box onClick={() => handleNavigate(params.row._id)} sx={{ cursor: 'pointer' }}>
             <Typography variant="body1" fontWeight="bold">
               {params.row.studentId?.studentName}
             </Typography>
@@ -238,6 +250,24 @@ const StudentReservation = () => {
       }
     },
     {
+      field: 'payment',
+      headerName: 'Payment',
+      flex: 1,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => handleOpenPayment(params.row)}
+          disabled={params.row.paymentStatus === 'paid'}
+        >
+          Pay
+        </Button>
+      )
+    },
+    {
       field: 'action',
       headerName: 'Action',
       flex: 1,
@@ -251,6 +281,7 @@ const StudentReservation = () => {
 
   return (
     <>
+      <AddPayment open={openPayment} handleClose={handleClosePayment} rowData={rowData} />
       <ChangeStatus open={openChangePassword} handleClose={handleCloseChangePassword} rowData={rowData} />
       <EditReservation open={openEdit} handleClose={handleCloseEdit} hostelId={hostelId} rowData={rowData} />
       <AddNewReservation open={openAdd} handleClose={handleCloseAdd} hostelId={hostelId} />

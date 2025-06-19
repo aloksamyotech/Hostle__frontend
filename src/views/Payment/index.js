@@ -284,13 +284,13 @@ const PaymentList = () => {
             <Typography variant="h5">Student Payments List</Typography>
           </Stack>
 
-          <Stack direction="row" alignItems="center" spacing={2}>
+          {/* <Stack direction="row" alignItems="center" spacing={2}>
             <Card>
               <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
                 Add Payment
               </Button>
             </Card>
-          </Stack>
+          </Stack> */}
         </Box>
 
         <TableStyle>

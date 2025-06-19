@@ -30,7 +30,7 @@ import Cookies from 'js-cookie';
 import { useLocation } from 'react-router-dom';
 
 const AddPayment = (props) => {
-  const { open, handleClose } = props;
+  const { open, handleClose, rowData } = props;
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -39,82 +39,11 @@ const AddPayment = (props) => {
   const [hostelId, setHostelId] = useState(null);
   const [remainingAmt, setRemainingAmt] = useState();
 
-  const location = useLocation();
-  const pathname = location.pathname;
-  const parts = pathname.split('/');
-  const id = parts[parts.length - 1];
-
-
-
-  const fetchStudents = async (hostelId) => {
-    try {
-      const response = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/index/${hostelId}`);
-      const activeStudents = response.data.result.filter((item) => item.status === 'active' && item.paymentStatus === 'pending');
-      setStudentList(activeStudents);
-    } catch (error) {
-      console.error('Error fetching room data:', error);
-    }
-  };
-
-  const handleStudentChange = async (studentId) => {
-    formik.setFieldValue('studentId', studentId);
-
-    try {
-      const res1 = await axios.get(`${REACT_APP_BACKEND_URL}/sudent_reservation/getStudent/${studentId}`);
-      const assignedData = res1.data.data;
-
-      const res2 = await axios.get(`${REACT_APP_BACKEND_URL}/student_payment/getRemaningData/${studentId}`);
-
-      const paymentData = res2.data?.result;
-
-      setPaymentData(paymentData);
-     
-
-      const totalRent = assignedData?.finalTotalRent || 0;
-      const remainingAmount = paymentData != null ? paymentData.remainingAmount : totalRent;
-      setRemainingAmt(remainingAmount);
-
-      formik.setValues({
-        ...formik.values,
-        studentId,
-        totalStayingMonth: assignedData?.stayMonths || '',
-        roomNo: assignedData?.roomNumber || '',
-        roomType: assignedData?.roomType || '',
-        bedNo: assignedData?.bedNumber || '',
-        roomRent: assignedData?.roomRent || '',
-        foodFee: assignedData?.foodFee || '',
-        libraryFee: assignedData?.libraryFee || '',
-        totalRent: assignedData?.totalRent || '',
-        advanceAmount: assignedData?.advanceAmount || '',
-        discount: assignedData?.discount || '',
-        finalTotalRent: assignedData?.finalTotalRent || '',
-        remainingAmount: remainingAmount
-      });
-    } catch (error) {
-      console.error('Error fetching student/payment data:', error);
-    }
-  };
-
-  useEffect(() => {
-    const Hos_Id = Cookies.get('_Id');
-    if (Hos_Id) {
-      setHostelId(Hos_Id);
-    }
-    if (id) {
-      formik.setFieldValue('studentId', id);
-      handleStudentChange(id);
-      fetchStudents(Hos_Id);
-    } 
-    // else {
-    //   fetchStudents(Hos_Id);
-    // }
-
-    
-  }, [open]);
-
   const formik = useFormik({
     initialValues: {
       studentId: '',
+      studentName: '',
+      reservationId: '',
       totalStayingMonth: '',
       roomNo: '',
       roomType: '',
@@ -136,13 +65,11 @@ const AddPayment = (props) => {
     onSubmit: async (values) => {
       try {
         const response = await axios.post(`${REACT_APP_BACKEND_URL}/student_payment/add/${hostelId}`, values);
-
         if (response.status === 201) {
           toast.success('Payment Details Added Successfully !!');
         } else {
           toast.error('Failed to Add Payment Details');
         }
-
         handleClose();
         formik.resetForm();
       } catch (error) {
@@ -153,14 +80,111 @@ const AddPayment = (props) => {
   });
 
   useEffect(() => {
-    const total = paymentdata?.remainingAmount ?? (parseFloat(formik.values.finalTotalRent) || 0);
     const paid = parseFloat(formik.values.paymentAmount) || 0;
-    const remaining = total - paid;
+    const remaining = (parseFloat(remainingAmt) || 0) - paid;
+    formik.setFieldValue('remainingAmount', remaining >= 0 ? remaining : 0);
+  }, [formik.values.paymentAmount, remainingAmt]);
 
-    formik.setFieldValue('remainingAmount', remaining);
-  
+  useEffect(() => {
+    const Hos_Id = Cookies.get('_Id');
+    if (Hos_Id) {
+      setHostelId(Hos_Id);
+    }
+  }, [open]);
 
-  }, [formik.values.paymentAmount]);
+  // useEffect(() => {
+  //   if (rowData) {
+  //     formik.setValues({
+  //       studentId: rowData.studentId?._id || '',
+  //       studentName: rowData.studentId?.studentName || '',
+  //       reservationId: rowData._id,
+  //       totalStayingMonth: rowData.stayMonths || '',
+  //       roomNo: rowData.roomNumber || '',
+  //       roomType: rowData.roomType || '',
+  //       bedNo: rowData.bedNumber || '',
+  //       roomRent: rowData.roomRent || '',
+  //       foodFee: rowData.foodFee || '',
+  //       libraryFee: rowData.libraryFee || '',
+  //       totalRent: rowData.totalRent || '',
+  //       advanceAmount: rowData.advanceAmount || '',
+  //       discount: rowData.discount || '',
+  //       finalTotalRent: rowData.finalTotalRent || '',
+  //       remainingAmount: rowData.finalTotalRent || '',
+  //       paymentMethod: '',
+  //       date: '',
+  //       paymentAmount: ''
+  //     });
+  //   }
+  // }, [rowData, open]);
+
+  useEffect(() => {
+    const fetchLatestPayment = async () => {
+      if (!rowData?._id) return;
+
+      try {
+        const response = await axios.get(`${REACT_APP_BACKEND_URL}/student_payment/latest-payment/${rowData._id}`);
+
+        const latest = response.data;
+
+        const remaining = parseFloat(latest.remainingAmount) || 0;
+
+        formik.setValues({
+          studentId: rowData.studentId?._id || '',
+          studentName: rowData.studentId?.studentName || '',
+          reservationId: rowData._id,
+          totalStayingMonth: rowData.stayMonths || '',
+          roomNo: rowData.roomNumber || '',
+          roomType: rowData.roomType || '',
+          bedNo: rowData.bedNumber || '',
+          roomRent: rowData.roomRent || '',
+          foodFee: rowData.foodFee || '',
+          libraryFee: rowData.libraryFee || '',
+          totalRent: rowData.totalRent || '',
+          advanceAmount: rowData.advanceAmount || '',
+          discount: rowData.discount || '',
+          finalTotalRent: rowData.finalTotalRent || '',
+          remainingAmount: remaining,
+          paymentMethod: '',
+          date: '',
+          paymentAmount: ''
+        });
+
+        setRemainingAmt(remaining);
+      } catch (error) {
+        // If 404 - no previous payment, treat as first payment
+        if (error.response?.status === 404) {
+          formik.setValues({
+            studentId: rowData.studentId?._id || '',
+            studentName: rowData.studentId?.studentName || '',
+            reservationId: rowData._id,
+            totalStayingMonth: rowData.stayMonths || '',
+            roomNo: rowData.roomNumber || '',
+            roomType: rowData.roomType || '',
+            bedNo: rowData.bedNumber || '',
+            roomRent: rowData.roomRent || '',
+            foodFee: rowData.foodFee || '',
+            libraryFee: rowData.libraryFee || '',
+            totalRent: rowData.totalRent || '',
+            advanceAmount: rowData.advanceAmount || '',
+            discount: rowData.discount || '',
+            finalTotalRent: rowData.finalTotalRent || '',
+            remainingAmount: rowData.finalTotalRent || '',
+            paymentMethod: '',
+            date: '',
+            paymentAmount: ''
+          });
+
+          setRemainingAmt(rowData.finalTotalRent || 0);
+        } else {
+          console.error('Failed to fetch latest payment:', error);
+        }
+      }
+    };
+
+    if (rowData && open) {
+      fetchLatestPayment();
+    }
+  }, [rowData, open]);
 
   return (
     <Dialog open={open} onClose={handleClose} aria-labelledby="add-payment-dialog-title">
@@ -177,24 +201,9 @@ const AddPayment = (props) => {
       <DialogContent dividers>
         <form onSubmit={formik.handleSubmit}>
           <Grid container spacing={2}>
-            {/* Select Student */}
             <Grid item xs={12} sm={6} md={6}>
-              <FormLabel>Select Student</FormLabel>
-              <Select
-                name="studentId"
-                value={formik.values.studentId}
-                onChange={(e) => handleStudentChange(e.target.value)}
-                size="small"
-                fullWidth
-              >
-               
-                
-                {studentList.map((student) => (
-                  <MenuItem key={student._id} value={student._id}>
-                    {student.studentName}
-                  </MenuItem>
-                ))}
-              </Select>
+              <FormLabel>Student</FormLabel>
+              <TextField name="studentName" value={formik.values.studentName} size="small" fullWidth disabled />
             </Grid>
 
             <Grid item xs={12} sm={6} md={6}>
@@ -202,43 +211,36 @@ const AddPayment = (props) => {
               <TextField name="totalStayingMonth" value={formik.values.totalStayingMonth} size="small" fullWidth disabled />
             </Grid>
 
-            {/* Room Number */}
             <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Room Number</FormLabel>
               <TextField name="roomNo" value={formik.values.roomNo} size="small" fullWidth disabled />
             </Grid>
 
-            {/* Room Type */}
             <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Room Type</FormLabel>
               <TextField name="roomType" value={formik.values.roomType} size="small" fullWidth disabled />
             </Grid>
 
-            {/* Bed Number */}
             <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Bed Number</FormLabel>
               <TextField name="bedNo" value={formik.values.bedNo} size="small" fullWidth disabled />
             </Grid>
 
-            {/* Room Rent */}
             <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Room Rent</FormLabel>
               <TextField name="roomRent" value={formik.values.roomRent} size="small" fullWidth disabled />
             </Grid>
 
-            {/* Food Fee */}
             <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Food Fee</FormLabel>
               <TextField name="foodFee" value={formik.values.foodFee} size="small" fullWidth disabled />
             </Grid>
 
-            {/* Library Fee */}
             <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Library Fee</FormLabel>
               <TextField name="libraryFee" value={formik.values.libraryFee} size="small" fullWidth disabled />
             </Grid>
 
-            {/* Total Rent */}
             <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Total Rent</FormLabel>
               <TextField name="totalRent" value={formik.values.totalRent} size="small" fullWidth disabled />
@@ -277,7 +279,6 @@ const AddPayment = (props) => {
               </FormControl>
             </Grid>
 
-            {/* Select Month */}
             <Grid item xs={12} sm={6} md={6}>
               <FormLabel>Date</FormLabel>
               <TextField
