@@ -84,7 +84,7 @@ const StudentReservation = () => {
       setHostelId(Hos_Id);
     }
     fetchStudents(Hos_Id);
-  }, [openAdd, openEdit]);
+  }, [openAdd, openEdit, openPayment]);
 
   const fetchStudents = async (hostelId) => {
     try {
@@ -304,7 +304,7 @@ const StudentReservation = () => {
               <HomeIcon color="primary" />
             </IconButton>
             <ArrowBackIosNewRoundedIcon sx={{ transform: 'rotate(180deg)', fontSize: '18px', color: 'black', mr: 1 }} />
-            <Typography variant="h5">Student List</Typography>
+            <Typography variant="h5">Student Reservation List</Typography>
           </Stack>
 
           <Stack direction="row" alignItems="center" spacing={2}>

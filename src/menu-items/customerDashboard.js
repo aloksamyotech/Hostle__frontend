@@ -19,6 +19,7 @@ import {
   IconReceipt,
   IconUserPlus
 } from '@tabler/icons';
+// import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
 
 // constant
 const icons = {
@@ -88,15 +89,22 @@ const subdashboard = {
     },
     {
       id: '05',
+      title: 'Student Management',
+      type: 'item',
+      url: '/dashboard/students',
+      icon: icons.IconUserPlus,
+      breadcrumbs: false
+    },
+    {
+      id: '06',
       title: 'Report',
       type: 'item',
       url: '/dashboard/report',
       icon: icons.IconCategory,
       breadcrumbs: false
     },
-
     {
-      id: '06',
+      id: '07',
       title: 'Student Complaints',
       type: 'item',
       url: '/dashboard/complaints',
@@ -104,7 +112,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '07',
+      id: '08',
       title: 'Visitor Details',
       type: 'item',
       url: '/dashboard/visitor',
@@ -112,13 +120,13 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '08',
+      id: '09',
       title: 'Inventory',
       type: 'collapse',
       icon: icons.IconCategory,
       children: [
         {
-          id: '101',
+          id: '901',
           title: 'Canteen Inventory',
           type: 'item',
           url: '/dashboard/canteen_inventory',
@@ -126,7 +134,7 @@ const subdashboard = {
           breadcrumbs: false
         },
         {
-          id: '102',
+          id: '902',
           title: 'Purchase Inventory',
           type: 'item',
           url: '/dashboard/purches_inventory',
@@ -134,7 +142,7 @@ const subdashboard = {
           breadcrumbs: false
         },
         {
-          id: '103',
+          id: '903',
           title: 'Consume Inventory',
           type: 'item',
           url: '/dashboard/consume_inventory',
@@ -142,7 +150,7 @@ const subdashboard = {
           breadcrumbs: false
         },
         {
-          id: '104',
+          id: '904',
           title: 'Inventory Report',
           type: 'item',
           url: '/dashboard/inventory_report',
@@ -153,7 +161,7 @@ const subdashboard = {
     },
 
     {
-      id: '09',
+      id: '10',
       title: "Expenditure's",
       type: 'item',
       url: '/dashboard/expenditures',
@@ -161,7 +169,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '10',
+      id: '11',
       title: 'Notice Board',
       type: 'item',
       url: '/dashboard/notice_board',
@@ -169,7 +177,7 @@ const subdashboard = {
       breadcrumbs: false
     },
     {
-      id: '11',
+      id: '12',
       title: 'Weekly Food Menu',
       type: 'item',
       url: '/dashboard/weekly_foodmenu',

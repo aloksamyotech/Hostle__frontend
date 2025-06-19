@@ -10,7 +10,7 @@ import { Typography } from '@mui/material';
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 const Administrator = Loadable(lazy(() => import('views/Administrator')));
 const ViewAdministrator = Loadable(lazy(() => import('views/Administrator/ViewAdministrator')));
-const Student = Loadable(lazy(() => import('views/Student')));
+
 const ViewStudent = Loadable(lazy(() => import('views/Student/ViewStudent')));
 const Complaints = Loadable(lazy(() => import('views/Complaints')));
 const Hostel = Loadable(lazy(() => import('views/Hostels')));
@@ -38,6 +38,7 @@ const InventoryReport = Loadable(lazy(() => import('views/CanteenInventory/Inven
 
 const ViewBeds = Loadable(lazy(() => import('views/Room/ViewBeds')));
 import Report from 'views/Report';
+const Student = Loadable(lazy(() => import('views/Student')));
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -211,6 +212,15 @@ const SubAdminRoutes = {
         {
           path: 'payments',
           element: <Payment />
+        }
+      ]
+    },
+    {
+      path: 'dashboard',
+      children: [
+        {
+          path: 'students',
+          element: <Student />
         }
       ]
     }
