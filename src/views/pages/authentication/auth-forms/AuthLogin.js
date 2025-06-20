@@ -75,7 +75,7 @@ const FirebaseLogin = ({ ...others }) => {
             const response = await axios.post(`${REACT_APP_BACKEND_URL}/administrator/login`, values);
 
             if (response?.data?.token) {
-              Cookies.set('Token', response?.data?.token, { expires: 7 });
+              Cookies.set('Token', response?.data?.token);
               Cookies.set('_Id', response?.data?.user._id);
               Cookies.set('Role', response?.data?.user.role);
               Cookies.set('user', JSON.stringify(response?.data?.user));
