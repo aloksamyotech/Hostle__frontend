@@ -89,7 +89,7 @@ const UserProfile = (props) => {
     address: userData ? userData.address : '',
     email: userData ? userData.email : '',
     hostelphoto: null,
-    aadharphoto: null
+    // aadharphoto: null
   };
 
   // Formik setup
@@ -109,7 +109,7 @@ const UserProfile = (props) => {
         formData.append('address', values.address);
 
         formData.append('hostelphoto', values.hostelphoto);
-        formData.append('aadharphoto', values.aadharphoto);
+        // formData.append('aadharphoto', values.aadharphoto);
 
         const response = await axios.put(`${REACT_APP_BACKEND_URL}/hostel/edit/${userData._id}`, formData);
 
@@ -130,9 +130,9 @@ const UserProfile = (props) => {
       if (userData.hostelphoto && !hostelPhotoPreview) {
         setHostelPhotoPreview(`${REACT_APP_BACKEND_URL}${userData.hostelphoto}`);
       }
-      if (userData.aadharphoto && !aadharPhotoPreview) {
-        setAadharPhotoPreview(`${REACT_APP_BACKEND_URL}${userData.aadharphoto}`);
-      }
+      // if (userData.aadharphoto && !aadharPhotoPreview) {
+      //   setAadharPhotoPreview(`${REACT_APP_BACKEND_URL}${userData.aadharphoto}`);
+      // }
     }
   }, [open, userData]);
 
@@ -327,24 +327,7 @@ const UserProfile = (props) => {
                   )}
                 </Grid>
 
-                <Grid item xs={12}>
-                  <FormLabel>Aadhar Card Photo</FormLabel>
-                  <TextField
-                    id="aadharphoto"
-                    name="aadharphoto"
-                    type="file"
-                    size="small"
-                    fullWidth
-                    onChange={(event) => {
-                      const file = event.currentTarget.files[0];
-                      formik.setFieldValue('aadharphoto', file);
-                      setAadharPhotoPreview(URL.createObjectURL(file));
-                    }}
-                  />
-                  {aadharPhotoPreview && (
-                    <img src={aadharPhotoPreview} alt="Aadhar Preview" style={{ marginTop: 8, maxHeight: 80, display: 'block' }} />
-                  )}
-                </Grid>
+               
               </Grid>
             </DialogContentText>
           </form>
