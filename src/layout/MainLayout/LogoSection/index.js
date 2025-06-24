@@ -45,18 +45,19 @@ const LogoSection = () => {
 
   const hostelId = Cookies.get('_Id');
 
-  const [logoUrl, setLogoUrl] = useState();
-  const baseUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
+  const [logoUrl, setLogoUrl] = useState(LogoMain);
+  const baseUrl = process.env.REACT_APP_BACKEND_URL || 'https://smarthostel.samyotech.in';
+  console.log(' baseUrl :', baseUrl);
 
   const fetchHotelData = async () => {
     try {
       const response = await axios.get(`${baseUrl}/hostel/view/${hostelId}`);
 
-      const imageUrl = response?.data?.result?.hostelphoto
-        ? `${process.env.REACT_APP_BACKEND_URL}${response?.data?.result?.hostelphoto}`
-        : LogoMain;
+      const photo = response?.data?.result?.hostelphoto;
+      const fullImageUrl = photo ? `${baseUrl}${photo}` : LogoMain;
+      console.log('fullImageUrl :', fullImageUrl);
 
-      setLogoUrl(imageUrl);
+      setLogoUrl(fullImageUrl);
     } catch (error) {
       console.log('Error fetching hotel data:', error);
     }
@@ -64,7 +65,7 @@ const LogoSection = () => {
 
   useEffect(() => {
     fetchHotelData();
-  }, [hostelId]);
+  }, []);
 
   return (
     <ButtonBase disableRipple>
@@ -79,7 +80,7 @@ const LogoSection = () => {
         }}
         onError={(e) => {
           e.target.onerror = null;
-          e.target.src = Logo;
+          e.target.src = LogoMain;
         }}
       />
     </ButtonBase>
