@@ -87,7 +87,9 @@ const AddVisotor = (props) => {
           <form onSubmit={formik.handleSubmit}>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Select Student</FormLabel>
+                <FormLabel>
+                  Select Student <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <Select name="studentId" value={formik.values.studentId} onChange={formik.handleChange} size="small" fullWidth>
                   {studentList.map((student) => (
                     <MenuItem key={student._id} value={student._id}>
@@ -98,7 +100,7 @@ const AddVisotor = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Visitor Name</FormLabel>
+                <FormLabel>Visitor Name <span style={{ color: 'red' }}>*</span>{' '}</FormLabel>
                 <TextField
                   id="visitorName"
                   name="visitorName"
@@ -112,7 +114,7 @@ const AddVisotor = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Contact No</FormLabel>
+                <FormLabel>Contact No <span style={{ color: 'red' }}>*</span>{' '}</FormLabel>
                 <TextField
                   id="phoneNumber"
                   name="phoneNumber"
@@ -127,7 +129,7 @@ const AddVisotor = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Date & Time</FormLabel>
+                <FormLabel>Date & Time <span style={{ color: 'red' }}>*</span>{' '}</FormLabel>
                 <TextField
                   id="dateTime"
                   name="dateTime"
@@ -142,7 +144,7 @@ const AddVisotor = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Visit Duration (In Hours)</FormLabel>
+                <FormLabel>Visit Duration (In Hours) <span style={{ color: 'red' }}>*</span>{' '}</FormLabel>
                 <TextField
                   id="visitorduration"
                   name="visitorduration"

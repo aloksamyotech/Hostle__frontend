@@ -373,7 +373,9 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Start Date</FormLabel>
+                <FormLabel>
+                  Start Date <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="startDate"
                   name="startDate"
@@ -389,7 +391,9 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>End Date</FormLabel>
+                <FormLabel>
+                  End Date <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="endDate"
                   name="endDate"
@@ -564,7 +568,9 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Student Contact No.</FormLabel>
+                <FormLabel>
+                  Student Contact No. <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="studentContact"
                   name="studentContact"
@@ -579,7 +585,9 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Student Name</FormLabel>
+                <FormLabel>
+                  Student Name <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="studentName"
                   name="studentName"
@@ -593,7 +601,9 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Fathers Name</FormLabel>
+                <FormLabel>
+                  Fathers Name <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="fatherName"
                   name="fatherName"
@@ -607,7 +617,9 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Fathers Contact No.</FormLabel>
+                <FormLabel>
+                  Fathers Contact No. <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="fatherContact"
                   name="fatherContact"
@@ -621,7 +633,9 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Date of Birth</FormLabel>
+                <FormLabel>
+                  Date of Birth <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="dob"
                   name="dob"
@@ -637,7 +651,9 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Gender</FormLabel>
+                <FormLabel>
+                  Gender <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="gender"
                   name="gender"
@@ -656,7 +672,9 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Email Id</FormLabel>
+                <FormLabel>
+                  Email Id <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="mailId"
                   name="mailId"
@@ -684,7 +702,9 @@ const ReservedBeds = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={12} md={12}>
-                <FormLabel>Full Address</FormLabel>
+                <FormLabel>
+                  Address <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="address"
                   name="address"

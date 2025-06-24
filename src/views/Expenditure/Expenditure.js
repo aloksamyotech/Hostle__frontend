@@ -32,8 +32,6 @@ const AllExpenses = (props) => {
     },
     validationSchema: editExpense ? editExpenseValidationSchema : addExpenseValidationSchema,
     onSubmit: async (values) => {
-    
-
       const formData = new FormData();
       Object.keys(values).forEach((key) => {
         if (key === 'billPhoto') {
@@ -114,7 +112,9 @@ const AllExpenses = (props) => {
           <form onSubmit={formik.handleSubmit}>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Expense Title</FormLabel>
+                <FormLabel>
+                  Expense Title <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="expenseTitle"
                   name="expenseTitle"
@@ -128,7 +128,9 @@ const AllExpenses = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Price</FormLabel>
+                <FormLabel>
+                  Price <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="price"
                   name="price"
@@ -143,7 +145,9 @@ const AllExpenses = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Date</FormLabel>
+                <FormLabel>
+                  Date <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="date"
                   name="date"

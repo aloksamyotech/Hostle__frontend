@@ -16,7 +16,6 @@ import { useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { handleApiResponse } from 'utils/common';
 
-
 const AddInventory = (props) => {
   const { open, handleClose, hostelId, editInventory } = props;
 
@@ -107,7 +106,9 @@ const AddInventory = (props) => {
           <form encType="multipart/form-data">
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Product Name</FormLabel>
+                <FormLabel>
+                  Product Name <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="productName"
                   name="productName"
@@ -121,7 +122,9 @@ const AddInventory = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Measurement</FormLabel>
+                <FormLabel>
+                  Measurement <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <Select
                   id="mesurment"
                   name="mesurment"

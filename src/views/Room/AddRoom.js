@@ -22,11 +22,8 @@ import { toast } from 'react-toastify';
 import { handleApiResponse } from 'utils/common';
 
 const AddRoom = (props) => {
-
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const { open, handleClose, hostelId, rowData } = props;
-
-
 
   const [roomType, setRoomType] = useState([]);
   const [roomPhotos, setRoomPhotos] = useState([]);
@@ -44,7 +41,6 @@ const AddRoom = (props) => {
     validationSchema: rowData ? roomEditValidationSchema(rowData?.occupiedBeds) : roomValidationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
-     
       try {
         const formData = new FormData();
         formData.append('roomTypeId', values.roomTypeId);
@@ -68,7 +64,6 @@ const AddRoom = (props) => {
             });
 
             const res = await handleApiResponse(response, 'UPDATE');
-           
           } catch (error) {
             console.log('Error:', error);
             // toast.error('Something went wrong !!');
@@ -170,7 +165,9 @@ const AddRoom = (props) => {
           <form onSubmit={formik.handleSubmit}>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Room Type</FormLabel>
+                <FormLabel>
+                  Room Type <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <Select
                   id="roomTypeId"
                   name="roomTypeId"
@@ -198,7 +195,9 @@ const AddRoom = (props) => {
 
               {/* Room Number Input */}
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Room Number</FormLabel>
+                <FormLabel>
+                  Room Number <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="roomNumber"
                   name="roomNumber"
@@ -212,7 +211,9 @@ const AddRoom = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>No of Beds</FormLabel>
+                <FormLabel>
+                  No of Beds <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="noOfBeds"
                   name="noOfBeds"
@@ -228,7 +229,9 @@ const AddRoom = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Room Price</FormLabel>
+                <FormLabel>
+                  Room Price <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="roomPrice"
                   name="roomPrice"

@@ -88,7 +88,10 @@ const AddRoomType = (props) => {
           <form onSubmit={formik.handleSubmit}>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Room Type</FormLabel>
+                <FormLabel>
+                  Room Type <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
+
                 <TextField
                   id="roomType"
                   name="roomType"
@@ -102,7 +105,9 @@ const AddRoomType = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Room Category</FormLabel>
+                <FormLabel>
+                  Room Category <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <Select
                   id="roomCategory"
                   name="roomCategory"

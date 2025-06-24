@@ -158,7 +158,9 @@ const PurchaseInventory = (props) => {
           <form>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Product List</FormLabel>
+                <FormLabel>
+                  Product List <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <Select
                   id="productName"
                   name="productName"
@@ -180,7 +182,9 @@ const PurchaseInventory = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Quantity</FormLabel>
+                <FormLabel>
+                  Quantity <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="quantity"
                   name="quantity"
@@ -195,7 +199,9 @@ const PurchaseInventory = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Price</FormLabel>
+                <FormLabel>
+                  Price <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="price"
                   name="price"
@@ -210,7 +216,9 @@ const PurchaseInventory = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Date & Time</FormLabel>
+                <FormLabel>
+                  Date & Time <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="date"
                   name="date"

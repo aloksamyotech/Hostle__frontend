@@ -105,7 +105,9 @@ const FoodMenu = (props) => {
           <form>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Weekdays</FormLabel>
+                <FormLabel>
+                  Weekdays <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <Select id="weekdays" name="weekdays" size="small" fullWidth value={formik.values.weekdays} onChange={formik.handleChange}>
                   <MenuItem value="Monday">Monday</MenuItem>
                   <MenuItem value="Tuesday">Tuesday</MenuItem>
@@ -119,7 +121,9 @@ const FoodMenu = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Food Type</FormLabel>
+                <FormLabel>
+                  Food Type <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <Select id="foodType" name="foodType" size="small" fullWidth value={formik.values.foodType} onChange={formik.handleChange}>
                   <MenuItem value="Breakfast">Breakfast</MenuItem>
                   <MenuItem value="Lunch">Lunch</MenuItem>
@@ -129,7 +133,9 @@ const FoodMenu = (props) => {
               </Grid>
 
               <Grid item xs={12}>
-                <FormLabel>Food Description</FormLabel>
+                <FormLabel>
+                  Food Description <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="foodDescription"
                   name="foodDescription"

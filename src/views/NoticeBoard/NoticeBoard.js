@@ -111,7 +111,9 @@ const Notices = (props) => {
           <form>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Notice Title</FormLabel>
+                <FormLabel>
+                  Notice Title <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="noticeTitle"
                   name="noticeTitle"
@@ -125,7 +127,9 @@ const Notices = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Date & Time</FormLabel>
+                <FormLabel>
+                  Date & Time <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="dateTime"
                   name="dateTime"
@@ -140,7 +144,9 @@ const Notices = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={12} md={12}>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>
+                  Description <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="description"
                   name="description"

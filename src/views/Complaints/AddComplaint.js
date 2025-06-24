@@ -119,7 +119,9 @@ const AddComplaint = (props) => {
           <form>
             <Grid container rowSpacing={3} columnSpacing={{ xs: 0, sm: 5, md: 4 }}>
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Select Student</FormLabel>
+                <FormLabel>
+                  Select Student <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <Select name="studentId" value={formik.values.studentId} onChange={formik.handleChange} size="small" fullWidth>
                   {studentList.map((student) => (
                     <MenuItem key={student._id} value={student._id}>
@@ -130,7 +132,9 @@ const AddComplaint = (props) => {
               </Grid>
 
               <Grid item xs={12} sm={6} md={6}>
-                <FormLabel>Date and Time</FormLabel>
+                <FormLabel>
+                  Date and Time <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="datetime"
                   name="datetime"
@@ -145,7 +149,9 @@ const AddComplaint = (props) => {
               </Grid>
 
               <Grid item xs={12}>
-                <FormLabel>Status</FormLabel>
+                <FormLabel>
+                  Status <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <Select
                   id="status"
                   name="status"
@@ -165,7 +171,9 @@ const AddComplaint = (props) => {
               </Grid>
 
               <Grid item xs={12}>
-                <FormLabel>Problem Description</FormLabel>
+                <FormLabel>
+                  Problem Description <span style={{ color: 'red' }}>*</span>{' '}
+                </FormLabel>
                 <TextField
                   id="problemDescription"
                   name="problemDescription"

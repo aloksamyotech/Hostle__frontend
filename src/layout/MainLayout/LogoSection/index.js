@@ -30,8 +30,8 @@ import { useEffect, useState } from 'react';
 import { ButtonBase } from '@mui/material';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import Logo from '../../../assets/images/hostelCRMLogo.png'
-
+import Logo from '../../../assets/images/hostelCRMLogo.png';
+import LogoMain from '../../../assets/images/admin-logo.png';
 
 const LogoSection = () => {
   // useEffect(() => {
@@ -54,8 +54,8 @@ const LogoSection = () => {
 
       const imageUrl = response?.data?.result?.hostelphoto
         ? `${process.env.REACT_APP_BACKEND_URL}${response?.data?.result?.hostelphoto}`
-        : Logo;
-      
+        : LogoMain;
+
       setLogoUrl(imageUrl);
     } catch (error) {
       console.log('Error fetching hotel data:', error);
