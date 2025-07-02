@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 const ViewRoom = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const IMGURL = process.env.REACT_APP_BACKEND_URL_IMG || REACT_APP_BACKEND_URL;
 
   const navigate = useNavigate();
   const [roomDetail, setRoomDetails] = useState(null);
@@ -121,7 +122,7 @@ const ViewRoom = () => {
                   roomDetail.roomphoto.map((image, index) => {
                     return (
                       <ImageListItem key={index}>
-                        <img src={`${REACT_APP_BACKEND_URL}${image}`} alt={`Room ${index + 1}`} style={{ width: '100%', height: 'auto' }} />
+                        <img src={`${IMGURL}${image}`} alt={`Room ${index + 1}`} style={{ width: '100%', height: 'auto' }} />
                       </ImageListItem>
                     );
                   })

@@ -53,6 +53,7 @@ const InventoryPurches = () => {
   const [rowData, setRowData] = useState();
 
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const IMGURL = process.env.REACT_APP_BACKEND_URL_IMG || REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
 
   const handleOpenAdd = () => {
@@ -182,7 +183,7 @@ const InventoryPurches = () => {
         const billPhoto = params.row.purchesBillPhoto;
         return billPhoto ? (
           <a
-            href={`${process.env.REACT_APP_BACKEND_URL}${billPhoto}`}
+            href={`${IMGURL}${billPhoto}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: '#1976d2', textDecoration: 'none' }}

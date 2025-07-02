@@ -42,6 +42,7 @@ import AddPayment from 'views/Payment/AddPayment';
 
 const ProfileDetails = () => {
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const IMGURL = process.env.REACT_APP_BACKEND_URL_IMG || REACT_APP_BACKEND_URL;
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
   const [studentPaymentData, setStudentPaymentData] = useState([]);
@@ -447,7 +448,7 @@ const ProfileDetails = () => {
                         <Typography variant="h6">Student Photo:</Typography>
                         <Typography style={{ color: 'black', marginTop: '7px' }}>
                           <a
-                            href={`${REACT_APP_BACKEND_URL}${profileData?.studentId?.aadharPhoto}`}
+                            href={`${IMGURL}${profileData?.studentId?.aadharPhoto}`}
                             target="_blank"
                             rel="noreferrer"
                             style={{ textDecoration: 'none' }}
@@ -462,7 +463,7 @@ const ProfileDetails = () => {
                         <Typography variant="h6">Aadhar Proof:</Typography>
                         <Typography style={{ color: 'black', marginTop: '7px' }}>
                           <a
-                            href={`${REACT_APP_BACKEND_URL}${profileData?.studentId?.aadharPhoto}`}
+                            href={`${IMGURL}${profileData?.studentId?.aadharPhoto}`}
                             target="_blank"
                             rel="noreferrer"
                             style={{ textDecoration: 'none' }}

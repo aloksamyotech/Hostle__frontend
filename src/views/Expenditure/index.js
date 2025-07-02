@@ -42,6 +42,7 @@ import { handleApiResponse } from 'utils/common';
 const Expenditure = () => {
   const navigate = useNavigate();
   const REACT_APP_BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+  const IMGURL = process.env.REACT_APP_BACKEND_URL_IMG || REACT_APP_BACKEND_URL;
 
   const [openAdd, setOpenAdd] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -82,9 +83,8 @@ const Expenditure = () => {
         }
       });
       const res = await handleApiResponse(response);
-     
+
       setAllExpenses(res?.data);
-      
     } catch (error) {
       console.error('Error fetching expenses data:', error);
     }
@@ -178,12 +178,7 @@ const Expenditure = () => {
       renderCell: (params) => {
         const billPhoto = params.row.billPhoto;
         return billPhoto ? (
-          <a
-            href={`${process.env.REACT_APP_BACKEND_URL}${billPhoto}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: '#1976d2', textDecoration: 'none' }}
-          >
+          <a href={`${IMGURL}${billPhoto}`} target="_blank" rel="noopener noreferrer" style={{ color: '#1976d2', textDecoration: 'none' }}>
             View Bill
           </a>
         ) : (
@@ -237,36 +232,6 @@ const Expenditure = () => {
             </Card>
           </Stack>
         </Box>
-
-        {/* <Stack direction="row" alignItems="center" mb={5} justifyContent="space-between">
-          <Typography variant="h3">All Expenditures</Typography>
-          <Stack direction="row" alignItems="center" justifyContent="flex-end" spacing={2}>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenAdd}>
-              Add New
-            </Button>
-            <TextField
-              label="Start Date"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-            <TextField
-              label="End Date"
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              InputLabelProps={{
-                shrink: true
-              }}
-            />
-            <Button variant="contained" onClick={handleFilter}>
-              Filter
-            </Button>
-          </Stack>
-        </Stack> */}
 
         <TableStyle>
           <Box width="100%">
